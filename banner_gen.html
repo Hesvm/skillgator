@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      width: 1376px;
+      height: 768px;
+      background: radial-gradient(circle at 50% -20%, #1e293b 0%, #0f172a 45%, #020617 100%);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      color: #0f172a;
+    }
+    
+    /* Background grid and glows */
+    .grid-pattern {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 85%);
+      pointer-events: none;
+    }
+
+    .ambient-glow-emerald {
+      position: absolute;
+      width: 650px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(16, 185, 129, 0.04) 55%, transparent 70%);
+      filter: blur(60px);
+      top: 40%;
+      left: 30%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .ambient-glow-blue {
+      position: absolute;
+      width: 650px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.20) 0%, rgba(99, 102, 241, 0.05) 55%, transparent 70%);
+      filter: blur(60px);
+      top: 45%;
+      left: 70%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* Top Headline Badge & Title */
+    .hero-header {
+      position: relative;
+      z-index: 20;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 9999px;
+      margin-bottom: 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    .badge-text {
+      color: #34d399;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hero-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    /* Floating Showcase Mockup Window */
+    .mockup-window {
+      position: relative;
+      z-index: 10;
+      width: 1180px;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 20px;
+      box-shadow: 
+        0 30px 80px -20px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* macOS Window Bar */
+    .window-header {
+      padding: 14px 22px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; border: 1px solid #e0443e; }
+    .dot-yellow { background: #ffbd2e; border: 1px solid #dea123; }
+    .dot-green { background: #27c93f; border: 1px solid #1aab29; }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 12px;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-badge {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: #059669;
+      background: #ecfdf5;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid #a7f3d0;
+    }
+
+    .header-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-pill {
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      padding: 5px 12px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header-pill.active {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    /* Window Body */
+    .window-body {
+      display: flex;
+      height: 380px;
+      background: #ffffff;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 250px;
+      padding: 16px 14px;
+      border-right: 1px solid #f1f5f9;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .search-mock {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-item {
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-item.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .sidebar-count {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* Cards Grid */
+    .main-grid {
+      flex: 1;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      background: #fcfcfd;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      position: relative;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .card-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: #059669;
+      background: #ecfdf5;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid #a7f3d0;
+    }
+    .card-tag.purple {
+      color: #7c3aed;
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+    }
+    .card-tag.amber {
+      color: #d97706;
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .card-footer {
+      width: 100%;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* Bottom Features Ribbon */
+    .banner-footer {
+      position: relative;
+      z-index: 20;
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 8px 24px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .banner-feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .feature-check {
+      color: #10b981;
+      font-size: 14px;
+    }
+
+    .dot-separator {
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-pattern"></div>
+  <div class="ambient-glow-emerald"></div>
+  <div class="ambient-glow-blue"></div>
+
+  <!-- Hero Header -->
+  <div class="hero-header">
+    <div class="badge-wrap">
+      <span class="badge-dot"></span>
+      <span class="badge-text">Next-Gen Local Agent Cockpit</span>
+    </div>
+    <div class="hero-title">
+      <span>🐊 Skillgator</span>
+      <span style="color:#64748b; font-weight:400;">—</span>
+      <span style="color:#f1f5f9;">Universal AI Agent & Skills Radar</span>
+    </div>
+    <div class="hero-subtitle">
+      Zero-config live discovery for Antigravity, Claude Code, Cursor, and MCP Ecosystems
+    </div>
+  </div>
+
+  <!-- Floating Mockup Window -->
+  <div class="mockup-window">
+    <div class="window-header">
+      <div style="display:flex; align-items:center;">
+        <div class="window-controls">
+          <span class="control-dot dot-red"></span>
+          <span class="control-dot dot-yellow"></span>
+          <span class="control-dot dot-green"></span>
+        </div>
+        <div class="brand-left">
+          <img src="assets/crocodile_3d.png" style="width: 28px; height: 28px; object-fit: contain;">
+          <span class="brand-title">Skillgator</span>
+          <span class="brand-badge">⚡ Live Radar</span>
+        </div>
+      </div>
+      
+      <div class="header-pills">
+        <span class="header-pill active">Cards</span>
+        <span class="header-pill">Table</span>
+        <span class="header-pill">🔥 Richness</span>
+        <span class="header-pill" style="color: #059669; background: #ecfdf5; border-color: #a7f3d0;">
+          <span style="width:6px; height:6px; background:#10b981; border-radius:50%; display:inline-block;"></span>
+          Live Stream
+        </span>
+      </div>
+    </div>
+
+    <div class="window-body">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="search-mock">
+          <span>Search skills & tools...</span>
+          <span style="font-family:'JetBrains Mono'; font-size:10px; background:#f1f5f9; padding:2px 4px; border-radius:4px;">⌘K</span>
+        </div>
+        <div class="sidebar-item active">
+          <span>All Items</span>
+          <span class="sidebar-count">222</span>
+        </div>
+        <div class="sidebar-item">
+          <span>Antigravity Skills</span>
+          <span class="sidebar-count">176</span>
+        </div>
+        <div class="sidebar-item">
+          <span>Claude Code</span>
+          <span class="sidebar-count">23</span>
+        </div>
+        <div class="sidebar-item">
+          <span>MCP Servers</span>
+          <span class="sidebar-count">17</span>
+        </div>
+        <div class="sidebar-item">
+          <span>CLI Tools</span>
+          <span class="sidebar-count">15</span>
+        </div>
+      </div>
+
+      <!-- Main Grid Cards -->
+      <div class="main-grid">
+        <div class="card">
+          <div class="card-icon"><img src="assets/thiings/book.png"></div>
+          <div class="card-title">persian-writing</div>
+          <span class="card-tag">⭐ Custom Skill</span>
+          <div class="card-footer">
+            <span>Antigravity</span>
+            <span>49 files</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon"><img src="assets/thiings/code.png"></div>
+          <div class="card-title">figma-console</div>
+          <span class="card-tag purple">134 methods</span>
+          <div class="card-footer">
+            <span>MCP Server</span>
+            <span>Active</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon"><img src="assets/thiings/crown.png"></div>
+          <div class="card-title">creator-intelligence</div>
+          <span class="card-tag amber">17 Dossiers</span>
+          <div class="card-footer">
+            <span>Creator OS</span>
+            <span>22 files</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon"><img src="assets/thiings/globe.png"></div>
+          <div class="card-title">seo-technical</div>
+          <span class="card-tag">Core Skill</span>
+          <div class="card-footer">
+            <span>Antigravity</span>
+            <span>Ready</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon"><img src="assets/thiings/robot.png"></div>
+          <div class="card-title">google-search-console</div>
+          <span class="card-tag purple">21 methods</span>
+          <div class="card-footer">
+            <span>MCP Server</span>
+            <span>Active</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon"><img src="assets/thiings/video.png"></div>
+          <div class="card-title">vidiq</div>
+          <span class="card-tag purple">69 methods</span>
+          <div class="card-footer">
+            <span>MCP Server</span>
+            <span>Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Features Ribbon -->
+  <div class="banner-footer">
+    <div class="banner-feature">
+      <span class="feature-check">✓</span>
+      <span>Zero-Config Auto-Discovery</span>
+    </div>
+    <div class="dot-separator"></div>
+    <div class="banner-feature">
+      <span class="feature-check">✓</span>
+      <span>Live Filesystem Stream</span>
+    </div>
+    <div class="dot-separator"></div>
+    <div class="banner-feature">
+      <span class="feature-check">✓</span>
+      <span>Recursive Skill Inspector</span>
+    </div>
+    <div class="dot-separator"></div>
+    <div class="banner-feature">
+      <span class="feature-check">✓</span>
+      <span>Bilingual LTR / RTL Support</span>
+    </div>
+  </div>
+</body>
+</html>

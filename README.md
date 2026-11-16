@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Skillgator Banner](docs/images/dashboard-grid.png)
+<img src="./docs/images/banner.png" alt="Skillgator Header Banner" width="100%" style="border-radius: 16px; margin-bottom: 24px;" />
 
 <p align="center">
   <strong>The open-source, zero-config real-time dashboard for discovering, inspecting, and managing AI Skills, MCP Servers, and Agent Tools.</strong>
