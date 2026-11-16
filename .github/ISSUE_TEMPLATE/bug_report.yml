@@ -1,0 +1,21 @@
+name: Bug Report
+description: Create a report to help us improve Skillgator
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report an issue!
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: macOS 15.0 / Ubuntu 24.04 / Windows 11
+    validations:
+      required: true
