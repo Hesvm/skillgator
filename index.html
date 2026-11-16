@@ -231,6 +231,15 @@
             <span id="count-clis" class="font-mono-code text-[11px] opacity-75">0</span>
           </button>
 
+          <button onclick="setTab('conflicts')" id="tab-conflicts" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-amber-700 hover:text-amber-900 hover:bg-amber-100/60">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base text-amber-600" icon-name="warning-2"></i>
+              <span id="txt-tab-conflicts">تداخل تریگرها (Conflicts)</span>
+            </div>
+            <span id="count-conflicts" class="font-mono-code text-[11px] bg-amber-200/80 text-amber-900 px-1.5 py-0.5 rounded-full font-bold">0</span>
+          </button>
+
         </nav>
       </div>
 
@@ -272,10 +281,19 @@
         <!-- فیلتر مرتب‌سازی -->
         <select id="sortOrder" onchange="renderItems()" class="bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 font-medium focus:outline-none focus:border-slate-400 cursor-pointer transition-colors">
           <option value="richness" selected>🔥 پربارترین</option>
+          <option value="tokens">📊 وزن توکن (Token Weight)</option>
           <option value="files">📂 تعداد فایل</option>
           <option value="recent">⏱️ آخرین تغییرات</option>
           <option value="name">🔤 الفبا</option>
         </select>
+      </div>
+
+      <!-- نشانگر وضعیت بار توکن کل سیستم (System Token Weight Indicator) -->
+      <div id="systemTokenBadge" class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100/80 border border-slate-200/70 text-slate-600 text-[11px]" title="تخمین کل بار توکن اسکیماها و پرامپت‌ها">
+        <i class="iconsax text-xs text-blue-500" icon-name="cpu-charge"></i>
+        <span>وزن کانتکست:</span>
+        <span id="systemTokenValue" dir="ltr" class="font-bold text-slate-900 font-mono-code">~0k</span>
+        <span class="text-[10px] text-slate-400 font-mono-code">tokens</span>
       </div>
 
 
@@ -307,6 +325,25 @@
               <!-- ردیف‌های جدول -->
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- نمای اختصاصی رادار تداخل تریگرها (Trigger Conflict Radar View) -->
+      <div id="conflictsView" class="hidden space-y-4">
+        <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+            <i class="iconsax text-lg" icon-name="warning-2"></i>
+          </div>
+          <div>
+            <h4 id="txt-conflicts-banner-title" class="text-xs font-bold text-amber-900">رادار شناسایی تداخل‌های تریگر و اسلش‌کامند</h4>
+            <p id="txt-conflicts-banner-desc" class="text-[11px] text-amber-700 mt-0.5">
+              کلمات کلیدی زیر توسط ۲ یا چند اسکیل مختلف رزرو شده‌اند. هوش مصنوعی هنگام مواجهه با این کلمات ممکن است دچار ابهام شده و اسکیل دیگری را به جای اسکیل مدنظر شما اجرا کند.
+            </p>
+          </div>
+        </div>
+
+        <div id="conflictsList" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- با جاوااسکریپت رندر می‌شود -->
         </div>
       </div>
 
@@ -352,6 +389,10 @@
 
         <!-- دکمه‌های عملیاتی هدر مدال -->
         <div class="flex items-center gap-2">
+          <button id="modalSyncBtn" onclick="syncCurrentItem()" class="hidden px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs transition-colors" title="همگام‌سازی مستقیم با Claude Desktop / Code">
+            <i class="iconsax text-sm" icon-name="refresh-2"></i>
+            <span id="txt-modal-sync-btn">سینک به Claude</span>
+          </button>
           <button onclick="openInEditor()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs transition-colors">
             <i class="iconsax text-sm" icon-name="code-1"></i>
             <span id="txt-modal-open-editor">باز کردن در ادیتور</span>
@@ -371,8 +412,8 @@
         <!-- ستون درخت فایل‌ها و متادیتا (Sidebar درون مدال) -->
         <div class="w-72 border-e border-slate-100 bg-slate-50/50 flex flex-col justify-between shrink-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
           
-          <!-- آمار فایل‌ها -->
-          <div id="modalMetrics" class="grid grid-cols-3 gap-1 p-2 bg-white rounded-xl border border-slate-200/70 text-center font-mono-code text-[11px]">
+          <!-- آمار فایل‌ها و تخمین بار توکن -->
+          <div id="modalMetrics" class="grid grid-cols-4 gap-1 p-2 bg-white rounded-xl border border-slate-200/70 text-center font-mono-code text-[11px]">
             <div>
               <div class="text-[10px] text-slate-400" id="txt-modal-size">حجم</div>
               <div id="modalSize" class="font-bold text-slate-800">-</div>
@@ -381,9 +422,13 @@
               <div class="text-[10px] text-slate-400" id="txt-modal-files">فایل‌ها</div>
               <div id="modalFiles" class="font-bold text-slate-800">-</div>
             </div>
-            <div>
+            <div class="border-e border-slate-100">
               <div class="text-[10px] text-slate-400" id="txt-modal-lines">خطوط</div>
               <div id="modalLines" class="font-bold text-slate-800">-</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-blue-500 font-bold" id="txt-modal-tokens">توکن</div>
+              <div id="modalTokens" class="font-bold text-blue-600">-</div>
             </div>
           </div>
 
@@ -469,32 +514,53 @@
     let currentModalTools = [];
     let currentViewMode = 'grid'; // 'grid' | 'table'
 
-    function initLiveStream() {
+    async function initLiveStream() {
       const liveStatus = document.getElementById('liveStatusText');
       const liveBadge = document.getElementById('liveBadge');
 
-      const evtSource = new EventSource('/api/stream');
+      // 1. Initial immediate fetch for instant zero-latency render
+      try {
+        const res = await fetch('/api/data');
+        if (res.ok) {
+          rawData = await res.json();
+          updateDashboard(rawData);
+          // Check if tab parameter is present in URL
+          const params = new URLSearchParams(window.location.search);
+          if (params.get('tab')) {
+            setTab(params.get('tab'));
+          }
+        }
+      } catch (e) {
+        console.error('Initial fetch failed', e);
+      }
 
-      evtSource.addEventListener('init', function(e) {
-        rawData = JSON.parse(e.data);
-        updateDashboard(rawData);
-      });
+      // 2. Real-time streaming for live updates
+      try {
+        const evtSource = new EventSource('/api/stream');
 
-      evtSource.addEventListener('update', function(e) {
-        rawData = JSON.parse(e.data);
-        updateDashboard(rawData);
-        showToast('اطلاعات با موفقیت به‌روزرسانی شد.');
-      });
+        evtSource.addEventListener('init', function(e) {
+          rawData = JSON.parse(e.data);
+          updateDashboard(rawData);
+        });
 
-      evtSource.onerror = function() {
-        liveStatus.innerText = 'قطع ارتباط';
-        liveBadge.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium';
-      };
+        evtSource.addEventListener('update', function(e) {
+          rawData = JSON.parse(e.data);
+          updateDashboard(rawData);
+          showToast('اطلاعات با موفقیت به‌روزرسانی شد.');
+        });
 
-      evtSource.onopen = function() {
-        liveStatus.innerText = 'زنده';
-        liveBadge.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium';
-      };
+        evtSource.onerror = function() {
+          liveStatus.innerText = 'قطع ارتباط';
+          liveBadge.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium';
+        };
+
+        evtSource.onopen = function() {
+          liveStatus.innerText = 'زنده';
+          liveBadge.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium';
+        };
+      } catch (err) {
+        console.error('EventSource error', err);
+      }
     }
 
     function showToast(msg) {
@@ -551,6 +617,7 @@
       const creatorOsCount = all.filter(i => i.suite === 'Creator OS' || (i.platform && i.platform.includes('Creator OS'))).length;
       const userCustomCount = all.filter(i => i.is_user_created).length;
       const mcpCount = (data.antigravity?.mcp?.length || 0) + (data.claude?.mcp?.length || 0);
+      const conflictsCount = stats.total_conflicts_count || (data.conflicts?.length || 0);
 
       const totalBadge = document.getElementById('totalBadge');
       if (totalBadge) totalBadge.innerText = (currentLanguage === 'en') ? `${all.length} items` : `${all.length} مورد`;
@@ -562,6 +629,15 @@
       document.getElementById('count-claude').innerText = claudeCount;
       document.getElementById('count-mcp').innerText = mcpCount;
       document.getElementById('count-clis').innerText = stats.total_clis || 0;
+      
+      const countConflictsEl = document.getElementById('count-conflicts');
+      if (countConflictsEl) countConflictsEl.innerText = conflictsCount;
+
+      // Update System Token Weight indicator
+      const totalTokens = stats.total_token_weight || 0;
+      const tokenDisplay = totalTokens > 1000 ? `~${Math.round(totalTokens / 1000)}k` : `~${totalTokens}`;
+      const systemTokenVal = document.getElementById('systemTokenValue');
+      if (systemTokenVal) systemTokenVal.innerText = tokenDisplay;
 
       renderItems();
     }
@@ -624,19 +700,90 @@
       return Array.from(dedupedMap.values());
     }
 
+    let currentModalItem = null;
+
     function setTab(tab) {
       currentTab = tab;
-      const tabs = ['all', 'creator-os', 'user-custom', 'antigravity', 'claude', 'mcp', 'clis'];
+      const tabs = ['all', 'creator-os', 'user-custom', 'antigravity', 'claude', 'mcp', 'clis', 'conflicts'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (!btn) return;
         if (t === tab) {
           btn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs";
         } else {
-          btn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50";
+          btn.className = t === 'conflicts'
+            ? "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-amber-700 hover:text-amber-900 hover:bg-amber-100/60"
+            : "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50";
         }
       });
-      renderItems();
+
+      const conflictsView = document.getElementById('conflictsView');
+      const grid = document.getElementById('cardsGrid');
+      const table = document.getElementById('tableView');
+      const empty = document.getElementById('emptyState');
+
+      if (tab === 'conflicts') {
+        grid.classList.add('hidden');
+        table.classList.add('hidden');
+        empty.classList.add('hidden');
+        conflictsView.classList.remove('hidden');
+        renderConflicts();
+      } else {
+        conflictsView.classList.add('hidden');
+        if (currentViewMode === 'grid') {
+          grid.classList.remove('hidden');
+          table.classList.add('hidden');
+        } else {
+          grid.classList.add('hidden');
+          table.classList.remove('hidden');
+        }
+        renderItems();
+      }
+    }
+
+    function renderConflicts() {
+      if (!rawData) return;
+      const conflicts = rawData.conflicts || [];
+      const container = document.getElementById('conflictsList');
+      const isEn = (currentLanguage === 'en');
+
+      if (conflicts.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-2 p-8 text-center bg-white rounded-2xl border border-slate-200">
+            <div class="text-3xl mb-2">🎉</div>
+            <h4 class="text-xs font-bold text-slate-800">${isEn ? 'No trigger conflicts found!' : 'هیچ تداخلی بین تریگرها پیدا نشد!'}</h4>
+            <p class="text-[11px] text-slate-400 mt-1">${isEn ? 'All keywords and commands are completely unique and isolated.' : 'تمامی کلیدواژه‌ها و دستورات کاملاً یونیک و تفکیک‌شده هستند.'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = conflicts.map(c => `
+        <div class="p-4 rounded-2xl bg-white border border-amber-200/80 shadow-2xs hover:border-amber-400 transition-all space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-xl bg-amber-100 text-amber-900 font-mono-code font-bold text-xs border border-amber-300/60">
+                #${escapeHtml(c.trigger)}
+              </span>
+              <span class="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                ${c.count} ${isEn ? 'Overlaps' : 'همپوشانی'}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-400 font-medium mb-1.5">${isEn ? 'Competing Skills:' : 'اسکیل‌های دارای این کلمه محرک:'}</div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              ${c.skills.map(s => `
+                <button onclick="openModal('${escapeHtml(s)}')" 
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 font-mono-code text-[11px] flex items-center gap-1 transition-colors">
+                  <span>${escapeHtml(s)}</span>
+                  <i class="iconsax text-xs text-slate-400" icon-name="eye"></i>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
 
     function renderItems() {
@@ -675,6 +822,8 @@
       items.sort((a, b) => {
         if (sortOrder === 'richness') {
           return (b.richness_score || 0) - (a.richness_score || 0);
+        } else if (sortOrder === 'tokens') {
+          return (b.token_weight || 0) - (a.token_weight || 0);
         } else if (sortOrder === 'files') {
           return (b.file_count || 0) - (a.file_count || 0);
         } else if (sortOrder === 'recent') {
@@ -707,6 +856,12 @@
           metaTag = `<span class="text-[11px] font-mono-code text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">${item.size_kb} KB</span>`;
         }
 
+        let tokenTag = '';
+        if (item.token_weight) {
+          const formattedTokens = item.token_weight > 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`;
+          tokenTag = `<span dir="ltr" class="text-[10px] font-mono-code text-blue-700 bg-blue-50/90 border border-blue-200/80 px-1.5 py-0.5 rounded-full inline-block" title="${isEn ? 'Estimated context token weight' : 'تخمین وزن توکن در کانتکست'}">${formattedTokens} tok</span>`;
+        }
+
         let badgeTag = '';
         if (isCreatorOs) {
           badgeTag = `<span class="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">👑 OS</span>`;
@@ -733,6 +888,7 @@
               <div class="flex items-center justify-center gap-1.5 flex-wrap mt-1">
                 ${badgeTag}
                 ${metaTag}
+                ${tokenTag}
               </div>
             </div>
             <div class="w-full pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
@@ -760,6 +916,8 @@
           ? (isEn ? `Shared (${item.platforms.length})` : `مشترک (${item.platforms.length})`) 
           : escapeHtml(item.platform || (isEn ? 'General' : 'عمومی'));
 
+        const formattedTokens = item.token_weight ? (item.token_weight > 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`) : null;
+
         return `
           <tr onclick="openModal('${item.id || item.name}')" class="hover:bg-slate-50/90 cursor-pointer transition-colors group">
             <td class="py-3 px-4">
@@ -779,7 +937,10 @@
               ${triggersHtml}
             </td>
             <td class="py-3 px-4 font-mono-code text-[11px] text-slate-500 whitespace-nowrap">
-              ${item.tools_count ? `<span class="text-purple-600 font-bold">${item.tools_count} ${isEn ? "methods" : "متد"}</span>` : `${item.size_kb || 0} KB`}
+              <div class="flex items-center gap-2">
+                ${item.tools_count ? `<span class="text-purple-600 font-bold">${item.tools_count} ${isEn ? "methods" : "متد"}</span>` : `<span>${item.size_kb || 0} KB</span>`}
+                ${formattedTokens ? `<span class="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 text-[10px]" title="Token weight">${formattedTokens} tok</span>` : ''}
+              </div>
             </td>
             <td class="py-3 px-4 text-center">
               <button onclick="event.stopPropagation(); openModal('${item.id || item.name}')" class="p-1 rounded-lg text-slate-400 group-hover:text-slate-800 hover:bg-slate-200/60 transition-colors">
@@ -800,6 +961,7 @@
       const item = all.find(i => (i.id === itemId || i.name === itemId));
       if (!item) return;
 
+      currentModalItem = item;
       const isEn = (currentLanguage === 'en');
       document.getElementById('modalTitle').innerText = item.name;
       const displayPlatform = (item.platforms && item.platforms.length > 1) 
@@ -818,6 +980,15 @@
       document.getElementById('modalPathShort').innerText = item.path || '-';
       currentModalPath = item.path || '';
 
+      const syncBtn = document.getElementById('modalSyncBtn');
+      if (syncBtn) {
+        if (item.type === 'MCP Server') {
+          syncBtn.classList.remove('hidden');
+        } else {
+          syncBtn.classList.add('hidden');
+        }
+      }
+
       const thiingsImg = document.getElementById('modalThiingsImg');
       const emojiFallback = document.getElementById('modalEmojiFallback');
       if (item.thiings) {
@@ -834,13 +1005,20 @@
       document.getElementById('modalSize').innerText = `${item.size_kb || 0} KB`;
       document.getElementById('modalFiles').innerText = `${item.file_count || 1}`;
       document.getElementById('modalLines').innerText = `${(item.line_count || 0).toLocaleString()}`;
+      
+      const tokenVal = item.token_weight ? (item.token_weight > 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`) : '-';
+      document.getElementById('modalTokens').innerText = tokenVal;
 
       // Localize modal headers
       document.getElementById('txt-modal-size').innerText = isEn ? 'Size' : 'حجم';
       document.getElementById('txt-modal-files').innerText = isEn ? 'Files' : 'فایل‌ها';
       document.getElementById('txt-modal-lines').innerText = isEn ? 'Lines' : 'خطوط';
+      document.getElementById('txt-modal-tokens').innerText = isEn ? 'Tokens' : 'توکن';
       document.getElementById('txt-modal-tree-title').innerText = isEn ? 'Files & Directory Structure' : 'ساختار پوشه‌ها و فایل‌ها';
       document.getElementById('txt-modal-open-editor').innerText = isEn ? 'Open in Editor' : 'باز کردن در ادیتور';
+      if (document.getElementById('txt-modal-sync-btn')) {
+        document.getElementById('txt-modal-sync-btn').innerText = isEn ? 'Sync to Claude' : 'سینک به Claude';
+      }
       if (document.getElementById('txt-modal-triggers')) {
         document.getElementById('txt-modal-triggers').innerText = isEn ? 'Triggers & Keywords' : 'کلمات کلیدی محرک (Triggers)';
       }
@@ -1050,6 +1228,39 @@
       }
     }
 
+    async function syncCurrentItem() {
+      if (!currentModalItem || currentModalItem.type !== 'MCP Server') return;
+      const syncBtn = document.getElementById('modalSyncBtn');
+      const origHtml = syncBtn ? syncBtn.innerHTML : '';
+      if (syncBtn) {
+        syncBtn.disabled = true;
+        syncBtn.innerHTML = `<i class="iconsax text-sm animate-spin" icon-name="refresh-2"></i><span>سینک...</span>`;
+      }
+      
+      try {
+        const res = await fetch('/api/sync-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: currentModalItem.name, type: currentModalItem.type })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          showToast(currentLanguage === 'en' 
+            ? `Synced "${currentModalItem.name}" to Claude Desktop config!` 
+            : `سرور "${currentModalItem.name}" با موفقیت با Claude Desktop سینک شد!`);
+        } else {
+          showToast(currentLanguage === 'en' ? `Sync failed: ${data.message || 'Error'}` : `خطا در همگام‌سازی: ${data.message || 'نامشخص'}`);
+        }
+      } catch (err) {
+        showToast(currentLanguage === 'en' ? 'Network error during sync.' : 'خطای ارتباط در هنگام همگام‌سازی.');
+      } finally {
+        if (syncBtn) {
+          syncBtn.disabled = false;
+          syncBtn.innerHTML = origHtml;
+        }
+      }
+    }
+
     // Command Palette Functions (⌘K)
     function openCommandPalette() {
       document.getElementById('cmdPaletteModal').classList.remove('hidden');
@@ -1241,6 +1452,9 @@
         tabClaude: 'کلاد کد (Claude Code)',
         tabMcp: 'سرورهای MCP',
         tabClis: 'دستورات خط فرمان (CLI)',
+        tabConflicts: 'تداخل تریگرها (Conflicts)',
+        txtConflictsBannerTitle: 'رادار شناسایی تداخل‌های تریگر و اسلش‌کامند',
+        txtConflictsBannerDesc: 'کلمات کلیدی زیر توسط ۲ یا چند اسکیل مختلف رزرو شده‌اند. هوش مصنوعی هنگام مواجهه با این کلمات ممکن است دچار ابهام شده و اسکیل دیگری را به جای اسکیل مدنظر شما اجرا کند.',
         settingsLabel: 'تنظیمات',
         settingsTitle: 'تنظیمات استودیو',
         settingsDesc: 'شخصی‌سازی زبان و رفتار مانیتورینگ',
@@ -1254,6 +1468,7 @@
         copyUrl: 'کپی آدرس',
         activeBadge: 'فعال (Active)',
         sortRichness: '🔥 پربارترین',
+        sortTokens: '📊 وزن توکن (Token Weight)',
         sortFiles: '📂 تعداد فایل',
         sortRecent: '⏱️ آخرین تغییرات',
         sortName: '🔤 الفبا',
@@ -1267,11 +1482,13 @@
         thAction: 'مشاهده',
         copyPathTitle: 'کپی مسیر فایل',
         modalOpenEditor: 'باز کردن در ادیتور',
+        modalSyncBtn: 'سینک به Claude',
         modalTreeTitle: 'ساختار پوشه‌ها و فایل‌ها',
         modalTriggers: 'کلمات کلیدی محرک (Triggers)',
         modalSize: 'حجم',
         modalFiles: 'فایل‌ها',
         modalLines: 'خطوط',
+        modalTokens: 'توکن',
         modalDescTitle: 'شرح و کاربرد',
         toastUpdate: 'اطلاعات با موفقیت به‌روزرسانی شد.',
         toastRescan: 'بررسی دوباره فایل‌ها انجام شد.',
@@ -1289,6 +1506,9 @@
         tabClaude: 'Claude Code',
         tabMcp: 'MCP Servers',
         tabClis: 'CLI Tools',
+        tabConflicts: 'Trigger Conflicts',
+        txtConflictsBannerTitle: 'Trigger & Slash-Command Conflict Radar',
+        txtConflictsBannerDesc: 'The keywords below are registered by multiple skills. When triggered, the AI agent might confuse intent and pick an unintended skill.',
         settingsLabel: 'Settings',
         settingsTitle: 'Studio Settings',
         settingsDesc: 'Customize language and monitoring behavior',
@@ -1302,6 +1522,7 @@
         copyUrl: 'Copy URL',
         activeBadge: 'Active',
         sortRichness: '🔥 Richness',
+        sortTokens: '📊 Token Weight',
         sortFiles: '📂 File Count',
         sortRecent: '⏱️ Recent',
         sortName: '🔤 Alphabetical',
@@ -1315,11 +1536,13 @@
         thAction: 'Inspect',
         copyPathTitle: 'Copy path to clipboard',
         modalOpenEditor: 'Open in Editor',
+        modalSyncBtn: 'Sync to Claude',
         modalTreeTitle: 'Directory & Files Structure',
         modalTriggers: 'Triggers & Keywords',
         modalSize: 'Size',
         modalFiles: 'Files',
         modalLines: 'Lines',
+        modalTokens: 'Tokens',
         modalDescTitle: 'Description & Scope',
         toastUpdate: 'Ecosystem updated successfully.',
         toastRescan: 'Filesystem rescan complete.',
@@ -1374,6 +1597,15 @@
       setTxt('txt-tab-claude', t.tabClaude);
       setTxt('txt-tab-mcp', t.tabMcp);
       setTxt('txt-tab-clis', t.tabClis);
+      setTxt('txt-tab-conflicts', t.tabConflicts);
+
+      // Translate conflict banner
+      setTxt('txt-conflicts-banner-title', t.txtConflictsBannerTitle);
+      setTxt('txt-conflicts-banner-desc', t.txtConflictsBannerDesc);
+
+      // Translate modal elements
+      setTxt('txt-modal-tokens', t.modalTokens);
+      setTxt('txt-modal-sync-btn', t.modalSyncBtn);
 
       // Translate table headers
       setTxt('th-name', t.thName);
@@ -1387,11 +1619,12 @@
 
       // Translate sort order options
       const sortSelect = document.getElementById('sortOrder');
-      if (sortSelect) {
+      if (sortSelect && sortSelect.options.length >= 5) {
         sortSelect.options[0].text = t.sortRichness;
-        sortSelect.options[1].text = t.sortFiles;
-        sortSelect.options[2].text = t.sortRecent;
-        sortSelect.options[3].text = t.sortName;
+        sortSelect.options[1].text = t.sortTokens;
+        sortSelect.options[2].text = t.sortFiles;
+        sortSelect.options[3].text = t.sortRecent;
+        sortSelect.options[4].text = t.sortName;
       }
 
       // Translate view buttons
@@ -1433,6 +1666,9 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get('lang')) {
         setLanguage(params.get('lang'));
+      }
+      if (params.get('tab')) {
+        setTimeout(() => setTab(params.get('tab')), 300);
       }
       if (params.get('view') === 'table') {
         setTimeout(() => setViewMode('table'), 400);

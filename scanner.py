@@ -445,6 +445,11 @@ def scan_antigravity_skills():
                 stats = calculate_folder_stats(item)
                 visual = assign_icon_and_emoji(item.name, "Skill", "Antigravity")
                 triggers = extract_triggers(desc)
+                
+                # Token weight estimation for skill
+                skill_chars = len(text) if (skill_file.exists() and 'text' in locals() and text) else (stats["size_kb"] * 1024)
+                skill_tokens = max(50, int(skill_chars / 3.8))
+                
                 skills.append({
                     "id": f"agy-{item.name}",
                     "name": item.name,
@@ -459,6 +464,7 @@ def scan_antigravity_skills():
                     "color": visual["color"],
                     "description": desc,
                     "triggers": triggers,
+                    "token_weight": skill_tokens,
                     "path": str(item),
                     "last_modified": get_file_time(item),
                     "has_skill_md": skill_file.exists(),
@@ -486,6 +492,10 @@ def scan_antigravity_skills():
                 stats = calculate_folder_stats(item)
                 visual = assign_icon_and_emoji(item.name, "Skill", "Antigravity")
                 triggers = extract_triggers(desc)
+                
+                skill_chars = len(text) if (skill_file.exists() and 'text' in locals() and text) else (stats["size_kb"] * 1024)
+                skill_tokens = max(50, int(skill_chars / 3.8))
+                
                 skills.append({
                     "id": f"agy-builtin-{item.name}",
                     "name": item.name,
@@ -500,6 +510,7 @@ def scan_antigravity_skills():
                     "color": visual["color"],
                     "description": desc,
                     "triggers": triggers,
+                    "token_weight": skill_tokens,
                     "path": str(item),
                     "last_modified": get_file_time(item),
                     "has_skill_md": skill_file.exists(),
@@ -544,6 +555,11 @@ def scan_antigravity_mcp():
                 visual = assign_icon_and_emoji(item.name, "MCP Server", "Antigravity")
                 skills_user_built = ["hooshang", "vidiq"]
                 is_custom = (item.name in skills_user_built)
+                
+                # Token weight calculation for MCP schemas
+                total_schema_chars = sum(len(tf.read_text(encoding="utf-8", errors="ignore")) for tf in tool_files)
+                mcp_tokens = int(total_schema_chars / 3.8) if total_schema_chars > 0 else (len(tools_list) * 120)
+                
                 mcps.append({
                     "id": f"agy-mcp-{item.name}",
                     "name": item.name,
@@ -558,6 +574,7 @@ def scan_antigravity_mcp():
                     "tools_count": len(tools_list),
                     "tools": tools_list,
                     "tools_schema": tools_schema,
+                    "token_weight": mcp_tokens,
                     "status": "online",
                     "has_instructions": has_instructions,
                     "path": str(item),
@@ -654,6 +671,10 @@ def scan_claude_code():
                 stats = calculate_folder_stats(item)
                 visual = assign_icon_and_emoji(item.name, "Skill", "Claude Code")
                 triggers = extract_triggers(desc)
+                
+                skill_chars = len(text) if (skill_file.exists() and 'text' in locals() and text) else (stats["size_kb"] * 1024)
+                skill_tokens = max(50, int(skill_chars / 3.8))
+                
                 skills.append({
                     "id": f"claude-skill-{item.name}",
                     "name": item.name,
@@ -667,6 +688,7 @@ def scan_claude_code():
                     "color": visual["color"],
                     "description": desc,
                     "triggers": triggers,
+                    "token_weight": skill_tokens,
                     "path": str(item),
                     "last_modified": get_file_time(item),
                     "size_kb": stats["size_kb"],
@@ -1135,6 +1157,32 @@ def get_complete_ecosystem():
             "status": status
         })
 
+    # 1. Calculate Trigger Conflicts across all skills
+    all_skills_for_conflicts = agy_skills + claude_skills
+    trigger_map = {}
+    for s in all_skills_for_conflicts:
+        s_name = s.get("name")
+        for t in s.get("triggers", []):
+            t_clean = t.strip().lower().lstrip("#").lstrip("/")
+            if not t_clean or len(t_clean) < 3:
+                continue
+            trigger_map.setdefault(t_clean, []).append(s_name)
+
+    conflicts = []
+    for t, s_list in sorted(trigger_map.items()):
+        unique_skills = sorted(list(set(s_list)))
+        if len(unique_skills) > 1:
+            conflicts.append({
+                "trigger": t,
+                "count": len(unique_skills),
+                "skills": unique_skills
+            })
+
+    # 2. Total Token Weight across ecosystem
+    total_mcp_tokens = sum(m.get("token_weight", 0) for m in agy_mcp)
+    total_skill_tokens = sum(s.get("token_weight", 0) for s in (agy_skills + claude_skills))
+    total_token_weight = total_mcp_tokens + total_skill_tokens
+
     all_items = agy_skills + agy_mcp + agy_rules + claude_skills + claude_mcp + claude_commands + claude_plugins
     user_created_skills_count = sum(1 for s in (agy_skills + claude_skills) if s.get("is_user_created"))
     user_created_total_count = sum(1 for i in all_items if i.get("is_user_created"))
@@ -1153,7 +1201,11 @@ def get_complete_ecosystem():
             "synced_skills_count": sum(1 for s in skill_parity if s["status"] == "synced"),
             "synced_mcp_count": sum(1 for m in mcp_parity if m["status"] == "synced"),
             "user_created_skills_count": user_created_skills_count,
-            "user_created_total_count": user_created_total_count + len(creator_os_items)
+            "user_created_total_count": user_created_total_count + len(creator_os_items),
+            "total_conflicts_count": len(conflicts),
+            "total_token_weight": total_token_weight,
+            "total_mcp_tokens": total_mcp_tokens,
+            "total_skill_tokens": total_skill_tokens
         },
         "creator_os": creator_os_items,
         "antigravity": {
@@ -1172,7 +1224,8 @@ def get_complete_ecosystem():
         "parity": {
             "skills": skill_parity,
             "mcp": mcp_parity
-        }
+        },
+        "conflicts": conflicts
     }
 
 if __name__ == "__main__":

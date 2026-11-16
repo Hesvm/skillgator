@@ -197,6 +197,75 @@ class EcosystemMonitorHandler(SimpleHTTPRequestHandler):
             self.wfile.write(content)
             return
 
+        elif parsed.path == "/api/sync-item":
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                body = self.rfile.read(length).decode("utf-8") if length > 0 else "{}"
+                payload = json.loads(body)
+                item_name = payload.get("name")
+                item_type = payload.get("type", "MCP Server")
+                target = payload.get("target", "claude")
+
+                if not item_name:
+                    raise ValueError("Item name is required")
+
+                synced_details = []
+
+                if item_type == "MCP Server":
+                    # Sync to Claude Desktop config (~/Library/Application Support/Claude/claude_desktop_config.json)
+                    claude_desktop_path = Path.home() / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
+                    claude_desktop_cfg = {"mcpServers": {}}
+                    if claude_desktop_path.exists():
+                        try:
+                            claude_desktop_cfg = json.loads(claude_desktop_path.read_text(encoding="utf-8"))
+                            if "mcpServers" not in claude_desktop_cfg:
+                                claude_desktop_cfg["mcpServers"] = {}
+                        except Exception:
+                            claude_desktop_cfg = {"mcpServers": {}}
+                    
+                    # Also check ~/.claude.json
+                    claude_cli_path = Path.home() / ".claude.json"
+                    claude_cli_cfg = {}
+                    if claude_cli_path.exists():
+                        try:
+                            claude_cli_cfg = json.loads(claude_cli_path.read_text(encoding="utf-8"))
+                        except Exception:
+                            pass
+
+                    # Extract existing config from ~/.claude.json if available
+                    existing_cli_mcp = claude_cli_cfg.get("mcpServers", {}).get(item_name)
+                    if existing_cli_mcp:
+                        mcp_conf = existing_cli_mcp
+                    else:
+                        mcp_conf = {
+                            "command": "npx",
+                            "args": ["-y", f"@{item_name}/mcp"],
+                            "env": {}
+                        }
+
+                    claude_desktop_cfg["mcpServers"][item_name] = mcp_conf
+                    claude_desktop_path.parent.mkdir(parents=True, exist_ok=True)
+                    claude_desktop_path.write_text(json.dumps(claude_desktop_cfg, indent=2, ensure_ascii=False), encoding="utf-8")
+                    synced_details.append(f"Synced to Claude Desktop config ({item_name})")
+
+                resp = json.dumps({"status": "ok", "message": f"Successfully synced {item_name}!", "details": synced_details}, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(resp)))
+                self.end_headers()
+                self.wfile.write(resp)
+                return
+            except Exception as e:
+                err = json.dumps({"status": "error", "message": str(e)}).encode("utf-8")
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(err)))
+                self.end_headers()
+                self.wfile.write(err)
+                return
+
         elif parsed.path == "/api/open-editor":
             try:
                 length = int(self.headers.get("Content-Length", 0))
