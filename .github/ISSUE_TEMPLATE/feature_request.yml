@@ -1,0 +1,14 @@
+name: Feature Request
+description: Suggest an idea or capability for Skillgator
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: We appreciate suggestions for expanding AI agent monitoring capabilities.
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Proposed Feature
+      description: Describe what you would like Skillgator to do.
+    validations:
+      required: true
