@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <script src="/marked.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>اسکیل‌گیتور | Skillgator</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Plus Jakarta Sans Font for English Mode -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <!-- Iconsax Web Font -->
+  <link href="https://iconsax.gitlab.io/i/icons.css" rel="stylesheet">
+  
+  <!-- فونت رسمی دیجی‌کالا (Digikala Font) -->
+  <style>
+    @font-face {
+      font-family: 'Digikala';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url('/fonts/webfonts/Digikala-Variable.woff2') format('woff2-variations'),
+           url('/fonts/variable/Digikala-Variable.ttf') format('truetype');
+    }
+
+    @font-face {
+      font-family: 'Digikala';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('/fonts/webfonts/Digikala-Regular.woff2') format('woff2'),
+           url('/fonts/ttf/Digikala-Regular.ttf') format('truetype');
+    }
+
+    @font-face {
+      font-family: 'Digikala';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url('/fonts/webfonts/Digikala-Medium.woff2') format('woff2'),
+           url('/fonts/ttf/Digikala-Medium.ttf') format('truetype');
+    }
+
+    @font-face {
+      font-family: 'Digikala';
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+      src: url('/fonts/webfonts/Digikala-Bold.woff2') format('woff2'),
+           url('/fonts/ttf/Digikala-Bold.ttf') format('truetype');
+    }
+
+    /* فارسی: فونت رسمی دیجی‌کالا */
+    html[lang="fa"], html[dir="rtl"], 
+    html[lang="fa"] body, html[lang="fa"] button, html[lang="fa"] input, html[lang="fa"] select, 
+    html[lang="fa"] textarea, html[lang="fa"] span, html[lang="fa"] p, html[lang="fa"] h1, 
+    html[lang="fa"] h2, html[lang="fa"] h3, html[lang="fa"] h4, html[lang="fa"] div {
+      font-family: 'Digikala', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      font-feature-settings: "kern" 1, "liga" 1;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* انگلیسی: فونت مدرن Plus Jakarta Sans */
+    html[lang="en"], html[dir="ltr"], 
+    html[lang="en"] body, html[lang="en"] button, html[lang="en"] input, html[lang="en"] select, 
+    html[lang="en"] textarea, html[lang="en"] span, html[lang="en"] p, html[lang="en"] h1, 
+    html[lang="en"] h2, html[lang="en"] h3, html[lang="en"] h4, html[lang="en"] div {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      letter-spacing: -0.01em;
+    }
+
+    .font-mono-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    @keyframes pulse-live {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+    }
+    .live-dot {
+      animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .iconsax {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .card-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -6px rgba(15, 23, 42, 0.06);
+    }
+
+    /* Floating Card & Canvas */
+    .app-canvas {
+      background-color: #f1f3f5;
+    }
+    .floating-frame {
+      background-color: #ffffff;
+      border-radius: 2rem; /* rounded-4xl */
+      box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.04), 0 2px 10px -2px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+    }
+    .traffic-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen overflow-hidden app-canvas text-slate-800 antialiased selection:bg-slate-900 selection:text-white flex p-3 md:p-4 gap-3 md:gap-4">
+  <!-- سایدبار سمت راست (اولین عنصر در جهت RTL = سمت راست صفحه) -->
+  <aside class="w-64 md:w-72 h-full flex flex-col justify-between shrink-0 py-2 select-none">
+    
+    <!-- بخش بالایی سایدبار: لوگو، سرچ‌بار و دسته‌بندی‌ها -->
+    <div class="space-y-4">
+      
+      <!-- عنوان برند در بالای سایدبار (لوگو کاملاً آزاد بدون فریم و بدون برچسب زنده) -->
+      <div class="flex items-center gap-2.5 px-2 pt-2">
+        <img src="/assets/crocodile_3d.png" alt="Skillgator" class="w-8 h-8 object-contain shrink-0">
+        <span id="brandTitle" class="text-base font-bold text-slate-900 tracking-tight">اسکیل‌گیتور</span>
+      </div>
+
+      <!-- باکس جستجوی مینیمال درون سایدبار -->
+      <div class="px-1">
+        <div class="relative w-full">
+          <input type="text" id="searchInput" oninput="renderItems()" placeholder="جستجو در اسکیل‌ها... (⌘K)" 
+                 class="w-full pl-3 pr-8 py-2 rounded-2xl bg-white border border-slate-200/80 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-400 shadow-2xs transition-all">
+          <i class="iconsax text-slate-400 text-xs absolute right-3 top-3" icon-name="search-normal"></i>
+        </div>
+      </div>
+
+      <!-- منوهای سایدبار روی بستر بک‌گراند -->
+      <div class="pt-1">
+        <nav class="space-y-1">
+          
+          <button onclick="setTab('all')" id="tab-all" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base" icon-name="category-2"></i>
+              <span id="txt-tab-all">همه آیتم‌ها</span>
+            </div>
+            <span id="count-all" class="font-mono-code text-[11px] opacity-75">0</span>
+          </button>
+
+          <button onclick="setTab('creator-os')" id="tab-creator-os" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base text-amber-500" icon-name="crown-1"></i>
+              <span id="txt-tab-creator-os">کریتور او‌اس (Creator OS)</span>
+            </div>
+            <span id="count-creator-os" class="font-mono-code text-[11px] opacity-75">0</span>
+          </button>
+
+          <button onclick="setTab('user-custom')" id="tab-user-custom" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base text-emerald-600" icon-name="star-1"></i>
+              <span id="txt-tab-user-custom">ساخته‌های خودم</span>
+            </div>
+            <span id="count-user-custom" class="font-mono-code text-[11px] opacity-75">0</span>
+          </button>
+
+          <button onclick="setTab('antigravity')" id="tab-antigravity" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base text-blue-600" icon-name="cpu"></i>
+              <span id="txt-tab-antigravity">آنتی‌گرویتی (Antigravity)</span>
+            </div>
+            <span id="count-antigravity" class="font-mono-code text-[11px] opacity-75">0</span>
+          </button>
+
+          <button onclick="setTab('claude')" id="tab-claude" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base text-amber-600" icon-name="code-circle"></i>
+              <span id="txt-tab-claude">کلاد کد (Claude Code)</span>
+            </div>
+            <span id="count-claude" class="font-mono-code text-[11px] opacity-75">0</span>
+          </button>
+
+          <button onclick="setTab('mcp')" id="tab-mcp" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base text-purple-600" icon-name="driver-2"></i>
+              <span id="txt-tab-mcp">سرورهای MCP</span>
+            </div>
+            <span id="count-mcp" class="font-mono-code text-[11px] opacity-75">0</span>
+          </button>
+
+          <button onclick="setTab('clis')" id="tab-clis" 
+                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5">
+              <i class="iconsax text-base text-slate-500" icon-name="command"></i>
+              <span id="txt-tab-clis">دستورات خط فرمان (CLI)</span>
+            </div>
+            <span id="count-clis" class="font-mono-code text-[11px] opacity-75">0</span>
+          </button>
+
+        </nav>
+      </div>
+
+    </div>
+
+    <!-- دکمه دسترسی به تنظیمات در پایین سایدبار -->
+    <div class="pt-3 border-t border-slate-300/40 px-1">
+      <button onclick="openSettingsModal()" 
+              class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 transition-all">
+        <div class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shadow-2xs shrink-0">
+          <i class="iconsax text-base" icon-name="setting-2"></i>
+        </div>
+        <span id="txt-settings-label" class="font-bold">تنظیمات</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- محتوای اصلی شناور (Floating Frame در سمت چپ) -->
+  <main class="flex-1 h-full floating-frame flex flex-col overflow-hidden relative z-10 transition-all duration-300">
+    
+    <!-- نوار بالای فریم اصلی (فقط کنترل‌های مرتب‌سازی، تغییر نما و خروجی) -->
+    <header class="px-6 py-3.5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-xs">
+      
+      <!-- سمت راست هدر: سوئیچ نما و فیلتر مرتب‌سازی -->
+      <div class="flex items-center gap-2.5">
+        <!-- سوئیچ شبکه ای / جدول فشرده -->
+        <div class="flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200/60">
+          <button id="viewGridBtn" onclick="setViewMode('grid')" title="نمای شبکه‌ای کارتی" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1">
+            <i class="iconsax text-xs" icon-name="element-3"></i>
+            <span>کارت</span>
+          </button>
+          <button id="viewTableBtn" onclick="setViewMode('table')" title="نمای جدولی فشرده" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1">
+            <i class="iconsax text-xs" icon-name="row-vertical"></i>
+            <span>جدول</span>
+          </button>
+        </div>
+
+        <!-- فیلتر مرتب‌سازی -->
+        <select id="sortOrder" onchange="renderItems()" class="bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 font-medium focus:outline-none focus:border-slate-400 cursor-pointer transition-colors">
+          <option value="richness" selected>🔥 پربارترین</option>
+          <option value="files">📂 تعداد فایل</option>
+          <option value="recent">⏱️ آخرین تغییرات</option>
+          <option value="name">🔤 الفبا</option>
+        </select>
+      </div>
+
+
+
+    </header>
+
+    <!-- محتوای اسکرول‌خور درون فریم شناور -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
+      
+      <!-- شبکه کارت‌های وسط‌چین مینیمال -->
+      <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+        <!-- کارت‌ها با جاوااسکریپت رندر می‌شوند -->
+      </div>
+
+      <!-- نمای جدولی بسیار تمیز، استاندارد و خوانا (Linear / GitHub Style Table) -->
+      <div id="tableView" class="hidden bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+        <div class="w-full overflow-x-auto custom-scrollbar">
+          <table class="w-full min-w-[700px] text-start text-xs text-slate-700">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-[11px]">
+              <tr>
+                <th id="th-name" class="py-3.5 px-4 text-start">نام آیتم</th>
+                <th id="th-type" class="py-3.5 px-4 text-start">پلتفرم</th>
+                <th id="th-triggers" class="py-3.5 px-4 text-start">تریگرها</th>
+                <th id="th-specs" class="py-3.5 px-4 text-start">مشخصات فنی</th>
+                <th id="th-action" class="py-3.5 px-4 text-center w-16"></th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-100">
+              <!-- ردیف‌های جدول -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- حالت خالی -->
+      <div id="emptyState" class="hidden text-center py-16">
+        <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
+          <i class="iconsax text-2xl" icon-name="search-status"></i>
+        </div>
+        <p id="txt-empty-state" class="text-xs font-medium text-slate-500">هیچ موردی با این مشخصات پیدا نشد.</p>
+      </div>
+
+    </div>
+
+    <!-- پیام شناور اعلان (Toast) -->
+    <div id="toast" class="hidden absolute bottom-5 left-5 z-50 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-medium shadow-xl flex items-center gap-2 border border-slate-800 transition-all">
+      <i class="iconsax text-sm text-amber-400" icon-name="notification-status"></i>
+      <span id="toastMsg">تغییرات با موفقیت اعمال شد.</span>
+    </div>
+
+  </main>
+
+
+  <!-- پاپ‌آپ پیشرفته کالبدشکافی اسکیل و فایل‌ها (Skill Inspector & Code Viewer) -->
+  <div id="detailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-5xl h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+      
+      <!-- سربرگ مدرن مدال -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
+        <div class="flex items-center gap-3">
+          <div id="modalIconContainer" class="w-10 h-10 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center shadow-2xs shrink-0">
+            <img id="modalThiingsImg" src="" alt="icon" class="w-8 h-8 object-contain">
+            <span id="modalEmojiFallback" class="text-2xl hidden">🧩</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="modalTitle" class="text-sm font-bold text-slate-900 font-mono-code">عنوان آیتم</h3>
+              <span id="modalPlatform" class="text-[11px] px-2 py-0.5 rounded-lg bg-slate-200/60 text-slate-700 font-medium font-mono-code">پلتفرم</span>
+              <span id="modalCustomBadge" class="hidden text-[11px] px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">Custom</span>
+            </div>
+            <p id="modalPathShort" class="text-[11px] text-slate-400 font-mono-code mt-0.5 truncate max-w-md">-</p>
+          </div>
+        </div>
+
+        <!-- دکمه‌های عملیاتی هدر مدال -->
+        <div class="flex items-center gap-2">
+          <button onclick="openInEditor()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs transition-colors">
+            <i class="iconsax text-sm" icon-name="code-1"></i>
+            <span id="txt-modal-open-editor">باز کردن در ادیتور</span>
+          </button>
+          <button onclick="copyPath()" class="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs transition-colors" id="modalCopyBtn" title="کپی مسیر">
+            <i class="iconsax text-base" icon-name="copy"></i>
+          </button>
+          <button onclick="closeModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+            <i class="iconsax text-lg" icon-name="close-circle"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ساختار دو ستونه: سمت راست درخت فایل‌ها (File Tree)، سمت چپ پیش‌نمایش محتوا و مارک‌داون -->
+      <div class="flex-1 flex overflow-hidden">
+        
+        <!-- ستون درخت فایل‌ها و متادیتا (Sidebar درون مدال) -->
+        <div class="w-72 border-e border-slate-100 bg-slate-50/50 flex flex-col justify-between shrink-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
+          
+          <!-- آمار فایل‌ها -->
+          <div id="modalMetrics" class="grid grid-cols-3 gap-1 p-2 bg-white rounded-xl border border-slate-200/70 text-center font-mono-code text-[11px]">
+            <div>
+              <div class="text-[10px] text-slate-400" id="txt-modal-size">حجم</div>
+              <div id="modalSize" class="font-bold text-slate-800">-</div>
+            </div>
+            <div class="border-x border-slate-100">
+              <div class="text-[10px] text-slate-400" id="txt-modal-files">فایل‌ها</div>
+              <div id="modalFiles" class="font-bold text-slate-800">-</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400" id="txt-modal-lines">خطوط</div>
+              <div id="modalLines" class="font-bold text-slate-800">-</div>
+            </div>
+          </div>
+
+          <!-- درخت کامل فایل‌ها و پوشه‌ها -->
+          <div class="flex-1">
+            <div class="text-[11px] font-bold text-slate-500 mb-1.5 px-1 flex items-center justify-between">
+              <span id="txt-modal-tree-title">ساختار پوشه‌ها و فایل‌ها</span>
+              <span id="fileTreeCount" class="text-[10px] font-mono-code text-slate-400"></span>
+            </div>
+            <div id="modalFileTree" class="space-y-0.5 bg-white p-2 rounded-xl border border-slate-200/70 text-xs font-mono-code max-h-56 overflow-y-auto custom-scrollbar">
+              <div class="text-slate-400 text-center py-4 text-[11px]">در حال خواندن ساختار...</div>
+            </div>
+          </div>
+
+          <!-- تریگرها -->
+          <div id="modalTriggersSection" class="hidden">
+            <div class="text-[11px] font-bold text-slate-500 mb-1.5 px-1" id="txt-modal-triggers">کلمات کلیدی محرک (Triggers)</div>
+            <div id="modalTriggersContent" class="flex flex-wrap gap-1 bg-white p-2 rounded-xl border border-slate-200/70 max-h-24 overflow-y-auto custom-scrollbar">
+              <!-- بج‌های تریگر -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ستون نمایش محتوای فایل فعال و سند SKILL.md -->
+        <div class="flex-1 flex flex-col overflow-hidden bg-white">
+          
+          <!-- نوار تب فایل انتخابی -->
+          <div class="px-5 py-2.5 border-b border-slate-100 bg-white flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-2">
+              <i class="iconsax text-sm text-slate-400" icon-name="document-text"></i>
+              <span id="activeFileName" class="text-xs font-mono-code font-bold text-slate-800">SKILL.md</span>
+              <span id="activeFileSize" class="text-[10px] font-mono-code text-slate-400"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="viewRawBtn" onclick="toggleRawView()" class="text-[11px] font-mono-code text-slate-500 hover:text-slate-900 px-2 py-0.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
+                Raw / Markdown
+              </button>
+            </div>
+          </div>
+
+          <!-- محتوای فایل با قابلیت اسکرول و خوانایی حرفه‌ای -->
+          <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
+            <!-- پیش‌نمایش رندر شده با marked.js -->
+            <div id="markdownRenderArea" class="prose prose-slate max-w-none text-xs leading-relaxed space-y-3 font-sans">
+              <!-- رندر markdown فایل SKILL.md -->
+            </div>
+            <!-- متن خام کد -->
+            <pre id="rawContentArea" class="hidden p-4 rounded-2xl bg-slate-900 text-slate-100 font-mono-code text-[11px] overflow-x-auto custom-scrollbar select-all leading-normal whitespace-pre-wrap">
+              <!-- کدهای خام -->
+            </pre>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- پالت دستورات و جستجوی سریع (Raycast / Linear Command Palette) -->
+  <div id="cmdPaletteModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-start justify-center pt-20 p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-4 border-b border-slate-100 flex items-center gap-3">
+        <i class="iconsax text-xl text-slate-400" icon-name="search-normal"></i>
+        <input type="text" id="cmdPaletteInput" oninput="filterPalette()" placeholder="جستجوی سریع اسکیل، ابزار، MCP، تریگر... (Esc برای خروج)"
+               class="w-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent">
+        <kbd class="px-2 py-0.5 rounded-lg bg-slate-100 border border-slate-200 font-mono-code text-[10px] text-slate-400">ESC</kbd>
+      </div>
+      <div id="cmdPaletteResults" class="max-h-80 overflow-y-auto custom-scrollbar p-2 divide-y divide-slate-50">
+        <!-- نتایج سرچ پالتی -->
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- اسکریپت رندر و به‌روزرسانی -->
+  <script>
+    let rawData = null;
+    let currentTab = 'all';
+    let currentModalPath = '';
+    let currentModalTools = [];
+    let currentViewMode = 'grid'; // 'grid' | 'table'
+
+    function initLiveStream() {
+      const liveStatus = document.getElementById('liveStatusText');
+      const liveBadge = document.getElementById('liveBadge');
+
+      const evtSource = new EventSource('/api/stream');
+
+      evtSource.addEventListener('init', function(e) {
+        rawData = JSON.parse(e.data);
+        updateDashboard(rawData);
+      });
+
+      evtSource.addEventListener('update', function(e) {
+        rawData = JSON.parse(e.data);
+        updateDashboard(rawData);
+        showToast('اطلاعات با موفقیت به‌روزرسانی شد.');
+      });
+
+      evtSource.onerror = function() {
+        liveStatus.innerText = 'قطع ارتباط';
+        liveBadge.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium';
+      };
+
+      evtSource.onopen = function() {
+        liveStatus.innerText = 'زنده';
+        liveBadge.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium';
+      };
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    async function triggerRescan() {
+      const icon = document.getElementById('rescanIcon');
+      icon.classList.add('animate-spin');
+      try {
+        const res = await fetch('/api/rescan', { method: 'POST' });
+        rawData = await res.json();
+        updateDashboard(rawData);
+        showToast('بررسی دوباره فایل‌ها انجام شد.');
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setTimeout(() => icon.classList.remove('animate-spin'), 600);
+      }
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      const gridBtn = document.getElementById('viewGridBtn');
+      const tableBtn = document.getElementById('viewTableBtn');
+      const gridContainer = document.getElementById('cardsGrid');
+      const tableContainer = document.getElementById('tableView');
+
+      if (mode === 'grid') {
+        gridBtn.className = "px-2.5 py-1 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1";
+        tableBtn.className = "px-2.5 py-1 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1";
+        gridContainer.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+      } else {
+        tableBtn.className = "px-2.5 py-1 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1";
+        gridBtn.className = "px-2.5 py-1 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1";
+        gridContainer.classList.add('hidden');
+        tableContainer.classList.remove('hidden');
+      }
+      renderItems();
+    }
+
+    function updateDashboard(data) {
+      if (!data) return;
+
+      const all = getAllItemsList(data);
+      const stats = data.stats || {};
+      
+      const agyCount = stats.total_antigravity_skills || (data.antigravity?.skills?.length || 0);
+      const claudeCount = stats.total_claude_skills || (data.claude?.skills?.length || 0);
+      const creatorOsCount = all.filter(i => i.suite === 'Creator OS' || (i.platform && i.platform.includes('Creator OS'))).length;
+      const userCustomCount = all.filter(i => i.is_user_created).length;
+      const mcpCount = (data.antigravity?.mcp?.length || 0) + (data.claude?.mcp?.length || 0);
+
+      const totalBadge = document.getElementById('totalBadge');
+      if (totalBadge) totalBadge.innerText = (currentLanguage === 'en') ? `${all.length} items` : `${all.length} مورد`;
+
+      document.getElementById('count-all').innerText = all.length;
+      document.getElementById('count-creator-os').innerText = creatorOsCount;
+      document.getElementById('count-user-custom').innerText = userCustomCount;
+      document.getElementById('count-antigravity').innerText = agyCount;
+      document.getElementById('count-claude').innerText = claudeCount;
+      document.getElementById('count-mcp').innerText = mcpCount;
+      document.getElementById('count-clis').innerText = stats.total_clis || 0;
+
+      renderItems();
+    }
+
+    function getAllItemsList(data) {
+      if (!data) return [];
+      const raw = [];
+
+      if (data.creator_os) {
+        data.creator_os.forEach(c => raw.push(c));
+      }
+      if (data.antigravity) {
+        (data.antigravity.skills || []).forEach(s => raw.push(s));
+        (data.antigravity.mcp || []).forEach(m => raw.push(m));
+        (data.antigravity.rules || []).forEach(r => raw.push(r));
+      }
+      if (data.claude) {
+        (data.claude.skills || []).forEach(s => raw.push(s));
+        (data.claude.mcp || []).forEach(m => raw.push(m));
+        (data.claude.commands || []).forEach(c => raw.push(c));
+      }
+      if (data.cursor_windsurf) {
+        (data.cursor_windsurf || []).forEach(c => raw.push(c));
+      }
+      (data.clis || []).forEach(c => raw.push({
+        ...c,
+        platform: 'CLI',
+        type: 'CLI',
+        richness_score: 100
+      }));
+
+      // ادغام هوشمند آیتم‌های هم‌نام در پلتفرم‌های مختلف
+      const dedupedMap = new Map();
+      raw.forEach(item => {
+        const key = `${(item.name || '').toLowerCase().trim()}_${item.type || 'Skill'}`;
+        if (!dedupedMap.has(key)) {
+          dedupedMap.set(key, {
+            ...item,
+            platforms: [item.platform].filter(Boolean),
+            all_paths: item.path ? [item.path] : []
+          });
+        } else {
+          const existing = dedupedMap.get(key);
+          if (item.platform && !existing.platforms.includes(item.platform)) {
+            existing.platforms.push(item.platform);
+          }
+          if (item.path && !existing.all_paths.includes(item.path)) {
+            existing.all_paths.push(item.path);
+          }
+          if ((item.richness_score || 0) > (existing.richness_score || 0)) {
+            const preservedPlatforms = existing.platforms;
+            const preservedPaths = existing.all_paths;
+            Object.assign(existing, item);
+            existing.platforms = preservedPlatforms;
+            existing.all_paths = preservedPaths;
+          }
+        }
+      });
+
+      return Array.from(dedupedMap.values());
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      const tabs = ['all', 'creator-os', 'user-custom', 'antigravity', 'claude', 'mcp', 'clis'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (!btn) return;
+        if (t === tab) {
+          btn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs";
+        } else {
+          btn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50";
+        }
+      });
+      renderItems();
+    }
+
+    function renderItems() {
+      if (!rawData) return;
+      const grid = document.getElementById('cardsGrid');
+      const tableBody = document.getElementById('tableBody');
+      const empty = document.getElementById('emptyState');
+      const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const sortOrder = document.getElementById('sortOrder').value;
+
+      let items = getAllItemsList(rawData);
+
+      if (currentTab === 'creator-os') {
+        items = items.filter(i => i.suite === 'Creator OS' || (i.platform && i.platform.includes('Creator OS')) || (i.platforms && i.platforms.some(p => p.includes('Creator OS'))));
+      } else if (currentTab === 'user-custom') {
+        items = items.filter(i => i.is_user_created);
+      } else if (currentTab === 'antigravity') {
+        items = items.filter(i => (i.platform || '').includes('Antigravity') || (i.platforms && i.platforms.some(p => p.includes('Antigravity'))));
+      } else if (currentTab === 'claude') {
+        items = items.filter(i => (i.platform || '').includes('Claude') || (i.platforms && i.platforms.some(p => p.includes('Claude'))));
+      } else if (currentTab === 'mcp') {
+        items = items.filter(i => i.type === 'MCP Server');
+      } else if (currentTab === 'clis') {
+        items = items.filter(i => i.type === 'CLI');
+      }
+
+      if (query) {
+        items = items.filter(i => 
+          (i.name || '').toLowerCase().includes(query) ||
+          (i.description || '').toLowerCase().includes(query) ||
+          (i.platform || '').toLowerCase().includes(query) ||
+          (i.triggers && i.triggers.some(t => t.toLowerCase().includes(query)))
+        );
+      }
+
+      items.sort((a, b) => {
+        if (sortOrder === 'richness') {
+          return (b.richness_score || 0) - (a.richness_score || 0);
+        } else if (sortOrder === 'files') {
+          return (b.file_count || 0) - (a.file_count || 0);
+        } else if (sortOrder === 'recent') {
+          return (b.last_modified || '').localeCompare(a.last_modified || '');
+        } else if (sortOrder === 'name') {
+          return (a.name || '').localeCompare(b.name || '');
+        }
+        return 0;
+      });
+
+      const isEn = (currentLanguage === 'en');
+
+      if (items.length === 0) {
+        grid.innerHTML = '';
+        tableBody.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      empty.classList.add('hidden');
+
+      // 1. Render Cards Grid
+      grid.innerHTML = items.map(item => {
+        const isCreatorOs = item.suite === 'Creator OS' || (item.platform && item.platform.includes('Creator OS'));
+        let metaTag = '';
+        if (item.tools_count) {
+          const toolWord = isEn ? 'methods' : 'ابزار';
+          metaTag = `<span class="text-[11px] font-mono-code text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${item.tools_count} ${toolWord}</span>`;
+        } else if (item.size_kb) {
+          metaTag = `<span class="text-[11px] font-mono-code text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">${item.size_kb} KB</span>`;
+        }
+
+        let badgeTag = '';
+        if (isCreatorOs) {
+          badgeTag = `<span class="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">👑 OS</span>`;
+        } else if (item.is_user_created) {
+          const customWord = isEn ? '⭐ Custom' : '⭐ ساخت خودم';
+          badgeTag = `<span class="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">${customWord}</span>`;
+        }
+
+        const thiingsUrl = item.thiings || '';
+
+        return `
+          <div onclick="openModal('${item.id || item.name}')" 
+               class="card-hover bg-white border border-slate-200/80 hover:border-blue-400 rounded-3xl p-5 cursor-pointer flex flex-col items-center text-center justify-between group transition-all duration-200">
+            <div class="w-full flex flex-col items-center">
+              <div class="w-20 h-20 mb-3 flex items-center justify-center shrink-0">
+                ${thiingsUrl 
+                  ? `<img src="${thiingsUrl}" alt="${escapeHtml(item.name)}" class="w-20 h-20 object-contain drop-shadow-md group-hover:scale-108 transition-transform duration-300" loading="lazy">` 
+                  : `<span class="text-4xl">${item.emoji || '🧩'}</span>`
+                }
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 font-mono-code truncate w-full mb-1 group-hover:text-blue-600 transition-colors">
+                ${escapeHtml(item.name)}
+              </h4>
+              <div class="flex items-center justify-center gap-1.5 flex-wrap mt-1">
+                ${badgeTag}
+                ${metaTag}
+              </div>
+            </div>
+            <div class="w-full pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+              <span class="text-slate-500 font-medium">${(item.platforms && item.platforms.length > 1) ? (isEn ? `Shared (${item.platforms.length})` : `مشترک (${item.platforms.length})`) : escapeHtml(item.platform || (isEn ? 'General' : 'عمومی'))}</span>
+              <span class="font-mono-code text-slate-400">${item.file_count ? (isEn ? `${item.file_count} files` : `${item.file_count} فایل`) : (isEn ? 'Active' : 'فعال')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 2. Render Table Rows (Always in sync)
+      tableBody.innerHTML = items.map(item => {
+        const thiingsUrl = item.thiings || '';
+        let triggersHtml = '<span class="text-slate-300">-</span>';
+        if (item.triggers && item.triggers.length > 0) {
+          triggersHtml = `
+            <div class="flex items-center gap-1 flex-wrap">
+              ${item.triggers.slice(0, 2).map(t => `<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/60 text-[10px] font-mono-code whitespace-nowrap">#${escapeHtml(t)}</span>`).join('')}
+              ${item.triggers.length > 2 ? `<span class="text-[10px] text-slate-400 font-mono-code">+${item.triggers.length - 2}</span>` : ''}
+            </div>
+          `;
+        }
+
+        const platformLabel = (item.platforms && item.platforms.length > 1) 
+          ? (isEn ? `Shared (${item.platforms.length})` : `مشترک (${item.platforms.length})`) 
+          : escapeHtml(item.platform || (isEn ? 'General' : 'عمومی'));
+
+        return `
+          <tr onclick="openModal('${item.id || item.name}')" class="hover:bg-slate-50/90 cursor-pointer transition-colors group">
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                  ${thiingsUrl ? `<img src="${thiingsUrl}" class="w-5 h-5 object-contain">` : `<span class="text-xs">${item.emoji || '🧩'}</span>`}
+                </div>
+                <span class="font-mono-code font-bold text-slate-900 text-xs group-hover:text-blue-600 transition-colors">${escapeHtml(item.name)}</span>
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200/80 text-[11px] font-mono-code font-medium whitespace-nowrap">
+                ${platformLabel}
+              </span>
+            </td>
+            <td class="py-3 px-4">
+              ${triggersHtml}
+            </td>
+            <td class="py-3 px-4 font-mono-code text-[11px] text-slate-500 whitespace-nowrap">
+              ${item.tools_count ? `<span class="text-purple-600 font-bold">${item.tools_count} ${isEn ? "methods" : "متد"}</span>` : `${item.size_kb || 0} KB`}
+            </td>
+            <td class="py-3 px-4 text-center">
+              <button onclick="event.stopPropagation(); openModal('${item.id || item.name}')" class="p-1 rounded-lg text-slate-400 group-hover:text-slate-800 hover:bg-slate-200/60 transition-colors">
+                <i class="iconsax text-base" icon-name="eye"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    let currentRawContent = '';
+    let isRawMode = false;
+
+    async function openModal(itemId) {
+      if (!rawData) return;
+      const all = getAllItemsList(rawData);
+      const item = all.find(i => (i.id === itemId || i.name === itemId));
+      if (!item) return;
+
+      const isEn = (currentLanguage === 'en');
+      document.getElementById('modalTitle').innerText = item.name;
+      const displayPlatform = (item.platforms && item.platforms.length > 1) 
+        ? item.platforms.join(' + ') 
+        : (item.platform || (isEn ? 'General' : 'عمومی'));
+      document.getElementById('modalPlatform').innerText = displayPlatform;
+      
+      const customBadge = document.getElementById('modalCustomBadge');
+      if (item.is_user_created) {
+        customBadge.classList.remove('hidden');
+        customBadge.innerText = isEn ? '⭐ Custom' : '⭐ ساخت خودم';
+      } else {
+        customBadge.classList.add('hidden');
+      }
+
+      document.getElementById('modalPathShort').innerText = item.path || '-';
+      currentModalPath = item.path || '';
+
+      const thiingsImg = document.getElementById('modalThiingsImg');
+      const emojiFallback = document.getElementById('modalEmojiFallback');
+      if (item.thiings) {
+        thiingsImg.src = item.thiings;
+        thiingsImg.classList.remove('hidden');
+        emojiFallback.classList.add('hidden');
+      } else {
+        thiingsImg.classList.add('hidden');
+        emojiFallback.classList.remove('hidden');
+        emojiFallback.innerText = item.emoji || '🧩';
+      }
+
+      // Metrics
+      document.getElementById('modalSize').innerText = `${item.size_kb || 0} KB`;
+      document.getElementById('modalFiles').innerText = `${item.file_count || 1}`;
+      document.getElementById('modalLines').innerText = `${(item.line_count || 0).toLocaleString()}`;
+
+      // Localize modal headers
+      document.getElementById('txt-modal-size').innerText = isEn ? 'Size' : 'حجم';
+      document.getElementById('txt-modal-files').innerText = isEn ? 'Files' : 'فایل‌ها';
+      document.getElementById('txt-modal-lines').innerText = isEn ? 'Lines' : 'خطوط';
+      document.getElementById('txt-modal-tree-title').innerText = isEn ? 'Files & Directory Structure' : 'ساختار پوشه‌ها و فایل‌ها';
+      document.getElementById('txt-modal-open-editor').innerText = isEn ? 'Open in Editor' : 'باز کردن در ادیتور';
+      if (document.getElementById('txt-modal-triggers')) {
+        document.getElementById('txt-modal-triggers').innerText = isEn ? 'Triggers & Keywords' : 'کلمات کلیدی محرک (Triggers)';
+      }
+
+      // Triggers
+      const triggersSection = document.getElementById('modalTriggersSection');
+      const triggersContent = document.getElementById('modalTriggersContent');
+      if (item.triggers && item.triggers.length > 0) {
+        triggersSection.classList.remove('hidden');
+        triggersContent.innerHTML = item.triggers.map(t => `
+          <span class="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-mono-code text-[10px]">
+            #${escapeHtml(t)}
+          </span>
+        `).join('');
+      } else {
+        triggersSection.classList.add('hidden');
+      }
+
+      // Reset file preview
+      document.getElementById('activeFileName').innerText = 'Loading...';
+      document.getElementById('activeFileSize').innerText = '';
+      document.getElementById('markdownRenderArea').innerHTML = '<div class="py-12 text-center text-slate-400">Loading documentation...</div>';
+      document.getElementById('rawContentArea').innerText = '';
+
+      document.getElementById('detailModal').classList.remove('hidden');
+
+      // Fetch folder tree and default file (SKILL.md or main file)
+      loadSkillTreeAndPreview(item);
+    }
+
+    async function loadSkillTreeAndPreview(item) {
+      const treeContainer = document.getElementById('modalFileTree');
+      const itemPath = item.path || '';
+
+      if (!itemPath) {
+        treeContainer.innerHTML = '<div class="text-slate-400 text-center py-2 text-[11px]">No path</div>';
+        renderDirectContent(item.description || 'No description');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/skill-tree?path=${encodeURIComponent(itemPath)}`);
+        const data = await res.json();
+        if (data.status === 'ok' && data.tree && data.tree.length > 0) {
+          renderFileTree(data.tree, treeContainer);
+          // Find SKILL.md or primary md file
+          const skillMd = findPrimaryFile(data.tree);
+          if (skillMd) {
+            loadFileContent(skillMd.path, skillMd.name, skillMd.size_kb);
+          } else {
+            loadFileContent(data.tree[0].path, data.tree[0].name, data.tree[0].size_kb || 0);
+          }
+        } else {
+          // If it is a single file
+          treeContainer.innerHTML = `
+            <div onclick="loadFileContent('${escapeHtml(itemPath)}', '${escapeHtml(item.name)}', ${item.size_kb || 0})" 
+                 class="px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center gap-1.5 text-blue-600 font-bold">
+              <i class="iconsax text-sm" icon-name="document"></i>
+              <span>${escapeHtml(item.name)}</span>
+            </div>
+          `;
+          loadFileContent(itemPath, item.name, item.size_kb || 0);
+        }
+      } catch (err) {
+        renderDirectContent(item.description || 'No content');
+      }
+    }
+
+    function renderFileTree(tree, container, depth = 0) {
+      if (depth === 0) container.innerHTML = '';
+      tree.forEach(node => {
+        const nodeElem = document.createElement('div');
+        nodeElem.style.paddingLeft = (currentLanguage === 'en' ? `${depth * 14}px` : '0px');
+        nodeElem.style.paddingRight = (currentLanguage === 'fa' ? `${depth * 14}px` : '0px');
+
+        if (node.type === 'dir') {
+          nodeElem.className = 'py-1 flex items-center gap-1.5 text-slate-700 font-bold text-[11px] select-none';
+          nodeElem.innerHTML = `<i class="iconsax text-xs text-amber-500" icon-name="folder-2"></i><span>${escapeHtml(node.name)}</span>`;
+          container.appendChild(nodeElem);
+          if (node.children && node.children.length > 0) {
+            renderFileTree(node.children, container, depth + 1);
+          }
+        } else {
+          const isMd = node.name.toLowerCase().endsWith('.md');
+          const isCode = ['.py', '.js', '.json', '.sh'].some(ext => node.name.toLowerCase().endsWith(ext));
+          const iconColor = isMd ? 'text-blue-500' : (isCode ? 'text-emerald-500' : 'text-slate-400');
+          
+          nodeElem.className = 'py-1 px-1.5 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center justify-between group transition-colors';
+          nodeElem.innerHTML = `
+            <div class="flex items-center gap-1.5 truncate">
+              <i class="iconsax text-xs ${iconColor}" icon-name="document-text"></i>
+              <span class="truncate text-[11px] group-hover:text-blue-600">${escapeHtml(node.name)}</span>
+            </div>
+            <span class="text-[9px] text-slate-400 font-mono-code">${node.size_kb ? `${node.size_kb}k` : ''}</span>
+          `;
+          nodeElem.onclick = () => loadFileContent(node.path, node.name, node.size_kb);
+          container.appendChild(nodeElem);
+        }
+      });
+    }
+
+    function findPrimaryFile(tree) {
+      for (const node of tree) {
+        if (node.type === 'file' && node.name.toLowerCase() === 'skill.md') return node;
+        if (node.type === 'dir' && node.children) {
+          const found = findPrimaryFile(node.children);
+          if (found) return found;
+        }
+      }
+      for (const node of tree) {
+        if (node.type === 'file' && node.name.toLowerCase().endsWith('.md')) return node;
+      }
+      return null;
+    }
+
+    async function loadFileContent(filePath, fileName, sizeKb) {
+      document.getElementById('activeFileName').innerText = fileName;
+      document.getElementById('activeFileSize').innerText = sizeKb ? `${sizeKb} KB` : '';
+      currentModalPath = filePath;
+
+      try {
+        const res = await fetch(`/api/read-file?path=${encodeURIComponent(filePath)}`);
+        const data = await res.json();
+        if (data.status === 'ok') {
+          currentRawContent = data.content || '';
+          renderContent(currentRawContent, fileName);
+        } else {
+          renderDirectContent(`Error reading file: ${data.message || 'unknown'}`);
+        }
+      } catch (err) {
+        renderDirectContent('Network error while reading file.');
+      }
+    }
+
+    function renderContent(content, fileName) {
+      const renderArea = document.getElementById('markdownRenderArea');
+      const rawArea = document.getElementById('rawContentArea');
+      rawArea.innerText = content;
+
+      if (fileName.toLowerCase().endsWith('.md') && typeof marked !== 'undefined') {
+        renderArea.innerHTML = marked.parse(content);
+        renderArea.classList.remove('hidden');
+        rawArea.classList.add('hidden');
+        isRawMode = false;
+      } else {
+        renderArea.classList.add('hidden');
+        rawArea.classList.remove('hidden');
+        isRawMode = true;
+      }
+    }
+
+    function renderDirectContent(text) {
+      const renderArea = document.getElementById('markdownRenderArea');
+      const rawArea = document.getElementById('rawContentArea');
+      if (typeof marked !== 'undefined') {
+        renderArea.innerHTML = marked.parse(text);
+        renderArea.classList.remove('hidden');
+        rawArea.classList.add('hidden');
+      } else {
+        rawArea.innerText = text;
+        rawArea.classList.remove('hidden');
+        renderArea.classList.add('hidden');
+      }
+    }
+
+    function toggleRawView() {
+      const renderArea = document.getElementById('markdownRenderArea');
+      const rawArea = document.getElementById('rawContentArea');
+      isRawMode = !isRawMode;
+      if (isRawMode) {
+        renderArea.classList.add('hidden');
+        rawArea.classList.remove('hidden');
+      } else {
+        rawArea.classList.add('hidden');
+        renderArea.classList.remove('hidden');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function copyPath() {
+      if (currentModalPath) {
+        navigator.clipboard.writeText(currentModalPath).then(() => {
+          showToast('مسیر کپی شد.');
+        });
+      }
+    }
+
+    async function openInEditor() {
+      if (!currentModalPath) return;
+      try {
+        const res = await fetch('/api/open-editor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: currentModalPath })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          showToast('در ادیتور باز شد!');
+        } else {
+          showToast(`خطا: ${data.message || 'نامشخص'}`);
+        }
+      } catch (err) {
+        showToast('خطا در ارتباط با سرور.');
+      }
+    }
+
+    // Command Palette Functions (⌘K)
+    function openCommandPalette() {
+      document.getElementById('cmdPaletteModal').classList.remove('hidden');
+      const input = document.getElementById('cmdPaletteInput');
+      input.value = '';
+      input.focus();
+      filterPalette();
+    }
+
+    function closeCommandPalette() {
+      document.getElementById('cmdPaletteModal').classList.add('hidden');
+    }
+
+    function filterPalette() {
+      if (!rawData) return;
+      const q = (document.getElementById('cmdPaletteInput').value || '').toLowerCase().trim();
+      const resultsContainer = document.getElementById('cmdPaletteResults');
+      const all = getAllItemsList(rawData);
+
+      let matches = all;
+      if (q) {
+        matches = all.filter(i => 
+          (i.name || '').toLowerCase().includes(q) ||
+          (i.description || '').toLowerCase().includes(q) ||
+          (i.triggers && i.triggers.some(t => t.toLowerCase().includes(q))) ||
+          (i.tools && i.tools.some(t => t.toLowerCase().includes(q)))
+        );
+      }
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = '<div class="p-6 text-center text-xs text-slate-400">موردی یافت نشد.</div>';
+        return;
+      }
+
+      resultsContainer.innerHTML = matches.slice(0, 15).map(item => `
+        <div onclick="closeCommandPalette(); openModal('${item.id || item.name}')" 
+             class="p-2.5 rounded-2xl hover:bg-slate-100 flex items-center justify-between cursor-pointer transition-colors group">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-white flex items-center justify-center shrink-0">
+              ${item.thiings ? `<img src="${item.thiings}" class="w-6 h-6 object-contain">` : `<span class="text-sm">${item.emoji || '🧩'}</span>`}
+            </div>
+            <div>
+              <div class="font-mono-code font-bold text-xs text-slate-800">${escapeHtml(item.name)}</div>
+              <div class="text-[11px] text-slate-400 truncate max-w-sm">${escapeHtml((item.description || '').slice(0, 60))}</div>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 font-mono-code border border-slate-200">${escapeHtml(item.platform || '')}</span>
+        </div>
+      `).join('');
+    }
+
+    // Prompt Matcher Simulator Functions
+    function openPromptSimulator() {
+      document.getElementById('promptSimulatorModal').classList.remove('hidden');
+      document.getElementById('promptInput').focus();
+    }
+
+    function closePromptSimulator() {
+      document.getElementById('promptSimulatorModal').classList.add('hidden');
+    }
+
+    function setTestPrompt(text) {
+      document.getElementById('promptInput').value = text;
+      runPromptMatch();
+    }
+
+    function runPromptMatch() {
+      if (!rawData) return;
+      const text = (document.getElementById('promptInput').value || '').toLowerCase().trim();
+      const listContainer = document.getElementById('matchedSkillsList');
+      const badge = document.getElementById('matchCountBadge');
+
+      if (!text) {
+        listContainer.innerHTML = '<div class="text-center py-6 text-xs text-slate-400">پرامپتی را بنویسید یا یک نمونه را انتخاب کنید.</div>';
+        badge.innerText = '۰ مورد';
+        return;
+      }
+
+      const all = getAllItemsList(rawData);
+      const matched = [];
+
+      all.forEach(item => {
+        let score = 0;
+        let reasons = [];
+
+        // Check explicit triggers
+        if (item.triggers) {
+          item.triggers.forEach(trig => {
+            if (text.includes(trig.toLowerCase())) {
+              score += 10;
+              reasons.push(`تطبیق تریگر مستقیم: «${trig}»`);
+            }
+          });
+        }
+
+        // Check name keywords
+        const cleanName = (item.name || '').toLowerCase().replace(/[-_]/g, ' ');
+        if (cleanName.length > 2 && text.includes(cleanName)) {
+          score += 6;
+          reasons.push(`تطبیق نام اسکیل: «${item.name}»`);
+        }
+
+        // Check description keywords
+        const descWords = (item.description || '').toLowerCase().split(/[\s,،.]+/);
+        const promptWords = text.split(/[\s,،.]+/).filter(w => w.length > 2);
+        let sharedWords = promptWords.filter(w => descWords.includes(w));
+        if (sharedWords.length > 0) {
+          score += sharedWords.length * 2;
+          reasons.push(`کلمات کلیدی مشترک: ${sharedWords.slice(0, 3).join(', ')}`);
+        }
+
+        if (score > 0) {
+          matched.push({ item, score, reasons });
+        }
+      });
+
+      matched.sort((a, b) => b.score - a.score);
+
+      badge.innerText = `${matched.length} مورد`;
+
+      if (matched.length === 0) {
+        listContainer.innerHTML = '<div class="text-center py-6 text-xs text-amber-600 bg-amber-50 rounded-2xl border border-amber-200">هیچ اسکیل یا ابزاری مستقیماً برای این پرامپت تریگر نشد.</div>';
+        return;
+      }
+
+      listContainer.innerHTML = matched.slice(0, 8).map(m => `
+        <div onclick="closePromptSimulator(); openModal('${m.item.id || m.item.name}')" 
+             class="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200 hover:border-blue-200 transition-all cursor-pointer flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+              ${m.item.thiings ? `<img src="${m.item.thiings}" class="w-6 h-6 object-contain">` : `<span class="text-sm">${m.item.emoji || '🧩'}</span>`}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-xs text-slate-900 font-mono-code">${escapeHtml(m.item.name)}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-mono-code font-bold">امتیاز: ${m.score}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(m.reasons.join(' | '))}</div>
+            </div>
+          </div>
+          <i class="iconsax text-base text-slate-400" icon-name="arrow-left-2"></i>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Global Keybindings (Cmd+K, Ctrl+K, Escape)
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openCommandPalette();
+      } else if (e.key === 'Escape') {
+        closeCommandPalette();
+        closePromptSimulator();
+        closeModal();
+      }
+    });
+
+    window.onclick = function(event) {
+      if (event.target === document.getElementById('detailModal')) closeModal();
+      if (event.target === document.getElementById('settingsModal')) closeSettingsModal();
+      if (event.target === document.getElementById('cmdPaletteModal')) closeCommandPalette();
+      if (event.target === document.getElementById('promptSimulatorModal')) closePromptSimulator();
+    };
+
+    
+    // Language and Settings support (FA / EN)
+    let currentLanguage = localStorage.getItem('agent_lens_lang') || 'fa';
+
+    const translations = {
+      fa: {
+        radarTitle: 'اسکیل‌گیتور',
+        liveStatus: 'زنده',
+        searchPlaceholder: 'جستجو در اسکیل‌ها... (⌘K)',
+        palettePlaceholder: 'جستجوی سریع اسکیل، ابزار، MCP، تریگر... (Esc برای خروج)',
+        tabAll: 'همه آیتم‌ها',
+        tabCreatorOs: 'کریتور او‌اس (Creator OS)',
+        tabUserCustom: 'ساخته‌های خودم',
+        tabAntigravity: 'آنتی‌گرویتی (Antigravity)',
+        tabClaude: 'کلاد کد (Claude Code)',
+        tabMcp: 'سرورهای MCP',
+        tabClis: 'دستورات خط فرمان (CLI)',
+        settingsLabel: 'تنظیمات',
+        settingsTitle: 'تنظیمات استودیو',
+        settingsDesc: 'شخصی‌سازی زبان و رفتار مانیتورینگ',
+        settingLang: 'زبان رابط کاربری',
+        settingLangDesc: 'سوییچ بین حالت راست‌چین و چپ‌چین',
+        settingStream: 'پایش زنده فایل‌ها (Live Stream)',
+        settingStreamDesc: 'دریافت خودکار تغییرات جدید',
+        settingEditor: 'ادیتور فایل‌ها',
+        settingEditorDesc: 'باز کردن سریع اسکیل‌ها',
+        settingPort: 'پورت سرور لوکال',
+        copyUrl: 'کپی آدرس',
+        activeBadge: 'فعال (Active)',
+        sortRichness: '🔥 پربارترین',
+        sortFiles: '📂 تعداد فایل',
+        sortRecent: '⏱️ آخرین تغییرات',
+        sortName: '🔤 الفبا',
+        viewCard: 'کارت',
+        viewTable: 'جدول',
+        emptyText: 'هیچ موردی با این مشخصات پیدا نشد.',
+        thName: 'نام آیتم',
+        thType: 'نوع و پلتفرم',
+        thTriggers: 'تریگرها',
+        thSpecs: 'مشخصات',
+        thAction: 'مشاهده',
+        copyPathTitle: 'کپی مسیر فایل',
+        modalOpenEditor: 'باز کردن در ادیتور',
+        modalTreeTitle: 'ساختار پوشه‌ها و فایل‌ها',
+        modalTriggers: 'کلمات کلیدی محرک (Triggers)',
+        modalSize: 'حجم',
+        modalFiles: 'فایل‌ها',
+        modalLines: 'خطوط',
+        modalDescTitle: 'شرح و کاربرد',
+        toastUpdate: 'اطلاعات با موفقیت به‌روزرسانی شد.',
+        toastRescan: 'بررسی دوباره فایل‌ها انجام شد.',
+        itemsCount: 'مورد'
+      },
+      en: {
+        radarTitle: 'Skillgator',
+        liveStatus: 'Live',
+        searchPlaceholder: 'Search skills & tools... (⌘K)',
+        palettePlaceholder: 'Search skills, tools, MCP, triggers... (Esc to exit)',
+        tabAll: 'All Items',
+        tabCreatorOs: 'Creator OS',
+        tabUserCustom: 'Custom Created',
+        tabAntigravity: 'Antigravity',
+        tabClaude: 'Claude Code',
+        tabMcp: 'MCP Servers',
+        tabClis: 'CLI Tools',
+        settingsLabel: 'Settings',
+        settingsTitle: 'Studio Settings',
+        settingsDesc: 'Customize language and monitoring behavior',
+        settingLang: 'Interface Language',
+        settingLangDesc: 'Switch between RTL & LTR',
+        settingStream: 'Live Stream Monitoring',
+        settingStreamDesc: 'Auto-refresh on filesystem changes',
+        settingEditor: 'Code Editor',
+        settingEditorDesc: 'One-click open in IDE',
+        settingPort: 'Local Server Port',
+        copyUrl: 'Copy URL',
+        activeBadge: 'Active',
+        sortRichness: '🔥 Richness',
+        sortFiles: '📂 File Count',
+        sortRecent: '⏱️ Recent',
+        sortName: '🔤 Alphabetical',
+        viewCard: 'Cards',
+        viewTable: 'Table',
+        emptyText: 'No items match your query.',
+        thName: 'Item Name',
+        thType: 'Type & Platform',
+        thTriggers: 'Triggers',
+        thSpecs: 'Specifications',
+        thAction: 'Inspect',
+        copyPathTitle: 'Copy path to clipboard',
+        modalOpenEditor: 'Open in Editor',
+        modalTreeTitle: 'Directory & Files Structure',
+        modalTriggers: 'Triggers & Keywords',
+        modalSize: 'Size',
+        modalFiles: 'Files',
+        modalLines: 'Lines',
+        modalDescTitle: 'Description & Scope',
+        toastUpdate: 'Ecosystem updated successfully.',
+        toastRescan: 'Filesystem rescan complete.',
+        itemsCount: 'items'
+      }
+    };
+
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      localStorage.setItem('agent_lens_lang', lang);
+      applyLanguage(lang);
+    }
+
+    function applyLanguage(lang) {
+      const htmlElem = document.documentElement;
+      const t = translations[lang];
+
+      if (lang === 'en') {
+        htmlElem.setAttribute('dir', 'ltr');
+        htmlElem.setAttribute('lang', 'en');
+        document.getElementById('langEnBtn').className = "px-3 py-1 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all";
+        document.getElementById('langFaBtn').className = "px-3 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 transition-all";
+        // lang badge removed
+      } else {
+        htmlElem.setAttribute('dir', 'rtl');
+        htmlElem.setAttribute('lang', 'fa');
+        document.getElementById('langFaBtn').className = "px-3 py-1 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all";
+        document.getElementById('langEnBtn').className = "px-3 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 transition-all";
+        // lang badge removed
+      }
+
+      // Update text elements if present
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+      setTxt('brandTitle', t.radarTitle);
+      document.title = lang === 'fa' ? 'اسکیل‌گیتور | Skillgator' : 'Skillgator | AI Ecosystem';
+      setTxt('txt-settings-label', t.settingsLabel);
+      setTxt('txt-settings-title', t.settingsTitle);
+      setTxt('txt-settings-desc', t.settingsDesc);
+      setTxt('txt-setting-lang', t.settingLang);
+      setTxt('txt-setting-lang-desc', t.settingLangDesc);
+      setTxt('txt-setting-stream', t.settingStream);
+      setTxt('txt-setting-stream-desc', t.settingStreamDesc);
+      setTxt('txt-setting-editor', t.settingEditor);
+      setTxt('txt-setting-editor-desc', t.settingEditorDesc);
+      setTxt('txt-setting-port', t.settingPort);
+
+      // Translate sidebar tabs
+      setTxt('txt-tab-all', t.tabAll);
+      setTxt('txt-tab-creator-os', t.tabCreatorOs);
+      setTxt('txt-tab-user-custom', t.tabUserCustom);
+      setTxt('txt-tab-antigravity', t.tabAntigravity);
+      setTxt('txt-tab-claude', t.tabClaude);
+      setTxt('txt-tab-mcp', t.tabMcp);
+      setTxt('txt-tab-clis', t.tabClis);
+
+      // Translate table headers
+      setTxt('th-name', t.thName);
+      setTxt('th-type', t.thType);
+      setTxt('th-triggers', t.thTriggers);
+      setTxt('th-specs', t.thSpecs);
+      setTxt('th-action', t.thAction);
+
+      // Translate empty state
+      setTxt('txt-empty-state', t.emptyText);
+
+      // Translate sort order options
+      const sortSelect = document.getElementById('sortOrder');
+      if (sortSelect) {
+        sortSelect.options[0].text = t.sortRichness;
+        sortSelect.options[1].text = t.sortFiles;
+        sortSelect.options[2].text = t.sortRecent;
+        sortSelect.options[3].text = t.sortName;
+      }
+
+      // Translate view buttons
+      const viewGridBtn = document.getElementById('viewGridBtn');
+      if (viewGridBtn) viewGridBtn.querySelector('span').innerText = t.viewCard;
+      const viewTableBtn = document.getElementById('viewTableBtn');
+      if (viewTableBtn) viewTableBtn.querySelector('span').innerText = t.viewTable;
+
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.placeholder = t.searchPlaceholder;
+
+      const cmdPaletteInput = document.getElementById('cmdPaletteInput');
+      if (cmdPaletteInput) cmdPaletteInput.placeholder = t.palettePlaceholder;
+
+      const modalCopyBtn = document.getElementById('modalCopyBtn');
+      if (modalCopyBtn) modalCopyBtn.title = t.copyPathTitle;
+
+      renderItems();
+    }
+
+    function openSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function copyLocalUrl() {
+      navigator.clipboard.writeText('http://localhost:4949').then(() => {
+        showToast('آدرس لوکال کپی شد.');
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      applyLanguage(currentLanguage);
+      initLiveStream();
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('lang')) {
+        setLanguage(params.get('lang'));
+      }
+      if (params.get('view') === 'table') {
+        setTimeout(() => setViewMode('table'), 400);
+      }
+      if (params.get('open')) {
+        setTimeout(() => openModal(params.get('open')), 600);
+      }
+    });
+
+  </script>
+
+  <!-- پنجره تنظیمات استودیو (Settings Modal) -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+      
+      <!-- هدر تنظیمات -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
+            <i class="iconsax text-base" icon-name="setting-2"></i>
+          </div>
+          <div>
+            <h3 id="txt-settings-title" class="text-xs font-bold text-slate-900">تنظیمات رادار و استودیو</h3>
+            <p id="txt-settings-desc" class="text-[10px] text-slate-400">شخصی‌سازی زبان و رفتار مانیتورینگ</p>
+          </div>
+        </div>
+        <button onclick="closeSettingsModal()" class="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+          <i class="iconsax text-lg" icon-name="close-circle"></i>
+        </button>
+      </div>
+
+      <!-- محتوای گزینه‌های تنظیمات -->
+      <div class="p-6 space-y-4 text-xs">
+        
+        <!-- ۱. سوئیچ زبان (فارسی / English) -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <div id="txt-setting-lang" class="font-bold text-slate-800">زبان رابط کاربری</div>
+            <div id="txt-setting-lang-desc" class="text-[11px] text-slate-400 mt-0.5">سوییچ بین حالت راست‌چین و چپ‌چین</div>
+          </div>
+          <div class="flex items-center p-1 bg-slate-200/70 rounded-xl">
+            <button id="langFaBtn" onclick="setLanguage('fa')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all">فارسی</button>
+            <button id="langEnBtn" onclick="setLanguage('en')" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 transition-all">English</button>
+          </div>
+        </div>
+
+        <!-- ۲. سرعت مانیتورینگ خودکار -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <div id="txt-setting-stream" class="font-bold text-slate-800">پایش زنده فایل‌ها (Live Stream)</div>
+            <div id="txt-setting-stream-desc" class="text-[11px] text-slate-400 mt-0.5">دریافت خودکار تغییرات جدید</div>
+          </div>
+          <span class="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono-code font-bold text-[11px]">فعال (Active)</span>
+        </div>
+
+        <!-- ۳. ادیتور پیش‌فرض برای باز کردن فایل‌ها -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <div id="txt-setting-editor" class="font-bold text-slate-800">ادیتور فایل‌ها</div>
+            <div id="txt-setting-editor-desc" class="text-[11px] text-slate-400 mt-0.5">باز کردن سریع اسکیل‌ها</div>
+          </div>
+          <span class="px-2.5 py-1 rounded-xl bg-white text-slate-700 border border-slate-200 font-mono-code text-[11px]">Antigravity IDE</span>
+        </div>
+
+        <!-- ۴. اطلاعات پورت و آدرس محلی -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <div id="txt-setting-port" class="font-bold text-slate-800">پورت سرور لوکال</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">http://localhost:4949</div>
+          </div>
+          <button onclick="copyLocalUrl()" class="px-2.5 py-1 rounded-xl bg-white hover:bg-slate-100 text-blue-600 border border-slate-200 text-[11px] font-medium transition-colors">کپی آدرس</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

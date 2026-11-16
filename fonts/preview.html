@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پیش‌نمایش فونت اختصاصی دیجی‌کالا (Digikala Font)</title>
+  <link rel="stylesheet" href="digikala-font.css">
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --primary: #ef4056;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Digikala', system-ui, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 2rem 1rem;
+      line-height: 1.7;
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: #fee2e2;
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .meta-card {
+      background: var(--card-bg);
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .meta-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .meta-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .interactive-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.75rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+
+    .slider-box {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .slider-box input[type="range"] {
+      flex: 1;
+      height: 6px;
+      accent-color: var(--primary);
+    }
+
+    #sample-text {
+      font-size: 1.85rem;
+      line-height: 1.6;
+      border: 1px dashed var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      background-color: #fafafa;
+      outline: none;
+    }
+
+    .weights-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .weight-item {
+      background: var(--card-bg);
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .weight-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 0.4rem;
+    }
+
+    .weight-preview {
+      font-size: 1.35rem;
+      margin-top: 0.25rem;
+    }
+
+    .digits-section {
+      margin-top: 2rem;
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .digits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+      font-size: 1.15rem;
+    }
+
+    .price-box {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge">فونت رسمی دیجی‌کالا</span>
+      <h1>خانواده فونت دیجی‌کالا (Digikala Font)</h1>
+      <p class="subtitle">استخراج مستقیم از فرانت‌اند وب‌سایت رسمی Digikala.com</p>
+    </header>
+
+    <div class="meta-grid">
+      <div class="meta-card">
+        <div class="meta-title">طراح قلم</div>
+        <div class="meta-value">هیربد لطفیان (Hirbod Lotfian)</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-title">نسخه فونت</div>
+        <div class="meta-value">Version 2.401</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-title">نوع فونت</div>
+        <div class="meta-value">Variable Font (100-900)</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-title">تعداد وزن‌های ثابت</div>
+        <div class="meta-value">۹ وزن کامل</div>
+      </div>
+    </div>
+
+    <div class="interactive-card">
+      <h2 style="font-size: 1.3rem; margin-bottom: 1rem;">آزمایش تعاملی وزن متغیر (Variable Weight Slider)</h2>
+      <div class="slider-box">
+        <label for="weight-range" style="font-weight: 600;">وزن قلم: <span id="weight-val" style="color: var(--primary);">400</span></label>
+        <input type="range" id="weight-range" min="100" max="900" step="10" value="400">
+      </div>
+      <div id="sample-text" contenteditable="true">
+        لبخند به خانه می‌رسد، دیجی‌کالا | هر آنچه که نیاز دارید با بهترین قیمت
+      </div>
+    </div>
+
+    <h2 style="font-size: 1.4rem; margin-bottom: 1rem;">نمایش تمامی وزن‌های ۹ گانه فونت</h2>
+    <div class="weights-list">
+      <div class="weight-item">
+        <div class="weight-header"><span>Thin</span><span>وزن ۱۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 100;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>ExtraLight</span><span>وزن ۲۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 200;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>Light</span><span>وزن ۳۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 300;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>Regular</span><span>وزن ۴۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 400;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>Medium</span><span>وزن ۵۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 500;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>SemiBold</span><span>وزن ۶۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 600;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>Bold</span><span>وزن ۷۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 700;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>ExtraBold</span><span>وزن ۸۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 800;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+      <div class="weight-item">
+        <div class="weight-header"><span>Black</span><span>وزن ۹۰۰</span></div>
+        <div class="weight-preview" style="font-weight: 900;">دیجی‌کالا؛ بررسی، انتخاب و خرید آنلاین سریع و آسان</div>
+      </div>
+    </div>
+
+    <div class="digits-section">
+      <h3 style="font-size: 1.2rem;">تست اعداد فارسی، جداکنندهٔ ارقام و ارقام مالی</h3>
+      <div class="digits-grid">
+        <div class="price-box">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">قیمت محصول</div>
+          <div style="font-weight: 700; font-size: 1.35rem; color: var(--primary);">۱٬۲۵۰٬۰۰۰ تومان</div>
+        </div>
+        <div class="price-box">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">کد سفارش</div>
+          <div style="font-weight: 600; font-size: 1.35rem;">DKC-94827103</div>
+        </div>
+        <div class="price-box">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">تخفیف ویژه</div>
+          <div style="font-weight: 800; font-size: 1.35rem; color: #16a34a;">۲۵٪ تخفیف</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slider = document.getElementById('weight-range');
+    const valDisplay = document.getElementById('weight-val');
+    const sampleText = document.getElementById('sample-text');
+
+    slider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      valDisplay.textContent = val;
+      sampleText.style.fontWeight = val;
+    });
+  </script>
+</body>
+</html>
