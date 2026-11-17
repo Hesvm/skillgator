@@ -427,19 +427,19 @@
           <div id="modalMetrics" class="grid grid-cols-4 gap-1 p-2 bg-white rounded-xl border border-slate-200/70 text-center font-mono-code text-[11px]">
             <div>
               <div class="text-[10px] text-slate-400" id="txt-modal-size">حجم</div>
-              <div id="modalSize" class="font-bold text-slate-800">-</div>
+              <div id="modalSize" dir="ltr" class="font-bold text-slate-800">-</div>
             </div>
             <div class="border-x border-slate-100">
               <div class="text-[10px] text-slate-400" id="txt-modal-files">فایل‌ها</div>
-              <div id="modalFiles" class="font-bold text-slate-800">-</div>
+              <div id="modalFiles" dir="ltr" class="font-bold text-slate-800">-</div>
             </div>
             <div class="border-e border-slate-100">
               <div class="text-[10px] text-slate-400" id="txt-modal-lines">خطوط</div>
-              <div id="modalLines" class="font-bold text-slate-800">-</div>
+              <div id="modalLines" dir="ltr" class="font-bold text-slate-800">-</div>
             </div>
             <div>
               <div class="text-[10px] text-blue-500 font-bold" id="txt-modal-tokens">توکن</div>
-              <div id="modalTokens" class="font-bold text-blue-600">-</div>
+              <div id="modalTokens" dir="ltr" class="font-bold text-blue-600">-</div>
             </div>
           </div>
 
@@ -875,6 +875,21 @@
       `;
     }
 
+    function formatFileSize(kb) {
+      if (!kb || kb <= 0) return '0 KB';
+      const num = Number(kb);
+      if (isNaN(num)) return '0 KB';
+      if (num < 1024) {
+        return num < 10 ? `${num.toFixed(1)} KB` : `${Math.round(num)} KB`;
+      }
+      const mb = num / 1024;
+      if (mb < 1024) {
+        return mb < 10 ? `${mb.toFixed(1)} MB` : `${Math.round(mb)} MB`;
+      }
+      const gb = mb / 1024;
+      return `${gb.toFixed(2)} GB`;
+    }
+
     function renderItems() {
       if (!rawData) return;
       const grid = document.getElementById('cardsGrid');
@@ -1027,7 +1042,7 @@
             </td>
             <td class="py-3 px-4 font-mono-code text-[11px] text-slate-500 whitespace-nowrap">
               <div class="flex items-center gap-2">
-                ${item.tools_count ? `<span class="text-purple-600 font-bold">${item.tools_count} ${isEn ? "methods" : "متد"}</span>` : `<span>${item.size_kb || 0} KB</span>`}
+                ${item.tools_count ? `<span class="text-purple-600 font-bold">${item.tools_count} ${isEn ? "methods" : "متد"}</span>` : `<span dir="ltr" class="text-slate-600 font-medium">${formatFileSize(item.size_kb)}</span>`}
                 ${formattedTokens ? `<span dir="ltr" class="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 text-[10px]" title="Token weight">${formattedTokens} tok</span>` : ''}
               </div>
             </td>
@@ -1091,11 +1106,11 @@
       }
 
       // Metrics
-      document.getElementById('modalSize').innerText = `${item.size_kb || 0} KB`;
+      document.getElementById('modalSize').innerText = formatFileSize(item.size_kb || 0);
       document.getElementById('modalFiles').innerText = `${item.file_count || 1}`;
       document.getElementById('modalLines').innerText = `${(item.line_count || 0).toLocaleString()}`;
       
-      const tokenVal = item.token_weight ? (item.token_weight > 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`) : '-';
+      const tokenVal = item.token_weight ? (item.token_weight >= 1000000 ? `~${(item.token_weight / 1000000).toFixed(1)}M` : (item.token_weight >= 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`)) : '-';
       document.getElementById('modalTokens').innerText = tokenVal;
 
       // Localize modal headers
@@ -1201,7 +1216,7 @@
               <i class="iconsax text-xs ${iconColor}" icon-name="document-text"></i>
               <span class="truncate text-[11px] group-hover:text-blue-600">${escapeHtml(node.name)}</span>
             </div>
-            <span class="text-[9px] text-slate-400 font-mono-code">${node.size_kb ? `${node.size_kb}k` : ''}</span>
+            <span dir="ltr" class="text-[9px] text-slate-400 font-mono-code">${node.size_kb ? formatFileSize(node.size_kb) : ''}</span>
           `;
           nodeElem.onclick = () => loadFileContent(node.path, node.name, node.size_kb);
           container.appendChild(nodeElem);
