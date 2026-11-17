@@ -245,8 +245,20 @@
 
     </div>
 
-    <!-- دکمه دسترسی به تنظیمات در پایین سایدبار -->
-    <div class="pt-3 border-t border-slate-300/40 px-1">
+    <!-- دکمه‌های پایین سایدبار: حمایت مالی و تنظیمات -->
+    <div class="pt-2.5 border-t border-slate-300/40 px-1 space-y-1">
+      <!-- دکمه حمایت مالی (Animated Heart دقیقاً به سبک Vibekit) -->
+      <button onclick="openDonationModal()" 
+              id="btn-support-heart"
+              class="group w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-600 hover:text-rose-500 hover:bg-rose-50/70 transition-all cursor-pointer"
+              title="حمایت مالی از پروژه">
+        <div class="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-rose-100/70 flex items-center justify-center text-slate-600 group-hover:text-rose-500 shadow-2xs shrink-0 transition-all group-hover:scale-110">
+          <i class="iconsax text-base text-rose-500 transition-transform group-hover:scale-115" icon-name="heart"></i>
+        </div>
+        <span id="txt-support-label" class="font-bold text-slate-700 group-hover:text-rose-500 transition-colors">حمایت مالی</span>
+      </button>
+
+      <!-- دکمه تنظیمات -->
       <button onclick="openSettingsModal()" 
               class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 transition-all">
         <div class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shadow-2xs shrink-0">
@@ -1530,6 +1542,8 @@
         closePromptSimulator();
         closeModal();
         closeAddSkillModal();
+        closeSettingsModal();
+        closeDonationModal();
       }
     });
 
@@ -1539,6 +1553,7 @@
       if (event.target === document.getElementById('cmdPaletteModal')) closeCommandPalette();
       if (event.target === document.getElementById('promptSimulatorModal')) closePromptSimulator();
       if (event.target === document.getElementById('addSkillModal')) closeAddSkillModal();
+      if (event.target === document.getElementById('donationModal')) closeDonationModal();
     };
 
     
@@ -1599,6 +1614,7 @@
         toastUpdate: 'اطلاعات با موفقیت به‌روزرسانی شد.',
         toastRescan: 'بررسی دوباره فایل‌ها انجام شد.',
         itemsCount: 'مورد',
+        supportLabel: 'حمایت مالی',
         btnAddSkill: 'مهارت جدید',
         addModalTitle: 'افزودن مهارت جدید (Add Skill)',
         addModalDesc: 'ساخت دستی، ایمپورت از گیت‌هاب یا استفاده از تمپلیت',
@@ -1668,6 +1684,7 @@
         toastUpdate: 'Ecosystem updated successfully.',
         toastRescan: 'Filesystem rescan complete.',
         itemsCount: 'items',
+        supportLabel: 'Support Project',
         btnAddSkill: 'New Skill',
         addModalTitle: 'Add New Skill',
         addModalDesc: 'Manual builder, GitHub import or quick templates',
@@ -1734,6 +1751,7 @@
       setTxt('txt-tab-mcp', t.tabMcp);
       setTxt('txt-tab-clis', t.tabClis);
       setTxt('txt-tab-conflicts', t.tabConflicts);
+      setTxt('txt-support-label', t.supportLabel);
 
       // Translate conflict banner
       setTxt('txt-conflicts-banner-title', t.txtConflictsBannerTitle);
@@ -2029,9 +2047,489 @@ Optimize content structure and citation readiness for AI Overviews and answer en
       if (params.get('add')) {
         setTimeout(() => openAddSkillModal(), 500);
       }
+      if (params.get('donate')) {
+        setTimeout(() => openDonationModal(), 600);
+      }
     });
 
+    // ==========================================
+    // Donation Modal Logic (Exact Vibekit 1:1)
+    // ==========================================
+    const DON_CRYPTO_NETWORKS = [
+      {
+        id: "usdt-bep20",
+        name: "USDT",
+        network: "BEP-20 (BNB Smart Chain)",
+        badge: "BEP-20",
+        address: "0x73aCd9Cae9a289C2b6EA3c689E1ed737cd047384",
+        qr: "/assets/crypto-qr/qr-usdt-bep20-white.png",
+        color: "#26A17B",
+        subBadge: "BNB"
+      },
+      {
+        id: "usdt-trc20",
+        name: "USDT",
+        network: "TRC-20 (Tron)",
+        badge: "TRC-20",
+        address: "TDdTiWFTKZvn3dJvi9bxkDemMnA43vDgyy",
+        qr: "/assets/crypto-qr/qr-usdt-trc20-white.png",
+        color: "#26A17B",
+        subBadge: "TRON"
+      },
+      {
+        id: "sol",
+        name: "SOL",
+        network: "Solana",
+        badge: "Solana",
+        address: "3JS3Gc5uorKo99ggqXPQywWa4uvs1VSgARo7FB9TzNhq",
+        qr: "/assets/crypto-qr/qr-sol-white.png",
+        color: "#14F195",
+        subBadge: "SOL"
+      },
+      {
+        id: "ton",
+        name: "TON",
+        network: "The Open Network",
+        badge: "TON",
+        address: "UQCMV4ZU5oUt4zolv_oIFj-eqa0Ab5YZdg8GML2Xqj4JpSrx",
+        qr: "/assets/crypto-qr/qr-ton-white.png",
+        color: "#0098EA",
+        subBadge: "TON"
+      }
+    ];
+
+    let currentDonationMethod = "toman"; // "toman" | "crypto"
+    let currentRawToman = "250000";
+    let currentRawCrypto = "50";
+    let currentDonationStep = 1; // 1 | 2
+    let currentSelectedCrypto = DON_CRYPTO_NETWORKS[0];
+
+    const TOMAN_PRESETS = [100000, 250000, 500000, 1000000];
+    const CRYPTO_PRESETS = [10, 25, 50, 100, 250];
+
+    function handleSupportClick() {
+      const btn = document.getElementById('btn-support-heart');
+      if (btn) {
+        btn.classList.add('scale-95');
+        setTimeout(() => btn.classList.remove('scale-95'), 180);
+      }
+      openDonationModal();
+    }
+
+    function openDonationModal() {
+      currentDonationStep = 1;
+      const modal = document.getElementById('donationModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        setDonationMethod(currentDonationMethod);
+        updateDonationDisplay();
+        goToDonationStep1();
+        setTimeout(() => focusDonationInput(), 100);
+      }
+    }
+
+    function closeDonationModal() {
+      const modal = document.getElementById('donationModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function setDonationMethod(method) {
+      currentDonationMethod = method;
+      const tabToman = document.getElementById('donTabToman');
+      const tabCrypto = document.getElementById('donTabCrypto');
+      const dispToman = document.getElementById('donDispToman');
+      const dispCrypto = document.getElementById('donDispCrypto');
+
+      if (method === 'toman') {
+        if (tabToman) tabToman.className = "relative z-10 flex-1 py-1.5 rounded-full text-xs font-bold text-center transition-all cursor-pointer bg-white text-neutral-900 shadow-sm";
+        if (tabCrypto) tabCrypto.className = "relative z-10 flex-1 py-1.5 rounded-full text-xs font-bold text-center transition-all cursor-pointer text-white/60 hover:text-white";
+        if (dispToman) dispToman.classList.remove('hidden');
+        if (dispCrypto) dispCrypto.classList.add('hidden');
+      } else {
+        if (tabCrypto) tabCrypto.className = "relative z-10 flex-1 py-1.5 rounded-full text-xs font-bold text-center transition-all cursor-pointer bg-white text-neutral-900 shadow-sm";
+        if (tabToman) tabToman.className = "relative z-10 flex-1 py-1.5 rounded-full text-xs font-bold text-center transition-all cursor-pointer text-white/60 hover:text-white";
+        if (dispCrypto) dispCrypto.classList.remove('hidden');
+        if (dispToman) dispToman.classList.add('hidden');
+      }
+
+      currentDonationStep = 1;
+      goToDonationStep1();
+      renderDonationPresets();
+      updateDonationDisplay();
+      setTimeout(() => focusDonationInput(), 50);
+    }
+
+    function focusDonationInput() {
+      const input = document.getElementById('donInputAmount');
+      if (input) {
+        input.value = currentDonationMethod === 'toman' ? currentRawToman : currentRawCrypto;
+        input.focus();
+      }
+    }
+
+    function handleDonationInput(el) {
+      const digits = el.value.replace(/[^0-9]/g, '');
+      if (digits.length <= 11) {
+        if (currentDonationMethod === 'toman') {
+          currentRawToman = digits;
+        } else {
+          currentRawCrypto = digits;
+        }
+      }
+      updateDonationDisplay();
+    }
+
+    function handleDonationKey(e) {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentDonationMethod === 'toman') {
+          currentRawToman = String((Number(currentRawToman) || 0) + 100000);
+        } else {
+          currentRawCrypto = String((Number(currentRawCrypto) || 0) + 10);
+        }
+        updateDonationDisplay();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (currentDonationMethod === 'toman') {
+          currentRawToman = String(Math.max(0, (Number(currentRawToman) || 0) - 100000));
+        } else {
+          currentRawCrypto = String(Math.max(0, (Number(currentRawCrypto) || 0) - 10));
+        }
+        updateDonationDisplay();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        goToDonationStep2();
+      }
+    }
+
+    function updateDonationDisplay() {
+      const tomanValEl = document.getElementById('donTomanVal');
+      const cryptoValEl = document.getElementById('donCryptoVal');
+      const input = document.getElementById('donInputAmount');
+
+      if (tomanValEl) {
+        const val = Number(currentRawToman) || 0;
+        tomanValEl.innerText = val ? val.toLocaleString('fa-IR') : '۰';
+      }
+      if (cryptoValEl) {
+        const val = Number(currentRawCrypto) || 0;
+        cryptoValEl.innerText = val ? val.toLocaleString('en-US') : '0';
+      }
+      if (input) {
+        input.value = currentDonationMethod === 'toman' ? currentRawToman : currentRawCrypto;
+      }
+      renderDonationPresets();
+    }
+
+    function renderDonationPresets() {
+      const container = document.getElementById('donPresetsContainer');
+      if (!container) return;
+      const isCrypto = (currentDonationMethod === 'crypto');
+      const presets = isCrypto ? CRYPTO_PRESETS : TOMAN_PRESETS;
+      const currentVal = isCrypto ? Number(currentRawCrypto) : Number(currentRawToman);
+
+      container.innerHTML = presets.map(val => {
+        const isSelected = (currentVal === val);
+        const label = isCrypto 
+          ? `$${val}` 
+          : (val >= 1000000 ? `${(val / 1000000).toLocaleString('fa-IR')} میلیون` : `${(val / 1000).toLocaleString('fa-IR')} هزار`);
+        return `
+          <button type="button" 
+                  onclick="selectDonationPreset(${val})"
+                  class="px-3.5 py-1.5 rounded-full text-xs font-mono font-medium transition-all cursor-pointer ${
+                    isSelected 
+                      ? 'bg-white text-black font-bold shadow-md scale-105' 
+                      : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-white/5'
+                  }">
+            ${label}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectDonationPreset(val) {
+      if (currentDonationMethod === 'crypto') {
+        currentRawCrypto = String(val);
+      } else {
+        currentRawToman = String(val);
+      }
+      updateDonationDisplay();
+      focusDonationInput();
+    }
+
+    function goToDonationStep1() {
+      currentDonationStep = 1;
+      const step1 = document.getElementById('donStep1');
+      const step2 = document.getElementById('donStep2');
+      if (step1) step1.classList.remove('hidden');
+      if (step2) step2.classList.add('hidden');
+      setTimeout(() => focusDonationInput(), 50);
+    }
+
+    function goToDonationStep2() {
+      const amt = currentDonationMethod === 'toman' ? Number(currentRawToman) : Number(currentRawCrypto);
+      if (!amt || amt <= 0) {
+        showToast('لطفاً یک مبلغ معتبر وارد کنید');
+        focusDonationInput();
+        return;
+      }
+
+      currentDonationStep = 2;
+      const step1 = document.getElementById('donStep1');
+      const step2 = document.getElementById('donStep2');
+      if (step1) step1.classList.add('hidden');
+      if (step2) step2.classList.remove('hidden');
+
+      const step2Amt = document.getElementById('donStep2Amount');
+      if (step2Amt) {
+        step2Amt.innerText = currentDonationMethod === 'crypto' 
+          ? `$${amt}` 
+          : `${amt.toLocaleString('fa-IR')} تومان`;
+      }
+
+      const tomanDetails = document.getElementById('donTomanDetails');
+      const cryptoDetails = document.getElementById('donCryptoDetails');
+
+      if (currentDonationMethod === 'toman') {
+        if (tomanDetails) tomanDetails.classList.remove('hidden');
+        if (cryptoDetails) cryptoDetails.classList.add('hidden');
+      } else {
+        if (tomanDetails) tomanDetails.classList.add('hidden');
+        if (cryptoDetails) cryptoDetails.classList.remove('hidden');
+        selectCryptoNetwork(currentSelectedCrypto.id);
+      }
+    }
+
+    function selectCryptoNetwork(netId) {
+      const net = DON_CRYPTO_NETWORKS.find(n => n.id === netId) || DON_CRYPTO_NETWORKS[0];
+      currentSelectedCrypto = net;
+
+      // Update button active states
+      DON_CRYPTO_NETWORKS.forEach(n => {
+        const btn = document.getElementById(`donNetBtn-${n.id}`);
+        if (!btn) return;
+        if (n.id === net.id) {
+          btn.className = "don-net-btn relative flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer bg-white text-black shadow-lg";
+          const subBadge = btn.querySelector('.don-sub-badge');
+          if (subBadge) subBadge.className = "don-sub-badge text-[9px] font-mono mt-0.5 tracking-tight font-semibold text-neutral-700";
+        } else {
+          btn.className = "don-net-btn relative flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer text-neutral-400 hover:text-white hover:bg-white/5";
+          const subBadge = btn.querySelector('.don-sub-badge');
+          if (subBadge) subBadge.className = "don-sub-badge text-[9px] font-mono mt-0.5 tracking-tight text-neutral-500";
+        }
+      });
+
+      // Update QR Image and address
+      const qrImg = document.getElementById('donCryptoQR');
+      if (qrImg) qrImg.src = net.qr;
+
+      const netLabel = document.getElementById('donCryptoNetLabel');
+      if (netLabel) netLabel.innerText = net.network;
+
+      const walletTitle = document.getElementById('donWalletTitle');
+      if (walletTitle) walletTitle.innerText = `آدرس ولت (${net.badge})`;
+
+      const walletAddr = document.getElementById('donWalletAddress');
+      if (walletAddr) walletAddr.innerText = net.address;
+
+      const warnBadge = document.getElementById('donWarnBadge');
+      if (warnBadge) warnBadge.innerText = net.badge;
+    }
+
+    function copyCurrentCryptoWallet() {
+      if (!currentSelectedCrypto) return;
+      copyDonationText(currentSelectedCrypto.address, `آدرس ولت ${currentSelectedCrypto.name}`);
+    }
+
+    function copyDonationText(text, label) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`${label} با موفقیت کپی شد.`);
+      }).catch(() => {
+        showToast('کپی انجام شد.');
+      });
+    }
+
   </script>
+
+  <!-- پنجره حمایت مالی (Donation Modal - Exact Vibekit Design) -->
+  <div id="donationModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 select-none">
+    <div class="relative w-full max-w-[420px] rounded-[36px] bg-[#0c0c0e] text-white border border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col items-center p-6 text-center z-10 animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Bottom Ambient Glow -->
+      <div class="pointer-events-none absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-rose-950/30 via-rose-900/10 to-transparent"></div>
+
+      <!-- Header Bar: Close Button & Segmented Switcher -->
+      <div class="relative w-full flex items-center justify-center min-h-[36px] z-20">
+        <!-- Close Button on left -->
+        <button onclick="closeDonationModal()" class="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-neutral-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="بستن">
+          <i class="iconsax text-base" icon-name="close-circle"></i>
+        </button>
+
+        <!-- Segmented Pill Switcher -->
+        <div class="relative flex items-center bg-white/[0.08] p-1 rounded-full w-44 select-none" dir="rtl">
+          <button id="donTabToman" onclick="setDonationMethod('toman')" class="relative z-10 flex-1 py-1.5 rounded-full text-xs font-bold text-center transition-all cursor-pointer bg-white text-neutral-900 shadow-sm">
+            تومان
+          </button>
+          <button id="donTabCrypto" onclick="setDonationMethod('crypto')" class="relative z-10 flex-1 py-1.5 rounded-full text-xs font-bold text-center transition-all cursor-pointer text-white/60 hover:text-white">
+            کریپتو
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 1: Amount Selection -->
+      <div id="donStep1" class="w-full flex flex-col items-center mt-7 z-10">
+        <div onclick="focusDonationInput()" class="relative w-full rounded-2xl bg-white/[0.04] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 p-5 flex flex-col items-center justify-center cursor-text transition-colors">
+          <input id="donInputAmount" type="text" inputmode="numeric" oninput="handleDonationInput(this)" onkeydown="handleDonationKey(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-text z-20" aria-label="مبلغ حمایت">
+          
+          <div class="flex items-center justify-center font-mono pointer-events-none select-none z-10">
+            <!-- Toman Amount Display -->
+            <div id="donDispToman" class="flex items-baseline gap-2">
+              <span id="donTomanVal" class="text-4xl sm:text-5xl font-black tracking-tight text-white font-mono">۲۵۰,۰۰۰</span>
+              <span class="inline-block w-[3px] h-8 bg-fuchsia-500 rounded-full mx-0.5 animate-pulse"></span>
+              <span class="text-xs text-neutral-400 font-medium mr-1">تومان</span>
+            </div>
+            <!-- Crypto Amount Display -->
+            <div id="donDispCrypto" class="hidden flex items-baseline gap-1" dir="ltr">
+              <span class="text-3xl text-neutral-400 font-light">$</span>
+              <span id="donCryptoVal" class="text-5xl font-black tracking-tight text-white font-mono">50</span>
+              <span class="inline-block w-[3px] h-8 bg-fuchsia-500 rounded-full ml-0.5 animate-pulse"></span>
+            </div>
+          </div>
+
+          <!-- Quick Presets Grid -->
+          <div id="donPresetsContainer" class="flex flex-wrap items-center justify-center gap-2 mt-5 w-full z-30 pointer-events-auto">
+            <!-- Populated dynamically based on Toman / Crypto -->
+          </div>
+        </div>
+
+        <!-- Heart and Emotional Copy -->
+        <div class="flex flex-col items-center my-6">
+          <div class="text-4xl mb-3 select-none">❤️‍🔥</div>
+          <p class="text-[13px] font-medium text-neutral-200 leading-relaxed max-w-[320px]">
+            حمایتت باعث میشه این مسیر رو سریع‌تر و قوی‌تر جلو ببریم. مرسی ازت
+          </p>
+        </div>
+
+        <!-- Next Button -->
+        <button onclick="goToDonationStep2()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500/80 via-pink-600/80 to-rose-600/80 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-sm shadow-[0_10px_25px_-5px_rgba(244,63,94,0.4)] border border-white/20 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2">
+          <span>ادامه پرداخت</span>
+          <i class="iconsax text-base rotate-180" icon-name="arrow-right-2"></i>
+        </button>
+      </div>
+
+      <!-- STEP 2: Payment Details -->
+      <div id="donStep2" class="hidden w-full flex flex-col items-center mt-5 z-10">
+        <div class="w-full flex items-center justify-between mb-3 px-1">
+          <button onclick="goToDonationStep1()" class="flex items-center gap-1 text-xs text-neutral-400 hover:text-white transition cursor-pointer">
+            <i class="iconsax text-sm" icon-name="arrow-right-2"></i>
+            <span>تغییر مبلغ</span>
+          </button>
+          <span id="donStep2Amount" class="text-xs font-bold text-rose-400 font-mono">
+            ۲۵۰,۰۰۰ تومان
+          </span>
+        </div>
+
+        <!-- Toman Details -->
+        <div id="donTomanDetails" class="w-full flex flex-col gap-3">
+          <div class="w-full rounded-2xl bg-white/[0.04] border border-white/10 p-4 text-start">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-neutral-400 font-medium">شماره کارت (بانک سامان)</span>
+              <i class="iconsax text-base text-rose-500" icon-name="card"></i>
+            </div>
+            <div class="flex items-center justify-between bg-black/40 rounded-xl p-2.5 border border-white/5">
+              <span class="font-mono text-sm font-bold tracking-widest text-white" dir="ltr">
+                6219-8619-3344-5566
+              </span>
+              <button onclick="copyDonationText('6219861933445566', 'شماره کارت')" class="p-1 rounded-lg hover:bg-white/10 text-neutral-300 hover:text-white transition cursor-pointer" title="کپی شماره کارت">
+                <i class="iconsax text-base" icon-name="copy"></i>
+              </button>
+            </div>
+            <div class="mt-2 text-[11px] text-neutral-400">به نام: حسام الدین (تیم وایب کیت)</div>
+          </div>
+
+          <a href="https://zarinp.al/vibeclub" target="_blank" rel="noopener noreferrer" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md border border-emerald-400/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span>پرداخت امن شتابی (زرین‌پال)</span>
+            <i class="iconsax text-base" icon-name="tick-circle"></i>
+          </a>
+        </div>
+
+        <!-- Crypto Details -->
+        <div id="donCryptoDetails" class="hidden w-full flex flex-col gap-3">
+          <!-- 4 Network Tabs -->
+          <div class="grid grid-cols-4 gap-1.5 w-full bg-white/[0.03] p-1 rounded-2xl border border-white/5">
+            <button onclick="selectCryptoNetwork('usdt-bep20')" id="donNetBtn-usdt-bep20" class="don-net-btn relative flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer bg-white text-black shadow-lg">
+              <div class="w-5 h-5 mb-1 relative flex items-center justify-center">
+                <svg viewBox="0 0 32 32" class="w-full h-full"><circle cx="16" cy="16" r="16" fill="#26A17B"/><path d="M17.92 17.57c-.1.01-.58.04-1.92.04-1.07 0-1.74-.03-1.92-.04-4.22-.19-7.37-.89-7.37-1.73s3.15-1.54 7.37-1.73v2.75c.18.02.87.05 1.94.05 1.29 0 1.81-.03 1.9-.05V14.1c4.21.19 7.35.89 7.35 1.73s-3.14 1.54-7.35 1.74zm0-3.75V11.2h4.86V8.34H9.22V11.2h4.86v2.62C9.48 14.04 6 14.86 6 15.87c0 1.02 3.48 1.84 8.08 2.05v8.13h3.84v-8.13c4.6-.21 8.08-1.03 8.08-2.05 0-1.01-3.48-1.83-8.08-2.05z" fill="#FFFFFF"/></svg>
+                <span class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-[#F3BA2F] border-2 border-[#0c0c0e] flex items-center justify-center text-[7px] font-black text-black leading-none">B</span>
+              </div>
+              <span class="text-[11px] font-bold leading-none">USDT</span>
+              <span class="don-sub-badge text-[9px] font-mono mt-0.5 tracking-tight font-semibold text-neutral-700">BEP-20</span>
+            </button>
+
+            <button onclick="selectCryptoNetwork('usdt-trc20')" id="donNetBtn-usdt-trc20" class="don-net-btn relative flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer text-neutral-400 hover:text-white hover:bg-white/5">
+              <div class="w-5 h-5 mb-1 relative flex items-center justify-center">
+                <svg viewBox="0 0 32 32" class="w-full h-full"><circle cx="16" cy="16" r="16" fill="#26A17B"/><path d="M17.92 17.57c-.1.01-.58.04-1.92.04-1.07 0-1.74-.03-1.92-.04-4.22-.19-7.37-.89-7.37-1.73s3.15-1.54 7.37-1.73v2.75c.18.02.87.05 1.94.05 1.29 0 1.81-.03 1.9-.05V14.1c4.21.19 7.35.89 7.35 1.73s-3.14 1.54-7.35 1.74zm0-3.75V11.2h4.86V8.34H9.22V11.2h4.86v2.62C9.48 14.04 6 14.86 6 15.87c0 1.02 3.48 1.84 8.08 2.05v8.13h3.84v-8.13c4.6-.21 8.08-1.03 8.08-2.05 0-1.01-3.48-1.83-8.08-2.05z" fill="#FFFFFF"/></svg>
+                <span class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-[#EF0027] border-2 border-[#0c0c0e] flex items-center justify-center text-[7px] font-black text-white leading-none">T</span>
+              </div>
+              <span class="text-[11px] font-bold leading-none">USDT</span>
+              <span class="don-sub-badge text-[9px] font-mono mt-0.5 tracking-tight text-neutral-500">TRC-20</span>
+            </button>
+
+            <button onclick="selectCryptoNetwork('sol')" id="donNetBtn-sol" class="don-net-btn relative flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer text-neutral-400 hover:text-white hover:bg-white/5">
+              <div class="w-5 h-5 mb-1 relative flex items-center justify-center">
+                <svg viewBox="0 0 397.7 311.7" class="w-full h-full"><defs><linearGradient id="solG1" x1="363.9" y1="309.2" x2="56.5" y2="-7.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient></defs><path fill="url(#solG1)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/></svg>
+              </div>
+              <span class="text-[11px] font-bold leading-none">SOL</span>
+              <span class="don-sub-badge text-[9px] font-mono mt-0.5 tracking-tight text-neutral-500">Solana</span>
+            </button>
+
+            <button onclick="selectCryptoNetwork('ton')" id="donNetBtn-ton" class="don-net-btn relative flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer text-neutral-400 hover:text-white hover:bg-white/5">
+              <div class="w-5 h-5 mb-1 relative flex items-center justify-center">
+                <svg viewBox="0 0 32 32" class="w-full h-full"><circle cx="16" cy="16" r="16" fill="#0098EA"/><path d="M8.2 12.8L15.3 25c.3.5 1.1.5 1.4 0l7.1-12.2c.3-.5 0-1.1-.6-1.1H8.8c-.6 0-.9.6-.6 1.1z" fill="#FFFFFF"/><path d="M16 7l7.8 4.7H8.2L16 7z" fill="#FFFFFF" opacity="0.8"/></svg>
+              </div>
+              <span class="text-[11px] font-bold leading-none">TON</span>
+              <span class="don-sub-badge text-[9px] font-mono mt-0.5 tracking-tight text-neutral-500">TON</span>
+            </button>
+          </div>
+
+          <!-- QR Code Container -->
+          <div class="relative w-full rounded-2xl bg-white/[0.04] border border-white/10 p-3.5 flex flex-col items-center text-center">
+            <div class="relative w-44 h-44 rounded-2xl bg-[#0d0d12] p-3 shadow-2xl flex items-center justify-center border border-white/10 overflow-hidden">
+              <img id="donCryptoQR" src="/assets/crypto-qr/qr-usdt-bep20-white.png" alt="Crypto QR Code" class="w-full h-full object-contain select-none">
+            </div>
+            <div class="mt-2.5 flex items-center justify-center gap-1.5 text-[11px] text-neutral-400 font-medium">
+              <span>شبکه: <span id="donCryptoNetLabel" class="text-white font-mono font-bold" dir="ltr">BEP-20 (BNB Smart Chain)</span></span>
+            </div>
+          </div>
+
+          <!-- Wallet Address Box -->
+          <div class="w-full rounded-2xl bg-white/[0.04] border border-white/10 p-3.5 text-start">
+            <div class="flex items-center justify-between mb-1.5">
+              <span id="donWalletTitle" class="text-[11px] text-neutral-400 font-medium">آدرس ولت (BEP-20)</span>
+              <i class="iconsax text-sm text-rose-500" icon-name="wallet-3"></i>
+            </div>
+            <div class="flex items-center justify-between bg-black/55 rounded-xl p-2.5 border border-white/5 gap-2">
+              <span id="donWalletAddress" class="font-mono text-[11px] text-neutral-200 select-all break-all leading-relaxed" dir="ltr">
+                0x73aCd9Cae9a289C2b6EA3c689E1ed737cd047384
+              </span>
+              <button id="donCopyWalletBtn" onclick="copyCurrentCryptoWallet()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all shrink-0 flex items-center gap-1 text-xs cursor-pointer" title="کپی آدرس">
+                <i class="iconsax text-sm" icon-name="copy"></i>
+                <span class="text-[10px] font-bold">کپی</span>
+              </button>
+            </div>
+            <p id="donCryptoWarn" class="text-[10.5px] text-amber-400/80 mt-2 text-center" dir="rtl">
+              ⚠️ لطفاً فقط دارایی‌های روی شبکه <span id="donWarnBadge" class="font-bold font-mono text-amber-300">BEP-20</span> را به این آدرس ارسال کنید.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 text-[11px] text-neutral-400">
+          پس از پرداخت، حمایت شما مستقیماً صرف توسعه ویژگی‌های جدید خواهد شد. 🙏
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- پنجره تنظیمات استودیو (Settings Modal) -->
   <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
