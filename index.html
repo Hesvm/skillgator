@@ -262,58 +262,55 @@
   <main class="flex-1 h-full floating-frame flex flex-col overflow-hidden relative z-10 transition-all duration-300">
     
     <!-- نوار بالای فریم اصلی (فقط کنترل‌های مرتب‌سازی، تغییر نما و خروجی) -->
-    <header class="px-6 py-3.5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-xs">
+    <header class="px-5 py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-xs">
       
       <!-- سمت راست هدر: سوئیچ نما و فیلتر مرتب‌سازی -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2">
         <!-- سوئیچ شبکه ای / جدول فشرده -->
-        <div class="flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200/60">
-          <button id="viewGridBtn" onclick="setViewMode('grid')" title="نمای شبکه‌ای کارتی" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1">
+        <div class="flex items-center p-0.5 bg-slate-100/80 rounded-xl border border-slate-200/50">
+          <button id="viewGridBtn" onclick="setViewMode('grid')" title="نمای کارتی" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs transition-all flex items-center gap-1">
             <i class="iconsax text-xs" icon-name="element-3"></i>
             <span>کارت</span>
           </button>
-          <button id="viewTableBtn" onclick="setViewMode('table')" title="نمای جدولی فشرده" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1">
+          <button id="viewTableBtn" onclick="setViewMode('table')" title="نمای جدولی" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700 transition-all flex items-center gap-1">
             <i class="iconsax text-xs" icon-name="row-vertical"></i>
             <span>جدول</span>
           </button>
         </div>
 
-        <!-- فیلتر مرتب‌سازی -->
-        <select id="sortOrder" onchange="renderItems()" class="bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 font-medium focus:outline-none focus:border-slate-400 cursor-pointer transition-colors">
-          <option value="richness" selected>🔥 پربارترین</option>
-          <option value="tokens">📊 وزن توکن (Token Weight)</option>
-          <option value="files">📂 تعداد فایل</option>
-          <option value="recent">⏱️ آخرین تغییرات</option>
-          <option value="name">🔤 الفبا</option>
+        <!-- فیلتر مرتب‌سازی ساده و مینیمال -->
+        <select id="sortOrder" onchange="renderItems()" class="bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200/60 text-slate-600 text-xs rounded-xl px-2.5 py-1.5 font-medium focus:outline-none focus:border-slate-300 cursor-pointer transition-colors">
+          <option value="richness" selected>غنی‌تر / محبوب‌تر</option>
+          <option value="tokens">وزن توکن</option>
+          <option value="files">تعداد فایل</option>
+          <option value="recent">آخرین تغییرات</option>
+          <option value="name">حروف الفبا</option>
         </select>
       </div>
 
       <!-- سمت چپ هدر: دکمه افزودن مهارت جدید و نشانگر وضعیت بار توکن -->
       <div class="flex items-center gap-2.5">
-        <!-- نشانگر وضعیت بار توکن کل سیستم (System Token Weight Indicator) -->
-        <div id="systemTokenBadge" class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100/80 border border-slate-200/70 text-slate-600 text-[11px]" title="تخمین کل بار توکن اسکیماها و پرامپت‌ها">
-          <i class="iconsax text-xs text-blue-500" icon-name="cpu-charge"></i>
-          <span>وزن کانتکست:</span>
-          <span id="systemTokenValue" dir="ltr" class="font-bold text-slate-900 font-mono-code">~0k</span>
-          <span class="text-[10px] text-slate-400 font-mono-code">tokens</span>
+        <!-- نشانگر وضعیت بار توکن کل سیستم مینیمال -->
+        <div id="systemTokenBadge" dir="ltr" class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/70 border border-slate-200/50 text-slate-500 text-[11px] font-mono-code" title="تخمین بار توکن کل سیستم">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span id="systemTokenValue" class="font-semibold text-slate-700">~0k</span>
+          <span class="text-[10px] text-slate-400">tokens</span>
         </div>
 
-        <!-- دکمه مهارت جدید -->
-        <button onclick="openAddSkillModal()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 font-bold text-xs shadow-2xs hover:shadow-sm transition-all active:scale-95 cursor-pointer" title="ساخت یا ایمپورت مهارت جدید">
-          <i class="iconsax text-sm" icon-name="add-circle"></i>
+        <!-- دکمه مهارت جدید به سبک مینیمال تیره (Linear Style) -->
+        <button onclick="openAddSkillModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs hover:shadow-sm transition-all active:scale-95 cursor-pointer" title="ساخت یا ایمپورت مهارت جدید">
+          <i class="iconsax text-sm" icon-name="add"></i>
           <span id="txt-btn-add-skill">مهارت جدید</span>
         </button>
       </div>
 
-
-
     </header>
 
     <!-- محتوای اسکرول‌خور درون فریم شناور -->
-    <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-5">
       
       <!-- شبکه کارت‌های وسط‌چین مینیمال -->
-      <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+      <div id="cardsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3.5">
         <!-- کارت‌ها با جاوااسکریپت رندر می‌شوند -->
       </div>
 
@@ -644,7 +641,9 @@
 
       // Update System Token Weight indicator
       const totalTokens = stats.total_token_weight || 0;
-      const tokenDisplay = totalTokens > 1000 ? `~${Math.round(totalTokens / 1000)}k` : `~${totalTokens}`;
+      const tokenDisplay = totalTokens >= 1000000 
+        ? `~${(totalTokens / 1000000).toFixed(1)}M` 
+        : (totalTokens >= 1000 ? `~${Math.round(totalTokens / 1000)}k` : `~${totalTokens}`);
       const systemTokenVal = document.getElementById('systemTokenValue');
       if (systemTokenVal) systemTokenVal.innerText = tokenDisplay;
 
@@ -854,55 +853,54 @@
 
       empty.classList.add('hidden');
 
-      // 1. Render Cards Grid
+      // 1. Render Cards Grid (Minimalist & Clutter-Free)
       grid.innerHTML = items.map(item => {
         const isCreatorOs = item.suite === 'Creator OS' || (item.platform && item.platform.includes('Creator OS'));
-        let metaTag = '';
+        const formattedTokens = item.token_weight ? (item.token_weight >= 1000000 ? `~${(item.token_weight / 1000000).toFixed(1)}M` : (item.token_weight >= 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`)) : null;
+        
+        let singleBadge = '';
         if (item.tools_count) {
           const toolWord = isEn ? 'methods' : 'ابزار';
-          metaTag = `<span class="text-[11px] font-mono-code text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${item.tools_count} ${toolWord}</span>`;
-        } else if (item.size_kb) {
-          metaTag = `<span class="text-[11px] font-mono-code text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">${item.size_kb} KB</span>`;
-        }
-
-        let tokenTag = '';
-        if (item.token_weight) {
-          const formattedTokens = item.token_weight > 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`;
-          tokenTag = `<span dir="ltr" class="text-[10px] font-mono-code text-blue-700 bg-blue-50/90 border border-blue-200/80 px-1.5 py-0.5 rounded-full inline-block" title="${isEn ? 'Estimated context token weight' : 'تخمین وزن توکن در کانتکست'}">${formattedTokens} tok</span>`;
-        }
-
-        let badgeTag = '';
-        if (isCreatorOs) {
-          badgeTag = `<span class="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">👑 OS</span>`;
+          singleBadge = `<span class="text-[10px] font-mono-code text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/50">${item.tools_count} ${toolWord}</span>`;
+        } else if (isCreatorOs) {
+          singleBadge = `<span class="text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/50">👑 Creator OS</span>`;
+        } else if (sortOrder === 'tokens' && formattedTokens) {
+          singleBadge = `<span dir="ltr" class="text-[10px] font-mono-code text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200/50">${formattedTokens} tok</span>`;
+        } else if (item.triggers && item.triggers.length > 0) {
+          singleBadge = `<span class="text-[10px] font-mono-code text-slate-500 bg-slate-100/80 px-2 py-0.5 rounded-md truncate max-w-[130px]">/${escapeHtml(item.triggers[0])}</span>`;
         } else if (item.is_user_created) {
-          const customWord = isEn ? '⭐ Custom' : '⭐ ساخت خودم';
-          badgeTag = `<span class="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">${customWord}</span>`;
+          const customWord = isEn ? 'Custom' : 'شخصی';
+          singleBadge = `<span class="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50">${customWord}</span>`;
+        } else {
+          singleBadge = `<span class="text-[10px] text-slate-400 font-mono-code">${item.file_count ? (isEn ? `${item.file_count} files` : `${item.file_count} فایل`) : (isEn ? 'Active' : 'فعال')}</span>`;
         }
+
+        const platformLabel = (item.platforms && item.platforms.length > 1) 
+          ? (isEn ? `Shared (${item.platforms.length})` : `مشترک (${item.platforms.length})`) 
+          : escapeHtml(item.platform || (isEn ? 'General' : 'عمومی'));
 
         const thiingsUrl = item.thiings || '';
 
         return `
           <div onclick="openModal('${item.id || item.name}')" 
-               class="card-hover bg-white border border-slate-200/80 hover:border-blue-400 rounded-3xl p-5 cursor-pointer flex flex-col items-center text-center justify-between group transition-all duration-200">
+               class="card-hover bg-white border border-slate-200/70 hover:border-slate-300 rounded-2xl p-4 cursor-pointer flex flex-col items-center text-center justify-between group transition-all duration-200 hover:shadow-xs">
             <div class="w-full flex flex-col items-center">
-              <div class="w-20 h-20 mb-3 flex items-center justify-center shrink-0">
+              <div class="w-14 h-14 mb-2 flex items-center justify-center shrink-0">
                 ${thiingsUrl 
-                  ? `<img src="${thiingsUrl}" alt="${escapeHtml(item.name)}" class="w-20 h-20 object-contain drop-shadow-md group-hover:scale-108 transition-transform duration-300" loading="lazy">` 
-                  : `<span class="text-4xl">${item.emoji || '🧩'}</span>`
+                  ? `<img src="${thiingsUrl}" alt="${escapeHtml(item.name)}" class="w-14 h-14 object-contain group-hover:scale-105 transition-transform duration-200" loading="lazy">` 
+                  : `<span class="text-3xl">${item.emoji || '🧩'}</span>`
                 }
               </div>
-              <h4 class="text-sm font-bold text-slate-900 font-mono-code truncate w-full mb-1 group-hover:text-blue-600 transition-colors">
+              <h4 class="text-xs font-bold text-slate-800 font-mono-code truncate w-full mb-1 group-hover:text-blue-600 transition-colors" title="${escapeHtml(item.name)}">
                 ${escapeHtml(item.name)}
               </h4>
-              <div class="flex items-center justify-center gap-1.5 flex-wrap mt-1">
-                ${badgeTag}
-                ${metaTag}
-                ${tokenTag}
+              <div class="flex items-center justify-center min-h-[22px]">
+                ${singleBadge}
               </div>
             </div>
-            <div class="w-full pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-              <span class="text-slate-500 font-medium">${(item.platforms && item.platforms.length > 1) ? (isEn ? `Shared (${item.platforms.length})` : `مشترک (${item.platforms.length})`) : escapeHtml(item.platform || (isEn ? 'General' : 'عمومی'))}</span>
-              <span class="font-mono-code text-slate-400">${item.file_count ? (isEn ? `${item.file_count} files` : `${item.file_count} فایل`) : (isEn ? 'Active' : 'فعال')}</span>
+            <div class="w-full pt-2 mt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono-code">
+              <span class="text-slate-500 font-medium truncate max-w-[90px]">${platformLabel}</span>
+              <span dir="ltr" class="text-slate-400 shrink-0">${formattedTokens ? `${formattedTokens} tok` : (isEn ? 'Ready' : 'آماده')}</span>
             </div>
           </div>
         `;
@@ -1478,11 +1476,11 @@
         settingPort: 'پورت سرور لوکال',
         copyUrl: 'کپی آدرس',
         activeBadge: 'فعال (Active)',
-        sortRichness: '🔥 پربارترین',
-        sortTokens: '📊 وزن توکن (Token Weight)',
-        sortFiles: '📂 تعداد فایل',
-        sortRecent: '⏱️ آخرین تغییرات',
-        sortName: '🔤 الفبا',
+        sortRichness: 'غنی‌تر / محبوب‌تر',
+        sortTokens: 'وزن توکن',
+        sortFiles: 'تعداد فایل',
+        sortRecent: 'آخرین تغییرات',
+        sortName: 'حروف الفبا',
         viewCard: 'کارت',
         viewTable: 'جدول',
         emptyText: 'هیچ موردی با این مشخصات پیدا نشد.',
@@ -1547,11 +1545,11 @@
         settingPort: 'Local Server Port',
         copyUrl: 'Copy URL',
         activeBadge: 'Active',
-        sortRichness: '🔥 Richness',
-        sortTokens: '📊 Token Weight',
-        sortFiles: '📂 File Count',
-        sortRecent: '⏱️ Recent',
-        sortName: '🔤 Alphabetical',
+        sortRichness: 'Most Rich',
+        sortTokens: 'Token Weight',
+        sortFiles: 'File Count',
+        sortRecent: 'Recently Modified',
+        sortName: 'Alphabetical',
         viewCard: 'Cards',
         viewTable: 'Table',
         emptyText: 'No items match your query.',
