@@ -321,7 +321,12 @@
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-[11px]">
               <tr>
                 <th id="th-name" class="py-3.5 px-4 text-start">نام آیتم</th>
-                <th id="th-type" class="py-3.5 px-4 text-start">پلتفرم</th>
+                <th id="th-type" class="py-3.5 px-4 text-start">
+                  <div class="flex items-center gap-1.5">
+                    <i class="iconsax text-sm text-slate-400" icon-name="status"></i>
+                    <span id="txt-th-type">نصب‌شده روی</span>
+                  </div>
+                </th>
                 <th id="th-triggers" class="py-3.5 px-4 text-start">تریگرها</th>
                 <th id="th-specs" class="py-3.5 px-4 text-start">مشخصات فنی</th>
                 <th id="th-action" class="py-3.5 px-4 text-center w-16"></th>
@@ -534,6 +539,9 @@
           const params = new URLSearchParams(window.location.search);
           if (params.get('tab')) {
             setTab(params.get('tab'));
+          }
+          if (params.get('view')) {
+            setViewMode(params.get('view'));
           }
         }
       } catch (e) {
@@ -794,6 +802,79 @@
       `).join('');
     }
 
+    function renderPlatformLogos(item, size = 'md') {
+      const isEn = (currentLanguage === 'en');
+      let platforms = [];
+      if (Array.isArray(item.platforms) && item.platforms.length > 0) {
+        platforms = item.platforms;
+      } else if (item.platform) {
+        platforms = [item.platform];
+      } else {
+        platforms = ['General'];
+      }
+
+      // Filter and deduplicate
+      const unique = [];
+      platforms.forEach(p => {
+        if (!p) return;
+        const norm = p.trim();
+        if (!unique.includes(norm)) unique.push(norm);
+      });
+
+      const dim = size === 'sm' ? 'w-5 h-5' : 'w-7 h-7';
+      const border = size === 'sm' ? 'border-[1.5px] border-white ring-1 ring-slate-200/60' : 'border-2 border-white ring-1 ring-slate-200/80';
+      const textDim = size === 'sm' ? 'text-[9px]' : 'text-xs';
+
+      const badges = unique.map(p => {
+        const lower = p.toLowerCase();
+        if (lower.includes('antigravity')) {
+          return `
+            <div class="${dim} rounded-full bg-[#161b22] ${border} shadow-2xs flex items-center justify-center p-1 overflow-hidden shrink-0 transition-transform hover:scale-110 hover:z-10" title="Antigravity">
+              <img src="/assets/antigravity.png" alt="Antigravity" class="w-full h-full object-contain">
+            </div>
+          `;
+        } else if (lower.includes('claude')) {
+          return `
+            <div class="${dim} rounded-full bg-[#2a1d18] ${border} shadow-2xs flex items-center justify-center p-1 overflow-hidden shrink-0 transition-transform hover:scale-110 hover:z-10" title="${escapeHtml(p)}">
+              <img src="/assets/claude.png" alt="Claude" class="w-full h-full object-contain">
+            </div>
+          `;
+        } else if (lower.includes('creator os') || (item.suite === 'Creator OS')) {
+          return `
+            <div class="${dim} rounded-full bg-amber-500/15 text-amber-800 ${border} shadow-2xs flex items-center justify-center shrink-0 ${textDim} transition-transform hover:scale-110 hover:z-10" title="Creator OS">
+              👑
+            </div>
+          `;
+        } else if (lower.includes('cli')) {
+          return `
+            <div class="${dim} rounded-full bg-slate-800 text-white font-mono font-bold ${border} shadow-2xs flex items-center justify-center shrink-0 ${textDim} transition-transform hover:scale-110 hover:z-10" title="CLI">
+              >_
+            </div>
+          `;
+        } else if (lower.includes('cursor') || lower.includes('windsurf')) {
+          return `
+            <div class="${dim} rounded-full bg-blue-500/15 text-blue-700 font-mono font-bold ${border} shadow-2xs flex items-center justify-center shrink-0 ${textDim} transition-transform hover:scale-110 hover:z-10" title="${escapeHtml(p)}">
+              ⌁
+            </div>
+          `;
+        } else {
+          return `
+            <div class="${dim} rounded-full bg-slate-100 text-slate-600 font-bold ${border} shadow-2xs flex items-center justify-center shrink-0 ${textDim} transition-transform hover:scale-110 hover:z-10" title="${escapeHtml(p)}">
+              ${escapeHtml(p.charAt(0).toUpperCase())}
+            </div>
+          `;
+        }
+      });
+
+      const tooltipText = unique.join(' + ');
+
+      return `
+        <div dir="ltr" class="inline-flex items-center -space-x-1.5 py-0.5" title="${escapeHtml(tooltipText)}">
+          ${badges.join('')}
+        </div>
+      `;
+    }
+
     function renderItems() {
       if (!rawData) return;
       const grid = document.getElementById('cardsGrid');
@@ -899,7 +980,10 @@
               </div>
             </div>
             <div class="w-full pt-2 mt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono-code">
-              <span class="text-slate-500 font-medium truncate max-w-[90px]">${platformLabel}</span>
+              <div class="flex items-center gap-1.5 min-w-0">
+                ${renderPlatformLogos(item, 'sm')}
+                <span class="text-slate-500 font-medium truncate max-w-[80px]">${platformLabel}</span>
+              </div>
               <span dir="ltr" class="text-slate-400 shrink-0">${formattedTokens ? `${formattedTokens} tok` : (isEn ? 'Ready' : 'آماده')}</span>
             </div>
           </div>
@@ -936,9 +1020,7 @@
               </div>
             </td>
             <td class="py-3 px-4">
-              <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200/80 text-[11px] font-mono-code font-medium whitespace-nowrap">
-                ${platformLabel}
-              </span>
+              ${renderPlatformLogos(item, 'md')}
             </td>
             <td class="py-3 px-4">
               ${triggersHtml}
@@ -946,7 +1028,7 @@
             <td class="py-3 px-4 font-mono-code text-[11px] text-slate-500 whitespace-nowrap">
               <div class="flex items-center gap-2">
                 ${item.tools_count ? `<span class="text-purple-600 font-bold">${item.tools_count} ${isEn ? "methods" : "متد"}</span>` : `<span>${item.size_kb || 0} KB</span>`}
-                ${formattedTokens ? `<span class="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 text-[10px]" title="Token weight">${formattedTokens} tok</span>` : ''}
+                ${formattedTokens ? `<span dir="ltr" class="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 text-[10px]" title="Token weight">${formattedTokens} tok</span>` : ''}
               </div>
             </td>
             <td class="py-3 px-4 text-center">
@@ -1485,7 +1567,7 @@
         viewTable: 'جدول',
         emptyText: 'هیچ موردی با این مشخصات پیدا نشد.',
         thName: 'نام آیتم',
-        thType: 'نوع و پلتفرم',
+        thType: 'نصب‌شده روی',
         thTriggers: 'تریگرها',
         thSpecs: 'مشخصات',
         thAction: 'مشاهده',
@@ -1554,7 +1636,7 @@
         viewTable: 'Table',
         emptyText: 'No items match your query.',
         thName: 'Item Name',
-        thType: 'Type & Platform',
+        thType: 'Installed On',
         thTriggers: 'Triggers',
         thSpecs: 'Specifications',
         thAction: 'Inspect',
@@ -1665,7 +1747,7 @@
 
       // Translate table headers
       setTxt('th-name', t.thName);
-      setTxt('th-type', t.thType);
+      setTxt('txt-th-type', t.thType);
       setTxt('th-triggers', t.thTriggers);
       setTxt('th-specs', t.thSpecs);
       setTxt('th-action', t.thAction);
