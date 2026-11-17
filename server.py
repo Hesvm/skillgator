@@ -5,6 +5,9 @@ import time
 import socket
 import threading
 import subprocess
+import re
+import shutil
+import tempfile
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from pathlib import Path
@@ -17,6 +20,50 @@ import scanner
 
 PORT = 4949
 CURRENT_DIR = Path(__file__).resolve().parent
+
+# Target skill directories
+GEMINI_SKILLS_DIR = Path.home() / ".gemini" / "config" / "skills"
+CLAUDE_SKILLS_DIR = Path.home() / ".claude" / "skills"
+
+def parse_git_url(raw_url: str):
+    """Parses git clone URL, branch, and subtree path with support for diverse formats."""
+    trimmed = raw_url.strip()
+    branch = None
+    subpath = None
+
+    # Detect 'npx skills add owner/repo --skill xyz'
+    npx_match = re.match(r'^npx\s+skills\s+add\s+([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)(?:\s+--skill\s+([A-Za-z0-9_.-]+))?', trimmed)
+    if npx_match:
+        repo_slug, skill_flag = npx_match.groups()
+        clone_url = f"https://github.com/{repo_slug}.git"
+        return clone_url, None, skill_flag
+
+    # Detect GitHub blob URL: https://github.com/owner/repo/blob/branch/subpath/SKILL.md
+    gh_blob = re.match(r"^https://github\.com/([^/]+)/([^/]+)/blob/([^/]+)/?(.*)$", trimmed)
+    if gh_blob:
+        owner, repo, branch, subpath = gh_blob.groups()
+        if subpath.endswith('/SKILL.md') or subpath.endswith('/skill.md'):
+            subpath = subpath.rsplit('/', 1)[0]
+        elif subpath.lower() == 'skill.md':
+            subpath = ''
+        clone_url = f"https://github.com/{owner}/{repo}.git"
+        return clone_url, branch, subpath or None
+
+    # Detect GitHub tree URL: https://github.com/owner/repo/tree/branch/subpath
+    gh_match = re.match(r"^https://github\.com/([^/]+)/([^/]+)/tree/([^/]+)/?(.*)$", trimmed)
+    if gh_match:
+        owner, repo, branch, subpath = gh_match.groups()
+        clone_url = f"https://github.com/{owner}/{repo}.git"
+        return clone_url, branch, subpath or None
+
+    # Standard GitHub URL
+    if trimmed.startswith("http") and "github.com" in trimmed:
+        clean = trimmed.split("?")[0].rstrip("/")
+        if not clean.endswith(".git"):
+            clean += ".git"
+        return clean, None, None
+
+    return trimmed, None, None
 
 # Global cache & change tracking
 CACHE_DATA = None
@@ -292,6 +339,178 @@ class EcosystemMonitorHandler(SimpleHTTPRequestHandler):
                 err = json.dumps({"status": "error", "message": str(e)}).encode("utf-8")
                 self.send_response(500)
                 self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(err)))
+                self.end_headers()
+                self.wfile.write(err)
+                return
+
+        elif parsed.path == "/api/create-skill":
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                body = self.rfile.read(length).decode("utf-8") if length > 0 else "{}"
+                payload = json.loads(body)
+
+                raw_name = payload.get("name", "").strip()
+                name = re.sub(r"[^a-zA-Z0-9_-]", "-", raw_name).strip("-").lower()
+                desc = payload.get("description", "").strip() or f"Custom skill for {name}"
+                body_content = payload.get("body", "").strip() or "## Instructions\n\nFollow best practices for this skill."
+                triggers = payload.get("triggers", [])
+                if isinstance(triggers, str):
+                    triggers = [t.strip().lstrip("#") for t in triggers.split(",") if t.strip()]
+
+                targets = payload.get("targets", ["antigravity", "claude"])
+
+                if not name:
+                    raise ValueError("نام مهارت الزامی است (حروف انگلیسی و خط تیره)")
+
+                triggers_block = ""
+                if triggers:
+                    triggers_block = f"\n\n## Triggers\n" + ", ".join([f"`{t}`" for t in triggers])
+
+                skill_md_content = f"""---
+name: {name}
+description: {desc}
+---
+
+# {name}
+
+{body_content}{triggers_block}
+"""
+
+                saved_paths = []
+                if "antigravity" in targets:
+                    dest_dir = GEMINI_SKILLS_DIR / name
+                    dest_dir.mkdir(parents=True, exist_ok=True)
+                    (dest_dir / "SKILL.md").write_text(skill_md_content, encoding="utf-8")
+                    saved_paths.append(str(dest_dir))
+
+                if "claude" in targets:
+                    dest_dir = CLAUDE_SKILLS_DIR / name
+                    dest_dir.mkdir(parents=True, exist_ok=True)
+                    (dest_dir / "SKILL.md").write_text(skill_md_content, encoding="utf-8")
+                    saved_paths.append(str(dest_dir))
+
+                # Refresh ecosystem cache
+                get_cached_data(force=True)
+
+                resp = json.dumps({
+                    "status": "ok",
+                    "message": f"مهارت '{name}' با موفقیت ساخته شد و در دیسک ذخیره گردید.",
+                    "skill_id": name,
+                    "paths": saved_paths
+                }, ensure_ascii=False).encode("utf-8")
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(resp)))
+                self.end_headers()
+                self.wfile.write(resp)
+                return
+            except Exception as e:
+                err = json.dumps({"status": "error", "message": str(e)}).encode("utf-8")
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(err)))
+                self.end_headers()
+                self.wfile.write(err)
+                return
+
+        elif parsed.path == "/api/import-git-skill":
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                body = self.rfile.read(length).decode("utf-8") if length > 0 else "{}"
+                payload = json.loads(body)
+
+                raw_url = payload.get("url", "").strip()
+                if not raw_url:
+                    raise ValueError("آدرس مخزن گیت‌هاب الزامی است.")
+
+                custom_name = payload.get("custom_name", "").strip()
+                targets = payload.get("targets", ["antigravity", "claude"])
+
+                clone_url, branch, subpath = parse_git_url(raw_url)
+
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    temp_clone = Path(temp_dir) / "clone"
+                    cmd = ["git", "clone", "--depth", "1"]
+                    if branch:
+                        cmd.extend(["-b", branch])
+                    cmd.extend([clone_url, str(temp_clone)])
+
+                    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=120)
+                    if proc.returncode != 0:
+                        raise RuntimeError(f"خطا در کلون مخزن: {proc.stderr.strip()}")
+
+                    source_dir = temp_clone
+                    if subpath:
+                        cand = temp_clone / subpath
+                        if cand.exists() and cand.is_dir():
+                            source_dir = cand
+                        else:
+                            for root, dirs, _ in os.walk(temp_clone):
+                                for d in dirs:
+                                    if d.lower() == subpath.lower():
+                                        source_dir = Path(root) / d
+                                        break
+
+                    if custom_name:
+                        skill_name = re.sub(r"[^a-zA-Z0-9_-]", "-", custom_name).strip("-").lower()
+                    elif subpath:
+                        skill_name = re.sub(r"[^a-zA-Z0-9_-]", "-", Path(subpath).name).strip("-").lower()
+                    else:
+                        repo_name = clone_url.split("/")[-1].replace(".git", "")
+                        skill_name = re.sub(r"[^a-zA-Z0-9_-]", "-", repo_name).strip("-").lower()
+
+                    skill_md = source_dir / "SKILL.md"
+                    if not skill_md.exists():
+                        for f in source_dir.iterdir():
+                            if f.is_file() and f.name.lower() == "skill.md":
+                                skill_md = f
+                                break
+                    if not skill_md.exists():
+                        readme = source_dir / "README.md"
+                        readme_content = readme.read_text(encoding="utf-8", errors="ignore") if readme.exists() else f"# {skill_name}\n\nImported from {raw_url}"
+                        (source_dir / "SKILL.md").write_text(f"---\nname: {skill_name}\ndescription: Imported skill from {clone_url}\n---\n\n{readme_content}", encoding="utf-8")
+
+                    saved_paths = []
+                    if "antigravity" in targets:
+                        target_dir = GEMINI_SKILLS_DIR / skill_name
+                        if target_dir.exists():
+                            shutil.rmtree(target_dir)
+                        shutil.copytree(source_dir, target_dir, dirs_exist_ok=True, ignore=shutil.ignore_patterns(".git", ".github"))
+                        saved_paths.append(str(target_dir))
+
+                    if "claude" in targets:
+                        target_dir = CLAUDE_SKILLS_DIR / skill_name
+                        if target_dir.exists():
+                            shutil.rmtree(target_dir)
+                        shutil.copytree(source_dir, target_dir, dirs_exist_ok=True, ignore=shutil.ignore_patterns(".git", ".github"))
+                        saved_paths.append(str(target_dir))
+
+                # Force reload ecosystem
+                get_cached_data(force=True)
+
+                resp = json.dumps({
+                    "status": "ok",
+                    "message": f"مهارت '{skill_name}' با موفقیت از گیت‌هاب ایمپورت شد.",
+                    "skill_id": skill_name,
+                    "paths": saved_paths
+                }, ensure_ascii=False).encode("utf-8")
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(resp)))
+                self.end_headers()
+                self.wfile.write(resp)
+                return
+            except Exception as e:
+                err = json.dumps({"status": "error", "message": str(e)}).encode("utf-8")
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
                 self.send_header("Content-Length", str(len(err)))
                 self.end_headers()
                 self.wfile.write(err)

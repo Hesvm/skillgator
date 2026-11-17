@@ -288,12 +288,21 @@
         </select>
       </div>
 
-      <!-- نشانگر وضعیت بار توکن کل سیستم (System Token Weight Indicator) -->
-      <div id="systemTokenBadge" class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100/80 border border-slate-200/70 text-slate-600 text-[11px]" title="تخمین کل بار توکن اسکیماها و پرامپت‌ها">
-        <i class="iconsax text-xs text-blue-500" icon-name="cpu-charge"></i>
-        <span>وزن کانتکست:</span>
-        <span id="systemTokenValue" dir="ltr" class="font-bold text-slate-900 font-mono-code">~0k</span>
-        <span class="text-[10px] text-slate-400 font-mono-code">tokens</span>
+      <!-- سمت چپ هدر: دکمه افزودن مهارت جدید و نشانگر وضعیت بار توکن -->
+      <div class="flex items-center gap-2.5">
+        <!-- نشانگر وضعیت بار توکن کل سیستم (System Token Weight Indicator) -->
+        <div id="systemTokenBadge" class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100/80 border border-slate-200/70 text-slate-600 text-[11px]" title="تخمین کل بار توکن اسکیماها و پرامپت‌ها">
+          <i class="iconsax text-xs text-blue-500" icon-name="cpu-charge"></i>
+          <span>وزن کانتکست:</span>
+          <span id="systemTokenValue" dir="ltr" class="font-bold text-slate-900 font-mono-code">~0k</span>
+          <span class="text-[10px] text-slate-400 font-mono-code">tokens</span>
+        </div>
+
+        <!-- دکمه مهارت جدید -->
+        <button onclick="openAddSkillModal()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 font-bold text-xs shadow-2xs hover:shadow-sm transition-all active:scale-95 cursor-pointer" title="ساخت یا ایمپورت مهارت جدید">
+          <i class="iconsax text-sm" icon-name="add-circle"></i>
+          <span id="txt-btn-add-skill">مهارت جدید</span>
+        </button>
       </div>
 
 
@@ -1425,6 +1434,7 @@
         closeCommandPalette();
         closePromptSimulator();
         closeModal();
+        closeAddSkillModal();
       }
     });
 
@@ -1433,6 +1443,7 @@
       if (event.target === document.getElementById('settingsModal')) closeSettingsModal();
       if (event.target === document.getElementById('cmdPaletteModal')) closeCommandPalette();
       if (event.target === document.getElementById('promptSimulatorModal')) closePromptSimulator();
+      if (event.target === document.getElementById('addSkillModal')) closeAddSkillModal();
     };
 
     
@@ -1492,7 +1503,22 @@
         modalDescTitle: 'شرح و کاربرد',
         toastUpdate: 'اطلاعات با موفقیت به‌روزرسانی شد.',
         toastRescan: 'بررسی دوباره فایل‌ها انجام شد.',
-        itemsCount: 'مورد'
+        itemsCount: 'مورد',
+        btnAddSkill: 'مهارت جدید',
+        addModalTitle: 'افزودن مهارت جدید (Add Skill)',
+        addModalDesc: 'ساخت دستی، ایمپورت از گیت‌هاب یا استفاده از تمپلیت',
+        tabManual: 'ساخت دستی',
+        tabGit: 'ایمپورت از Git',
+        tabTemplates: 'تمپلیت‌ها',
+        lblSkillName: 'نام فنی مهارت (Slug ID)',
+        lblSkillTriggers: 'کلمات محرک / تریگرها (با کاما جدا کنید)',
+        lblSkillDesc: 'توضیح کوتاه و کاربرد (Description)',
+        lblSkillTargets: 'محل ذخیره و نصب مهارت:',
+        lblSkillBody: 'دستورالعمل پرامپت (SKILL.md Body)',
+        btnSaveManual: 'ذخیره و ساخت مهارت',
+        lblGitUrl: 'آدرس گیت‌هاب (Git URL / Tree URL)',
+        lblGitName: 'نام سفارشی (اختیاری)',
+        btnSaveGit: 'کلون و نصب مهارت'
       },
       en: {
         radarTitle: 'Skillgator',
@@ -1546,7 +1572,22 @@
         modalDescTitle: 'Description & Scope',
         toastUpdate: 'Ecosystem updated successfully.',
         toastRescan: 'Filesystem rescan complete.',
-        itemsCount: 'items'
+        itemsCount: 'items',
+        btnAddSkill: 'New Skill',
+        addModalTitle: 'Add New Skill',
+        addModalDesc: 'Manual builder, GitHub import or quick templates',
+        tabManual: 'Manual Builder',
+        tabGit: 'Git Import',
+        tabTemplates: 'Templates',
+        lblSkillName: 'Technical Slug ID',
+        lblSkillTriggers: 'Trigger Keywords (comma separated)',
+        lblSkillDesc: 'Description & Scope',
+        lblSkillTargets: 'Install Destinations:',
+        lblSkillBody: 'Prompt Guidelines (SKILL.md Body)',
+        btnSaveManual: 'Save & Build Skill',
+        lblGitUrl: 'GitHub Repository / Tree URL',
+        lblGitName: 'Custom Name (Optional)',
+        btnSaveGit: 'Clone & Install Skill'
       }
     };
 
@@ -1607,6 +1648,23 @@
       setTxt('txt-modal-tokens', t.modalTokens);
       setTxt('txt-modal-sync-btn', t.modalSyncBtn);
 
+      // Translate Add Skill button & modal elements
+      setTxt('txt-btn-add-skill', t.btnAddSkill);
+      setTxt('txt-add-modal-title', t.addModalTitle);
+      setTxt('txt-add-modal-desc', t.addModalDesc);
+      setTxt('txt-tab-manual', t.tabManual);
+      setTxt('txt-tab-git', t.tabGit);
+      setTxt('txt-tab-templates', t.tabTemplates);
+      setTxt('lbl-skill-name', t.lblSkillName);
+      setTxt('lbl-skill-triggers', t.lblSkillTriggers);
+      setTxt('lbl-skill-desc', t.lblSkillDesc);
+      setTxt('lbl-skill-targets', t.lblSkillTargets);
+      setTxt('lbl-skill-body', t.lblSkillBody);
+      setTxt('txt-save-manual-btn', t.btnSaveManual);
+      setTxt('lbl-git-url', t.lblGitUrl);
+      setTxt('lbl-git-name', t.lblGitName);
+      setTxt('txt-save-git-btn', t.btnSaveGit);
+
       // Translate table headers
       setTxt('th-name', t.thName);
       setTxt('th-type', t.thType);
@@ -1645,6 +1703,203 @@
       renderItems();
     }
 
+    // Add Skill Modal Functions (Custom skill builder & Git import)
+    function openAddSkillModal() {
+      document.getElementById('addSkillModal').classList.remove('hidden');
+      switchAddSkillTab('manual');
+      setTimeout(() => document.getElementById('newSkillName')?.focus(), 100);
+    }
+
+    function closeAddSkillModal() {
+      document.getElementById('addSkillModal').classList.add('hidden');
+    }
+
+    function switchAddSkillTab(tab) {
+      const manualSec = document.getElementById('addSkillManualSection');
+      const gitSec = document.getElementById('addSkillGitSection');
+      const tplSec = document.getElementById('addSkillTplSection');
+
+      const manualBtn = document.getElementById('addTabManualBtn');
+      const gitBtn = document.getElementById('addTabGitBtn');
+      const tplBtn = document.getElementById('addTabTplBtn');
+
+      const activeClass = "px-3 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-2xs transition-all";
+      const inactiveClass = "px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 transition-all";
+
+      manualSec.classList.add('hidden');
+      gitSec.classList.add('hidden');
+      tplSec.classList.add('hidden');
+
+      manualBtn.className = inactiveClass;
+      gitBtn.className = inactiveClass;
+      tplBtn.className = inactiveClass;
+
+      if (tab === 'manual') {
+        manualSec.classList.remove('hidden');
+        manualBtn.className = activeClass;
+      } else if (tab === 'git') {
+        gitSec.classList.remove('hidden');
+        gitBtn.className = activeClass;
+      } else if (tab === 'templates') {
+        tplSec.classList.remove('hidden');
+        tplBtn.className = activeClass;
+      }
+    }
+
+    const SKILL_TEMPLATES = {
+      code_auditor: {
+        name: "code-hardening",
+        desc: "Forensic code auditor for performance, edge cases, and architectural best practices.",
+        triggers: "code audit, ریویو کد, harden",
+        body: `## Role & Purpose
+Act as a Principal Staff Engineer conducting a rigorous code and architecture audit.
+
+## Review Checkpoints
+1. Edge cases, race conditions & memory leaks
+2. Performance bottlenecks and unmemoized heavy loops
+3. Type safety and boundary condition validations
+4. Clear error propagation and telemetry`
+      },
+      scriptwriter: {
+        name: "reels-architect",
+        desc: "Frame-by-frame short-form video scripting with high-retention hooks and pacing.",
+        triggers: "فیلمنامه, سناریو ریلز, script, hook",
+        body: `## Role & Purpose
+Architect high-retention short-form video scripts (Instagram Reels, Shorts, TikTok).
+
+## Script Architecture
+- 00:00 - 00:03 | Hook (Visual + Verbal + Text Overlays)
+- 00:03 - 00:15 | Tension Escalation / Problem Framing
+- 00:15 - 00:45 | High-Value Mechanism Proof & Demonstration
+- 00:45 - 00:55 | Punchy Conclusion + Single Frictionless CTA`
+      },
+      geo_expert: {
+        name: "geo-ai-search",
+        desc: "Generative Engine Optimization (GEO) for modern AI answer engines (ChatGPT, Perplexity, Gemini).",
+        triggers: "geo, aeo, ai search, سئو هوش مصنوعی",
+        body: `## Role & Purpose
+Optimize content structure and citation readiness for AI Overviews and answer engines.
+
+## Key Directives
+1. Entity-first passage definitions (First 40 words must define the core claim)
+2. Quantitative data assertions and original research statistics
+3. FAQ schema structures and clean Markdown citations`
+      }
+    };
+
+    function applySkillTemplate(key) {
+      const tpl = SKILL_TEMPLATES[key];
+      if (!tpl) return;
+      document.getElementById('newSkillName').value = tpl.name;
+      document.getElementById('newSkillDesc').value = tpl.desc;
+      document.getElementById('newSkillTriggers').value = tpl.triggers;
+      document.getElementById('newSkillBody').value = tpl.body;
+      switchAddSkillTab('manual');
+      showToast(currentLanguage === 'en' ? 'Template loaded!' : 'الگو روی فرم بارگذاری شد!');
+    }
+
+    async function submitCreateSkill() {
+      const name = document.getElementById('newSkillName').value.trim();
+      const desc = document.getElementById('newSkillDesc').value.trim();
+      const triggers = document.getElementById('newSkillTriggers').value.trim();
+      const body = document.getElementById('newSkillBody').value.trim();
+
+      const targets = [];
+      if (document.getElementById('targetAntigravity').checked) targets.push('antigravity');
+      if (document.getElementById('targetClaude').checked) targets.push('claude');
+
+      if (!name) {
+        showToast(currentLanguage === 'en' ? 'Skill name is required!' : 'نام مهارت الزامی است!');
+        return;
+      }
+
+      if (targets.length === 0) {
+        showToast(currentLanguage === 'en' ? 'Select at least one destination!' : 'حداقل یک پلتفرم مقصد را انتخاب کنید!');
+        return;
+      }
+
+      const saveBtn = document.getElementById('saveManualSkillBtn');
+      const origHtml = saveBtn.innerHTML;
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<i class="iconsax text-sm animate-spin" icon-name="refresh-2"></i><span>در حال ساخت...</span>`;
+
+      try {
+        const res = await fetch('/api/create-skill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description: desc, triggers, body, targets })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          showToast(data.message || (currentLanguage === 'en' ? 'Skill created successfully!' : 'مهارت با موفقیت ساخته شد!'));
+          closeAddSkillModal();
+          document.getElementById('newSkillName').value = '';
+          document.getElementById('newSkillDesc').value = '';
+          document.getElementById('newSkillTriggers').value = '';
+          document.getElementById('newSkillBody').value = '';
+
+          await triggerRescan();
+          setTimeout(() => openModal(data.skill_id || name), 500);
+        } else {
+          showToast(currentLanguage === 'en' ? `Error: ${data.message}` : `خطا: ${data.message}`);
+        }
+      } catch (err) {
+        showToast(currentLanguage === 'en' ? 'Network error saving skill!' : 'خطا در ارتباط با سرور هنگام ساخت مهارت!');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = origHtml;
+      }
+    }
+
+    async function submitGitImport() {
+      const url = document.getElementById('gitImportUrl').value.trim();
+      const custom_name = document.getElementById('gitCustomName').value.trim();
+
+      const targets = [];
+      if (document.getElementById('gitTargetAntigravity').checked) targets.push('antigravity');
+      if (document.getElementById('gitTargetClaude').checked) targets.push('claude');
+
+      if (!url) {
+        showToast(currentLanguage === 'en' ? 'Git URL is required!' : 'آدرس مخزن گیت‌هاب الزامی است!');
+        return;
+      }
+
+      if (targets.length === 0) {
+        showToast(currentLanguage === 'en' ? 'Select at least one destination!' : 'حداقل یک پلتفرم مقصد را انتخاب کنید!');
+        return;
+      }
+
+      const saveBtn = document.getElementById('saveGitSkillBtn');
+      const origHtml = saveBtn.innerHTML;
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<i class="iconsax text-sm animate-spin" icon-name="refresh-2"></i><span>در حال کلون و نصب...</span>`;
+
+      try {
+        const res = await fetch('/api/import-git-skill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, custom_name, targets })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          showToast(data.message || (currentLanguage === 'en' ? 'Skill imported from Git!' : 'مهارت از گیت‌هاب ایمپورت شد!'));
+          closeAddSkillModal();
+          document.getElementById('gitImportUrl').value = '';
+          document.getElementById('gitCustomName').value = '';
+
+          await triggerRescan();
+          setTimeout(() => openModal(data.skill_id), 500);
+        } else {
+          showToast(currentLanguage === 'en' ? `Error: ${data.message}` : `خطا: ${data.message}`);
+        }
+      } catch (err) {
+        showToast(currentLanguage === 'en' ? 'Network error importing skill!' : 'خطای ارتباط در هنگام ایمپورت مهارت!');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = origHtml;
+      }
+    }
+
     function openSettingsModal() {
       document.getElementById('settingsModal').classList.remove('hidden');
     }
@@ -1675,6 +1930,9 @@
       }
       if (params.get('open')) {
         setTimeout(() => openModal(params.get('open')), 600);
+      }
+      if (params.get('add')) {
+        setTimeout(() => openAddSkillModal(), 500);
       }
     });
 
@@ -1740,6 +1998,198 @@
             <div class="text-[11px] text-slate-400 mt-0.5">http://localhost:4949</div>
           </div>
           <button onclick="copyLocalUrl()" class="px-2.5 py-1 rounded-xl bg-white hover:bg-slate-100 text-blue-600 border border-slate-200 text-[11px] font-medium transition-colors">کپی آدرس</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- پنجره افزودن و ساخت مهارت جدید (Add Skill Modal) -->
+  <div id="addSkillModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+      
+      <!-- هدر مدال با تب‌های انتخاب حالت -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+            <i class="iconsax text-base" icon-name="add-circle"></i>
+          </div>
+          <div>
+            <h3 id="txt-add-modal-title" class="text-xs font-bold text-slate-900">افزودن مهارت جدید (Add Skill)</h3>
+            <p id="txt-add-modal-desc" class="text-[10px] text-slate-400">ساخت دستی، ایمپورت از گیت‌هاب یا استفاده از تمپلیت</p>
+          </div>
+        </div>
+
+        <!-- تب‌های سوئیچ -->
+        <div class="flex items-center p-1 bg-slate-200/70 rounded-xl text-xs font-medium">
+          <button id="addTabManualBtn" onclick="switchAddSkillTab('manual')" class="px-3 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-2xs transition-all">
+            🛠️ <span id="txt-tab-manual">ساخت دستی</span>
+          </button>
+          <button id="addTabGitBtn" onclick="switchAddSkillTab('git')" class="px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 transition-all">
+            🌐 <span id="txt-tab-git">ایمپورت از Git</span>
+          </button>
+          <button id="addTabTplBtn" onclick="switchAddSkillTab('templates')" class="px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 transition-all">
+            ⚡ <span id="txt-tab-templates">تمپلیت‌ها</span>
+          </button>
+        </div>
+
+        <button onclick="closeAddSkillModal()" class="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors">
+          <i class="iconsax text-lg" icon-name="close-circle"></i>
+        </button>
+      </div>
+
+      <!-- بدنه مدال -->
+      <div class="p-6 overflow-y-auto custom-scrollbar space-y-4 text-xs">
+        
+        <!-- ۱. بخش ساخت دستی (Manual Builder) -->
+        <div id="addSkillManualSection" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1" id="lbl-skill-name">نام فنی مهارت (Slug ID)</label>
+              <input type="text" id="newSkillName" placeholder="e.g. smart-code-auditor" dir="ltr"
+                     class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono-code text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+              <span class="text-[10px] text-slate-400 mt-0.5 block">فقط حروف انگلیسی، اعداد و خط تیره (-)</span>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1" id="lbl-skill-triggers">کلمات محرک / تریگرها (با کاما جدا کنید)</label>
+              <input type="text" id="newSkillTriggers" placeholder="e.g. audit, ریویو کد, check" 
+                     class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+              <span class="text-[10px] text-slate-400 mt-0.5 block">کلماتی که باعث فراخوانی خودکار این مهارت می‌شوند</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1" id="lbl-skill-desc">توضیح کوتاه و کاربرد (Description)</label>
+            <input type="text" id="newSkillDesc" placeholder="e.g. بررسی دقیق کیفیت و معماری کدهای پروژه بر اساس استانداردهای مدرن" 
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+          </div>
+
+          <!-- پلتفرم‌های مقصد -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1.5" id="lbl-skill-targets">محل ذخیره و نصب مهارت:</label>
+            <div class="flex items-center gap-3">
+              <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-100 transition-colors">
+                <input type="checkbox" id="targetAntigravity" checked class="rounded text-blue-600 focus:ring-0">
+                <span class="text-xs text-slate-700 font-medium">Antigravity (~/.gemini/config/skills)</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-100 transition-colors">
+                <input type="checkbox" id="targetClaude" checked class="rounded text-blue-600 focus:ring-0">
+                <span class="text-xs text-slate-700 font-medium">Claude Code (~/.claude/skills)</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-bold text-slate-700" id="lbl-skill-body">دستورالعمل پرامپت (SKILL.md Body)</label>
+              <span class="text-[10px] font-mono-code text-slate-400">Markdown format</span>
+            </div>
+            <textarea id="newSkillBody" rows="8" dir="ltr"
+                      class="w-full p-3 rounded-2xl bg-slate-50 border border-slate-200 font-mono-code text-[11px] text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white custom-scrollbar transition-all"
+                      placeholder="## Guidelines&#10;&#10;1. Always verify assumptions...&#10;2. Check boundary conditions..."></textarea>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button onclick="closeAddSkillModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-medium transition-colors">
+              انصراف
+            </button>
+            <button id="saveManualSkillBtn" onclick="submitCreateSkill()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer">
+              <i class="iconsax text-sm" icon-name="tick-circle"></i>
+              <span id="txt-save-manual-btn">ذخیره و ساخت مهارت</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ۲. بخش ایمپورت از گیت‌هاب (Git Import) -->
+        <div id="addSkillGitSection" class="hidden space-y-4">
+          <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex items-start gap-2.5">
+            <i class="iconsax text-lg text-blue-600 shrink-0" icon-name="info-circle"></i>
+            <div class="text-[11px] text-blue-800 leading-relaxed">
+              <strong>فرمت‌های معتبر:</strong> لینک کل مخزن گیت‌هاب (مانند <span dir="ltr" class="font-mono-code">https://github.com/owner/repo</span>) یا آدرس فولدر مهارت در مخزن (مانند <span dir="ltr" class="font-mono-code">.../tree/main/skills/my-skill</span>). اسکیل‌گیتور به‌طور خودکار فایل <span dir="ltr" class="font-mono-code">SKILL.md</span> را شناسایی و درون سیستم نصب می‌کند.
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1" id="lbl-git-url">آدرس گیت‌هاب (Git URL / Tree URL)</label>
+            <input type="text" id="gitImportUrl" placeholder="https://github.com/owner/repo" dir="ltr"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono-code text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1" id="lbl-git-name">نام سفارشی (اختیاری - در صورت خالی بودن از نام مخزن استفاده می‌شود)</label>
+            <input type="text" id="gitCustomName" placeholder="e.g. imported-tool" dir="ltr"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono-code text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+          </div>
+
+          <!-- پلتفرم‌های مقصد گیت -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1.5">محل ذخیره و نصب مهارت:</label>
+            <div class="flex items-center gap-3">
+              <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-100 transition-colors">
+                <input type="checkbox" id="gitTargetAntigravity" checked class="rounded text-blue-600 focus:ring-0">
+                <span class="text-xs text-slate-700 font-medium">Antigravity (~/.gemini/config/skills)</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer hover:bg-slate-100 transition-colors">
+                <input type="checkbox" id="gitTargetClaude" checked class="rounded text-blue-600 focus:ring-0">
+                <span class="text-xs text-slate-700 font-medium">Claude Code (~/.claude/skills)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button onclick="closeAddSkillModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-medium transition-colors">
+              انصراف
+            </button>
+            <button id="saveGitSkillBtn" onclick="submitGitImport()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer">
+              <i class="iconsax text-sm" icon-name="import"></i>
+              <span id="txt-save-git-btn">کلون و نصب مهارت</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ۳. بخش تمپلیت‌های سریع (Quick Templates) -->
+        <div id="addSkillTplSection" class="hidden space-y-3">
+          <p class="text-[11px] text-slate-500">یکی از الگوهای استاندارد زیر را انتخاب کنید تا فرم ساخت مهارت به‌طور خودکار با ساختار استاندارد پر شود:</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div onclick="applySkillTemplate('code_auditor')" 
+                 class="p-4 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 cursor-pointer transition-all flex flex-col justify-between group">
+              <div>
+                <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm mb-2 group-hover:scale-110 transition-transform">
+                  🛡️
+                </div>
+                <h4 class="font-bold text-slate-900 text-xs mb-1">Code Hardener</h4>
+                <p class="text-[10px] text-slate-500 line-clamp-3">ممیزی ساختار و امنیت کد، رفع باگ‌های لبه‌ای و تست‌های اتوماتیک.</p>
+              </div>
+              <span class="text-[10px] text-blue-600 font-bold mt-3 block">انتخاب این الگو ←</span>
+            </div>
+
+            <div onclick="applySkillTemplate('scriptwriter')" 
+                 class="p-4 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 cursor-pointer transition-all flex flex-col justify-between group">
+              <div>
+                <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-sm mb-2 group-hover:scale-110 transition-transform">
+                  🎬
+                </div>
+                <h4 class="font-bold text-slate-900 text-xs mb-1">Reels Scriptwriter</h4>
+                <p class="text-[10px] text-slate-500 line-clamp-3">سناریونویسی فریم‌به‌فریم ۵ ستونه با مهندسی قلاب‌های ۳ ثانیه‌ای اول.</p>
+              </div>
+              <span class="text-[10px] text-blue-600 font-bold mt-3 block">انتخاب این الگو ←</span>
+            </div>
+
+            <div onclick="applySkillTemplate('geo_expert')" 
+                 class="p-4 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 cursor-pointer transition-all flex flex-col justify-between group">
+              <div>
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm mb-2 group-hover:scale-110 transition-transform">
+                  🔍
+                </div>
+                <h4 class="font-bold text-slate-900 text-xs mb-1">GEO & AI Search</h4>
+                <p class="text-[10px] text-slate-500 line-clamp-3">بهینه‌سازی برای موتورهای پاسخ هوش مصنوعی (ChatGPT, Perplexity).</p>
+              </div>
+              <span class="text-[10px] text-blue-600 font-bold mt-3 block">انتخاب این الگو ←</span>
+            </div>
+          </div>
         </div>
 
       </div>
