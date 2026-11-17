@@ -4,6 +4,7 @@ import json
 import time
 import glob
 import subprocess
+import hashlib
 from pathlib import Path
 from datetime import datetime
 
@@ -123,307 +124,228 @@ def calculate_folder_stats(folder_path):
         "richness_score": score
     }
 
-THIINGS_ASSETS = {
-    "brain": "/assets/thiings/brain.png",
-    "camera": "/assets/thiings/camera.png",
-    "video": "/assets/thiings/video.png",
-    "rocket": "/assets/thiings/rocket.png",
-    "target": "/assets/thiings/target.png",
-    "code": "/assets/thiings/code.png",
-    "book": "/assets/thiings/book.png",
-    "shield": "/assets/thiings/shield.png",
-    "document": "/assets/thiings/document.png",
-    "globe": "/assets/thiings/globe.png",
-    "crown": "/assets/thiings/crown.png",
-    "folder": "/assets/thiings/folder.png",
-    "magic-wand": "/assets/thiings/magic-wand.png",
-    "scissors": "/assets/thiings/scissors.png",
-    "lightning": "/assets/thiings/lightning.png",
-    "star": "/assets/thiings/star.png",
-    "sparkle": "/assets/thiings/sparkle.png",
-    "heart": "/assets/thiings/heart.png",
-    "search": "/assets/thiings/search.png",
-    "pen": "/assets/thiings/pen.png",
-    "headphones": "/assets/thiings/headphones.png",
-    "speaker": "/assets/thiings/speaker.png",
-    "palette": "/assets/thiings/palette.png",
-    "briefcase": "/assets/thiings/briefcase.png",
-    "flame": "/assets/thiings/flame.png",
-    "robot": "/assets/thiings/robot.png",
-    "smartphone": "/assets/thiings/smartphone.png",
-    "calendar": "/assets/thiings/calendar.png",
-    "chat": "/assets/thiings/chat.png",
-    "gear": "/assets/thiings/gear.png",
-    "wrench": "/assets/thiings/wrench.png",
-    "puzzle": "/assets/thiings/puzzle.png"
+THIINGS_ASSETS = {} # Deprecated in favor of ICONLY_PRO_3D
+
+# Curated high-precision 3D models from Iconly Pro Hes Edition (Retina WebP 1024x1024)
+ICONLY_CURATED = {
+    # Creator OS Pipeline
+    "creator-intelligence": {"3d": "/assets/3d/AI/Brain_Angle_1.webp", "emoji": "🧠", "icon": "cpu-charge", "color": "text-purple-600 bg-purple-50 border-purple-200"},
+    "trend-radar": {"3d": "/assets/3d/Chart & Analytics/Trend_Line.webp", "emoji": "📡", "icon": "radar-2", "color": "text-blue-600 bg-blue-50 border-blue-200"},
+    "audience-positioning": {"3d": "/assets/3d/Chart & Analytics/Target_Chart.webp", "emoji": "🎯", "icon": "target", "color": "text-rose-600 bg-rose-50 border-rose-200"},
+    "topic-discovery": {"3d": "/assets/3d/Technology/Desk_Lamp_Alt_10731.webp", "emoji": "💡", "icon": "lamp-on", "color": "text-amber-600 bg-amber-50 border-amber-200"},
+    "idea-development": {"3d": "/assets/3d/Design/Magic.webp", "emoji": "🌱", "icon": "magic-star", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"},
+    "hook-engineering": {"3d": "/assets/3d/Essential/Flash_1_10240.webp", "emoji": "🪝", "icon": "flash-circle", "color": "text-red-600 bg-red-50 border-red-200"},
+    "scriptwriting": {"3d": "/assets/3d/Technology/Wacom_Pen_Alt_10788.webp", "emoji": "✍️", "icon": "edit-2", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"},
+    "visual-storyboarding": {"3d": "/assets/3d/Video & Movie/Movie_and_Cinema_Basic.webp", "emoji": "🎬", "icon": "video-play", "color": "text-teal-600 bg-teal-50 border-teal-200"},
+    "retention-editing": {"3d": "/assets/3d/Design/Scissor.webp", "emoji": "✂️", "icon": "scissor", "color": "text-orange-600 bg-orange-50 border-orange-200"},
+    "platform-packaging": {"3d": "/assets/3d/Files/Folder_1_10238.webp", "emoji": "📦", "icon": "box-1", "color": "text-sky-600 bg-sky-50 border-sky-200"},
+    "publishing-operations": {"3d": "/assets/3d/Essential/Rocket_1_10210.webp", "emoji": "🚀", "icon": "send-2", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"},
+    "performance-learning": {"3d": "/assets/3d/Chart & Analytics/Analytics_Dashboard.webp", "emoji": "📈", "icon": "chart-2", "color": "text-blue-600 bg-blue-50 border-blue-200"},
+    "youtube-thumbnail": {"3d": "/assets/3d/Design/Color_Picker.webp", "emoji": "🖼️", "icon": "gallery-edit", "color": "text-red-600 bg-red-50 border-red-200"},
+    "carousel-craft": {"3d": "/assets/3d/Technology/iPhone_14_Pro_Alt_10757.webp", "emoji": "📑", "icon": "slider-vertical", "color": "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200"},
+    "client-acquisition": {"3d": "/assets/3d/Cryptocurrency/Trading_Dashboard_Monitor.webp", "emoji": "💼", "icon": "dollar-circle", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"},
+    "pushe-film": {"3d": "/assets/3d/Video & Movie/Video_camera_1_10083.webp", "emoji": "🎥", "icon": "video-play", "color": "text-purple-600 bg-purple-50 border-purple-200"},
+    "sound-design": {"3d": "/assets/3d/Essential/Headset_1_10038.webp", "emoji": "🎵", "icon": "music-note", "color": "text-amber-600 bg-amber-50 border-amber-200"},
+    "vidiq": {"3d": "/assets/3d/Chart & Analytics/Report_Document.webp", "emoji": "📊", "icon": "chart-square", "color": "text-red-600 bg-red-50 border-red-200"},
+
+    # Instagram Suite
+    "ig-reel": {"3d": "/assets/3d/Technology/iPhone_14_Pro_Alt_10757.webp", "emoji": "📱", "icon": "video-square", "color": "text-pink-600 bg-pink-50 border-pink-200"},
+    "ig-story": {"3d": "/assets/3d/Technology/Apple_Watch_Alt_10798.webp", "emoji": "⏱️", "icon": "clock", "color": "text-rose-600 bg-rose-50 border-rose-200"},
+    "ig-viral": {"3d": "/assets/3d/Essential/Flash_1_10240.webp", "emoji": "🔥", "icon": "trend-up", "color": "text-orange-600 bg-orange-50 border-orange-200"},
+    "ig-profile": {"3d": "/assets/3d/Heart & Love/Arrow_in_Heart_Alt_10932.webp", "emoji": "👤", "icon": "profile-circle", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"},
+    "ig-caption": {"3d": "/assets/3d/AI/Chatbot_Interaction_Angle_2.webp", "emoji": "💬", "icon": "message-text-1", "color": "text-cyan-600 bg-cyan-50 border-cyan-200"},
+    "ig-human": {"3d": "/assets/3d/Cryptocurrency/Crypto_Security_Shield.webp", "emoji": "🛡️", "icon": "shield-tick", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"},
+    "ig-plan": {"3d": "/assets/3d/Documentation/Achievement_Document_Alt.webp", "emoji": "🗓️", "icon": "calendar-tick", "color": "text-purple-600 bg-purple-50 border-purple-200"},
+    "ig-audit": {"3d": "/assets/3d/Chart & Analytics/Performance_Gauge.webp", "emoji": "🔍", "icon": "scan-barcode", "color": "text-amber-600 bg-amber-50 border-amber-200"},
+    "ig-repurpose": {"3d": "/assets/3d/Design/Magic_Alt.webp", "emoji": "🔄", "icon": "refresh-circle", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"},
+    "ig-creator-expert": {"3d": "/assets/3d/Reward/Ranking_Alt.webp", "emoji": "👑", "icon": "crown-1", "color": "text-amber-600 bg-amber-50 border-amber-200"},
+
+    # UI / Design / Frontend
+    "figma": {"3d": "/assets/3d/Design/Design.webp", "emoji": "🎨", "icon": "bezier", "color": "text-purple-600 bg-purple-50 border-purple-200"},
+    "make-interfaces-feel-better": {"3d": "/assets/3d/Design/Color_Picker.webp", "emoji": "✨", "icon": "magicpen", "color": "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200"},
+    "vibe-component": {"3d": "/assets/3d/Design/Design_Alt.webp", "emoji": "💎", "icon": "magicpen", "color": "text-violet-600 bg-violet-50 border-violet-200"},
+    "vibe-production-hardening": {"3d": "/assets/3d/Cryptocurrency/Crypto_Security_Shield.webp", "emoji": "🔒", "icon": "security-safe", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"},
+
+    # SEO & Search Engine
+    "seo": {"3d": "/assets/3d/Chart & Analytics/Search_Analytics.webp", "emoji": "🌐", "icon": "global-search", "color": "text-blue-600 bg-blue-50 border-blue-200"},
+    "search-console": {"3d": "/assets/3d/Chart & Analytics/Search_Analytics.webp", "emoji": "🔍", "icon": "scan-barcode", "color": "text-blue-600 bg-blue-50 border-blue-200"},
+
+    # Persian & Localization
+    "persian": {"3d": "/assets/3d/Documentation/Achievement_Document_Alt.webp", "emoji": "🇮🇷", "icon": "translate", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"},
+
+    # MCP Servers & Tools
+    "hooshang": {"3d": "/assets/3d/AI/Robot_Full_Body_Angle_1.webp", "emoji": "🤖", "icon": "robot", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"},
+    "mem0": {"3d": "/assets/3d/AI/Brain_Angle_2.webp", "emoji": "🧠", "icon": "hierarchy-3", "color": "text-purple-600 bg-purple-50 border-purple-200"},
+    "notion": {"3d": "/assets/3d/Documentation/Achievement_Document_Alt.webp", "emoji": "📝", "icon": "document-text", "color": "text-slate-800 bg-slate-100 border-slate-200"},
+    "posthog": {"3d": "/assets/3d/Chart & Analytics/Data_Bars.webp", "emoji": "🦔", "icon": "data-2", "color": "text-amber-600 bg-amber-50 border-amber-200"},
+    "easytrader": {"3d": "/assets/3d/Cryptocurrency/Trading_Dashboard_Monitor.webp", "emoji": "📈", "icon": "trend-up", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"},
+    "adplat-admin": {"3d": "/assets/3d/Chart & Analytics/Conversion_Funnel.webp", "emoji": "📣", "icon": "bullhorn", "color": "text-blue-600 bg-blue-50 border-blue-200"},
+    "dastyar-serp": {"3d": "/assets/3d/Chart & Analytics/Search_Analytics.webp", "emoji": "🔎", "icon": "search-normal", "color": "text-purple-600 bg-purple-50 border-purple-200"},
+    "soundcloud": {"3d": "/assets/3d/Essential/Headset_1_10038.webp", "emoji": "🎧", "icon": "music-note", "color": "text-orange-600 bg-orange-50 border-orange-200"},
+
+    # CLIs & Runtime
+    "claude": {"3d": "/assets/3d/AI/Robot_Full_Body_Angle_2.webp", "emoji": "🤖", "icon": "command", "color": "text-amber-600 bg-amber-50 border-amber-200"},
+    "agy": {"3d": "/assets/3d/Essential/Rocket_1_10210.webp", "emoji": "🚀", "icon": "flash-1", "color": "text-blue-600 bg-blue-50 border-blue-200"},
+    "antigravity": {"3d": "/assets/3d/Essential/Rocket_1_10210.webp", "emoji": "🚀", "icon": "flash-1", "color": "text-blue-600 bg-blue-50 border-blue-200"},
+    "uv": {"3d": "/assets/3d/Essential/Flash_1_10240.webp", "emoji": "⚡", "icon": "electricity", "color": "text-violet-600 bg-violet-50 border-violet-200"},
+    "python": {"3d": "/assets/3d/AI/Code_Development_Angle_1.webp", "emoji": "🐍", "icon": "code-1", "color": "text-sky-600 bg-sky-50 border-sky-200"},
+    "git": {"3d": "/assets/3d/Essential/Settings_Gear_triple_Plastic.webp", "emoji": "🌿", "icon": "git-branch", "color": "text-orange-600 bg-orange-50 border-orange-200"},
+    "code": {"3d": "/assets/3d/AI/Code_Development_Angle_1.webp", "emoji": "💻", "icon": "code-1", "color": "text-sky-600 bg-sky-50 border-sky-200"},
+}
+
+# Curated pool for rich deterministic hash fallback
+FALLBACK_3D_POOLS = {
+    "AI": [
+        "/assets/3d/AI/Robot_Full_Body_Angle_1.webp",
+        "/assets/3d/AI/Brain_Angle_1.webp",
+        "/assets/3d/AI/Brain_Angle_2.webp",
+        "/assets/3d/AI/Code_Development_Angle_1.webp",
+        "/assets/3d/AI/Chatbot_Interaction_Angle_2.webp",
+        "/assets/3d/AI/AI_Web_Angle_2.webp",
+        "/assets/3d/AI/CPU_with_Nodes_Angle_1.webp",
+        "/assets/3d/AI/AI_Cloud.webp",
+    ],
+    "Technology": [
+        "/assets/3d/Technology/MacBook_Alt_10812.webp",
+        "/assets/3d/Technology/iPhone_14_Pro_Alt_10757.webp",
+        "/assets/3d/Technology/Apple_Watch_Alt_10798.webp",
+        "/assets/3d/Technology/Desk_Lamp_Alt_10731.webp",
+        "/assets/3d/Technology/Airpod_Alt_10794.webp",
+        "/assets/3d/Technology/Wacom_Pen_Alt_10788.webp",
+    ],
+    "Chart": [
+        "/assets/3d/Chart & Analytics/Analytics_Dashboard.webp",
+        "/assets/3d/Chart & Analytics/Bar_Chart.webp",
+        "/assets/3d/Chart & Analytics/Trend_Line.webp",
+        "/assets/3d/Chart & Analytics/Data_Bars.webp",
+        "/assets/3d/Chart & Analytics/Target_Chart.webp",
+        "/assets/3d/Chart & Analytics/Search_Analytics.webp",
+        "/assets/3d/Chart & Analytics/Conversion_Funnel.webp",
+    ],
+    "Design": [
+        "/assets/3d/Design/Design.webp",
+        "/assets/3d/Design/Design_Alt.webp",
+        "/assets/3d/Design/Color_Picker.webp",
+        "/assets/3d/Design/Magic.webp",
+        "/assets/3d/Design/Scissor.webp",
+    ],
+    "Media": [
+        "/assets/3d/Video & Movie/Video_camera_1_10083.webp",
+        "/assets/3d/Video & Movie/Movie_and_Cinema_Basic.webp",
+        "/assets/3d/Video & Movie/Video_Record.webp",
+        "/assets/3d/Photo/360_Camera.webp",
+        "/assets/3d/Essential/Headset_1_10038.webp",
+    ],
+    "Security": [
+        "/assets/3d/Cryptocurrency/Crypto_Security_Shield.webp",
+        "/assets/3d/Cryptocurrency/Blockchain_Cube_Network.webp",
+        "/assets/3d/Cryptocurrency/Trading_Dashboard_Monitor.webp",
+        "/assets/3d/Essential/Settings_Gear_triple_Plastic.webp",
+        "/assets/3d/Essential/Rocket_1_10210.webp",
+    ],
+    "Essential": [
+        "/assets/3d/Essential/Rocket_1_10210.webp",
+        "/assets/3d/Essential/Flash_1_10240.webp",
+        "/assets/3d/Essential/Settings_Gear_triple_Plastic.webp",
+        "/assets/3d/Documentation/Achievement_Document_Alt.webp",
+        "/assets/3d/Files/Folder_1_10238.webp",
+        "/assets/3d/Essential/Discover_Globe_10619.webp",
+    ]
 }
 
 def assign_icon_and_emoji(name, item_type="Skill", platform=""):
-    """Assigns a semantic 3D thiings asset, emoji, and Iconsax icon to each item."""
+    """Assigns an ultra-rich 3D Iconly Pro WebP model, emoji, and Iconsax icon to each item."""
     n = name.lower()
     
-    # Creator & Video Skills
-    if "creator-intelligence" in n:
-        return {"emoji": "🧠", "icon": "cpu-charge", "thiings": THIINGS_ASSETS["brain"], "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "trend-radar" in n:
-        return {"emoji": "📡", "icon": "radar-2", "thiings": THIINGS_ASSETS["globe"], "color": "text-blue-600 bg-blue-50 border-blue-200"}
-    elif "audience-positioning" in n:
-        return {"emoji": "🎯", "icon": "target", "thiings": THIINGS_ASSETS["target"], "color": "text-rose-600 bg-rose-50 border-rose-200"}
-    elif "topic-discovery" in n:
-        return {"emoji": "💡", "icon": "lamp-on", "thiings": THIINGS_ASSETS["search"], "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "idea-development" in n:
-        return {"emoji": "🌱", "icon": "magic-star", "thiings": THIINGS_ASSETS["magic-wand"], "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "hook-engineering" in n:
-        return {"emoji": "🪝", "icon": "flash-circle", "thiings": THIINGS_ASSETS["lightning"], "color": "text-red-600 bg-red-50 border-red-200"}
-    elif "scriptwriting" in n:
-        return {"emoji": "✍️", "icon": "edit-2", "thiings": THIINGS_ASSETS["pen"], "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "visual-storyboarding" in n:
-        return {"emoji": "🎬", "icon": "video-play", "thiings": THIINGS_ASSETS["camera"], "color": "text-teal-600 bg-teal-50 border-teal-200"}
-    elif "retention-editing" in n:
-        return {"emoji": "✂️", "icon": "scissor", "thiings": THIINGS_ASSETS["scissors"], "color": "text-orange-600 bg-orange-50 border-orange-200"}
-    elif "platform-packaging" in n:
-        return {"emoji": "📦", "icon": "box-1", "thiings": THIINGS_ASSETS["folder"], "color": "text-sky-600 bg-sky-50 border-sky-200"}
-    elif "publishing-operations" in n:
-        return {"emoji": "🚀", "icon": "send-2", "thiings": THIINGS_ASSETS["rocket"], "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "performance-learning" in n:
-        return {"emoji": "📈", "icon": "chart-2", "thiings": THIINGS_ASSETS["sparkle"], "color": "text-blue-600 bg-blue-50 border-blue-200"}
-    elif "youtube-thumbnail" in n:
-        return {"emoji": "🖼️", "icon": "gallery-edit", "thiings": THIINGS_ASSETS["palette"], "color": "text-red-600 bg-red-50 border-red-200"}
-    elif "carousel-craft" in n or "ig-carousel" in n or "carousel" in n:
-        return {"emoji": "📑", "icon": "slider-vertical", "thiings": THIINGS_ASSETS["document"], "color": "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200"}
-    elif "client-acquisition" in n:
-        return {"emoji": "💼", "icon": "dollar-circle", "thiings": THIINGS_ASSETS["briefcase"], "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "sound-design" in n or "soundcloud" in n:
-        return {"emoji": "🎵", "icon": "music-note", "thiings": THIINGS_ASSETS["headphones"], "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "watch-video" in n or "video-vision" in n or "analyze-edit" in n or "pushe-film" in n or "video-editor" in n:
-        return {"emoji": "👁️", "icon": "eye", "thiings": THIINGS_ASSETS["video"], "color": "text-violet-600 bg-violet-50 border-violet-200"}
-    elif "vidiq" in n:
-        return {"emoji": "📊", "icon": "chart-square", "thiings": THIINGS_ASSETS["sparkle"], "color": "text-red-600 bg-red-50 border-red-200"}
+    # 1. Direct curated match
+    for key, val in ICONLY_CURATED.items():
+        if key in n:
+            return {
+                "emoji": val["emoji"],
+                "icon": val["icon"],
+                "thiings": val["3d"],
+                "color": val["color"]
+            }
 
-    # Instagram Suite
-    elif "ig-reel" in n:
-        return {"emoji": "📱", "icon": "video-square", "thiings": THIINGS_ASSETS["smartphone"], "color": "text-pink-600 bg-pink-50 border-pink-200"}
-    elif "ig-story" in n:
-        return {"emoji": "⏱️", "icon": "clock", "thiings": THIINGS_ASSETS["calendar"], "color": "text-rose-600 bg-rose-50 border-rose-200"}
-    elif "ig-viral" in n:
-        return {"emoji": "🔥", "icon": "trend-up", "thiings": THIINGS_ASSETS["flame"], "color": "text-orange-600 bg-orange-50 border-orange-200"}
-    elif "ig-profile" in n:
-        return {"emoji": "👤", "icon": "profile-circle", "thiings": THIINGS_ASSETS["heart"], "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "ig-caption" in n or "ig-reply" in n or "ig-comment" in n or "ig-dm" in n:
-        return {"emoji": "💬", "icon": "message-text-1", "thiings": THIINGS_ASSETS["chat"], "color": "text-cyan-600 bg-cyan-50 border-cyan-200"}
-    elif "ig-human" in n or "security" in n:
-        return {"emoji": "🛡️", "icon": "shield-tick", "thiings": THIINGS_ASSETS["shield"], "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "ig-plan" in n:
-        return {"emoji": "🗓️", "icon": "calendar-tick", "thiings": THIINGS_ASSETS["calendar"], "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "ig-audit" in n:
-        return {"emoji": "🔍", "icon": "scan-barcode", "thiings": THIINGS_ASSETS["search"], "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "ig-repurpose" in n:
-        return {"emoji": "🔄", "icon": "refresh-circle", "thiings": THIINGS_ASSETS["magic-wand"], "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "ig-creator-expert" in n or "creator-os" in n:
-        return {"emoji": "👑", "icon": "crown-1", "thiings": THIINGS_ASSETS["crown"], "color": "text-amber-600 bg-amber-50 border-amber-200"}
+    # 2. Semantic category matching
+    pool = "Essential"
+    emoji = "🧩"
+    icon = "category"
+    color = "text-slate-600 bg-slate-100 border-slate-200"
 
-    # UI / Design / Figma
-    elif "figma" in n:
-        return {"emoji": "🎨", "icon": "bezier", "thiings": THIINGS_ASSETS["palette"], "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "make-interfaces-feel-better" in n or "vibe-component" in n:
-        return {"emoji": "✨", "icon": "magicpen", "thiings": THIINGS_ASSETS["sparkle"], "color": "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200"}
-    elif "vibe-production-hardening" in n:
-        return {"emoji": "🔒", "icon": "security-safe", "thiings": THIINGS_ASSETS["shield"], "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-
-    # SEO & Search
-    elif "seo" in n or "search-console" in n:
-        return {"emoji": "🌐", "icon": "global-search", "thiings": THIINGS_ASSETS["globe"], "color": "text-blue-600 bg-blue-50 border-blue-200"}
-
-    # Persian & Localization
-    elif "persian-writing" in n or "persian-rtl" in n or "persian" in n:
-        return {"emoji": "🇮🇷", "icon": "translate", "thiings": THIINGS_ASSETS["book"], "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-
-    # MCP Servers & Tools
-    elif "hooshang" in n or "robot" in n:
-        return {"emoji": "🤖", "icon": "robot", "thiings": THIINGS_ASSETS["robot"], "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "mem0" in n:
-        return {"emoji": "🧠", "icon": "hierarchy-3", "thiings": THIINGS_ASSETS["brain"], "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "notion" in n:
-        return {"emoji": "📝", "icon": "document-text", "thiings": THIINGS_ASSETS["document"], "color": "text-slate-800 bg-slate-100 border-slate-200"}
-    elif "posthog" in n:
-        return {"emoji": "🦔", "icon": "data-2", "thiings": THIINGS_ASSETS["sparkle"], "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "jitter" in n:
-        return {"emoji": "🎬", "icon": "video-play", "thiings": THIINGS_ASSETS["video"], "color": "text-purple-600 bg-purple-50 border-purple-200"}
-
-    # CLIs & Tools
-    elif "claude" in n:
-        return {"emoji": "🤖", "icon": "command", "thiings": THIINGS_ASSETS["robot"], "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "agy" in n or "antigravity" in n:
-        return {"emoji": "🚀", "icon": "flash-1", "thiings": THIINGS_ASSETS["rocket"], "color": "text-blue-600 bg-blue-50 border-blue-200"}
-    elif "uv" in n or "uvx" in n:
-        return {"emoji": "⚡", "icon": "electricity", "thiings": THIINGS_ASSETS["lightning"], "color": "text-violet-600 bg-violet-50 border-violet-200"}
-    elif "python" in n or "code" in n:
-        return {"emoji": "🐍", "icon": "code-1", "thiings": THIINGS_ASSETS["code"], "color": "text-sky-600 bg-sky-50 border-sky-200"}
-    elif "git" in n or "wrench" in n:
-        return {"emoji": "🌿", "icon": "git-branch", "thiings": THIINGS_ASSETS["wrench"], "color": "text-orange-600 bg-orange-50 border-orange-200"}
-
-    # Fallbacks by Type
-    if item_type == "MCP Server":
-        return {"emoji": "🔌", "icon": "server", "thiings": THIINGS_ASSETS["gear"], "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
+    if any(k in n for k in ["video", "film", "movie", "camera", "clip", "editor", "reel", "short", "youtube"]):
+        pool = "Media"
+        emoji = "🎬"
+        icon = "video-play"
+        color = "text-violet-600 bg-violet-50 border-violet-200"
+    elif any(k in n for k in ["audio", "sound", "music", "podcast", "earshot", "voice"]):
+        pool = "Media"
+        emoji = "🎵"
+        icon = "music-note"
+        color = "text-amber-600 bg-amber-50 border-amber-200"
+    elif any(k in n for k in ["ai", "robot", "llm", "intelligence", "gpt", "agent", "prompt", "brain"]):
+        pool = "AI"
+        emoji = "🤖"
+        icon = "cpu-charge"
+        color = "text-indigo-600 bg-indigo-50 border-indigo-200"
+    elif any(k in n for k in ["chart", "analytics", "stat", "trend", "seo", "audit", "metric", "ranking", "rank"]):
+        pool = "Chart"
+        emoji = "📈"
+        icon = "chart-2"
+        color = "text-blue-600 bg-blue-50 border-blue-200"
+    elif any(k in n for k in ["design", "ui", "ux", "figma", "visual", "art", "style", "theme", "color"]):
+        pool = "Design"
+        emoji = "🎨"
+        icon = "bezier"
+        color = "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200"
+    elif any(k in n for k in ["crypto", "finance", "money", "wallet", "trade", "dollar", "card"]):
+        pool = "Security"
+        emoji = "💰"
+        icon = "dollar-circle"
+        color = "text-emerald-600 bg-emerald-50 border-emerald-200"
+    elif any(k in n for k in ["security", "shield", "protect", "auth", "token", "lock", "guard", "safe"]):
+        pool = "Security"
+        emoji = "🛡️"
+        icon = "shield-tick"
+        color = "text-emerald-600 bg-emerald-50 border-emerald-200"
+    elif any(k in n for k in ["code", "dev", "git", "cli", "terminal", "script", "tool", "python", "node", "npm"]):
+        pool = "Technology"
+        emoji = "💻"
+        icon = "command"
+        color = "text-sky-600 bg-sky-50 border-sky-200"
+    elif item_type == "MCP Server":
+        pool = "Technology"
+        emoji = "🔌"
+        icon = "server"
+        color = "text-emerald-600 bg-emerald-50 border-emerald-200"
     elif item_type == "Command":
-        return {"emoji": "⚡", "icon": "slash", "thiings": THIINGS_ASSETS["lightning"], "color": "text-amber-600 bg-amber-50 border-amber-200"}
+        pool = "Essential"
+        emoji = "⚡"
+        icon = "flash-circle"
+        color = "text-amber-600 bg-amber-50 border-amber-200"
     elif item_type == "Rule":
-        return {"emoji": "📜", "icon": "shield-security", "thiings": THIINGS_ASSETS["shield"], "color": "text-purple-600 bg-purple-50 border-purple-200"}
+        pool = "Essential"
+        emoji = "📜"
+        icon = "shield-security"
+        color = "text-purple-600 bg-purple-50 border-purple-200"
     elif item_type == "CLI":
-        return {"emoji": "💻", "icon": "command", "thiings": THIINGS_ASSETS["code"], "color": "text-sky-600 bg-sky-50 border-sky-200"}
+        pool = "Technology"
+        emoji = "💻"
+        icon = "command"
+        color = "text-sky-600 bg-sky-50 border-sky-200"
 
-    return {"emoji": "🧩", "icon": "category", "thiings": THIINGS_ASSETS["puzzle"], "color": "text-slate-600 bg-slate-100 border-slate-200"}
-    """Assigns a specialized semantic emoji and Iconsax icon to each skill/MCP/CLI."""
-    n = name.lower()
-    
-    # Creator & Video Skills
-    if "creator-intelligence" in n:
-        return {"emoji": "🧠", "icon": "cpu-charge", "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "trend-radar" in n:
-        return {"emoji": "📡", "icon": "radar-2", "color": "text-blue-600 bg-blue-50 border-blue-200"}
-    elif "audience-positioning" in n:
-        return {"emoji": "🎯", "icon": "target", "color": "text-rose-600 bg-rose-50 border-rose-200"}
-    elif "topic-discovery" in n:
-        return {"emoji": "💡", "icon": "lamp-on", "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "idea-development" in n:
-        return {"emoji": "🌱", "icon": "magic-star", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "hook-engineering" in n:
-        return {"emoji": "🪝", "icon": "flash-circle", "color": "text-red-600 bg-red-50 border-red-200"}
-    elif "scriptwriting" in n:
-        return {"emoji": "✍️", "icon": "edit-2", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "visual-storyboarding" in n:
-        return {"emoji": "🎬", "icon": "video-play", "color": "text-teal-600 bg-teal-50 border-teal-200"}
-    elif "retention-editing" in n:
-        return {"emoji": "✂️", "icon": "scissor", "color": "text-orange-600 bg-orange-50 border-orange-200"}
-    elif "platform-packaging" in n:
-        return {"emoji": "📦", "icon": "box-1", "color": "text-sky-600 bg-sky-50 border-sky-200"}
-    elif "publishing-operations" in n:
-        return {"emoji": "🚀", "icon": "send-2", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "performance-learning" in n:
-        return {"emoji": "📈", "icon": "chart-2", "color": "text-blue-600 bg-blue-50 border-blue-200"}
-    elif "youtube-thumbnail" in n:
-        return {"emoji": "🖼️", "icon": "gallery-edit", "color": "text-red-600 bg-red-50 border-red-200"}
-    elif "carousel-craft" in n or "ig-carousel" in n or "carousel" in n:
-        return {"emoji": "📑", "icon": "slider-vertical", "color": "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200"}
-    elif "client-acquisition" in n:
-        return {"emoji": "💼", "icon": "dollar-circle", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "sound-design" in n or "soundcloud" in n:
-        return {"emoji": "🎵", "icon": "music-note", "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "watch-video" in n or "video-vision" in n or "analyze-edit" in n:
-        return {"emoji": "👁️", "icon": "eye", "color": "text-violet-600 bg-violet-50 border-violet-200"}
-    elif "vidiq" in n:
-        return {"emoji": "📊", "icon": "chart-square", "color": "text-red-600 bg-red-50 border-red-200"}
+    # Deterministic selection from selected category pool
+    target_pool = FALLBACK_3D_POOLS.get(pool, FALLBACK_3D_POOLS["Essential"])
+    hash_idx = int(hashlib.md5(name.encode("utf-8")).hexdigest(), 16) % len(target_pool)
+    model_3d = target_pool[hash_idx]
 
-    # Instagram Suite
-    elif "ig-reel" in n:
-        return {"emoji": "📱", "icon": "video-square", "color": "text-pink-600 bg-pink-50 border-pink-200"}
-    elif "ig-story" in n:
-        return {"emoji": "⏱️", "icon": "clock", "color": "text-rose-600 bg-rose-50 border-rose-200"}
-    elif "ig-viral" in n:
-        return {"emoji": "🔥", "icon": "trend-up", "color": "text-orange-600 bg-orange-50 border-orange-200"}
-    elif "ig-profile" in n:
-        return {"emoji": "👤", "icon": "profile-circle", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "ig-caption" in n:
-        return {"emoji": "💬", "icon": "message-text-1", "color": "text-cyan-600 bg-cyan-50 border-cyan-200"}
-    elif "ig-reply" in n or "ig-comment" in n:
-        return {"emoji": "💬", "icon": "messages-3", "color": "text-teal-600 bg-teal-50 border-teal-200"}
-    elif "ig-dm" in n:
-        return {"emoji": "✉️", "icon": "direct-normal", "color": "text-blue-600 bg-blue-50 border-blue-200"}
-    elif "ig-human" in n:
-        return {"emoji": "🛡️", "icon": "shield-tick", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif "ig-plan" in n:
-        return {"emoji": "🗓️", "icon": "calendar-tick", "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "ig-audit" in n:
-        return {"emoji": "🔍", "icon": "scan-barcode", "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "ig-repurpose" in n:
-        return {"emoji": "🔄", "icon": "refresh-circle", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "ig-creator-expert" in n:
-        return {"emoji": "👑", "icon": "crown-1", "color": "text-amber-600 bg-amber-50 border-amber-200"}
-
-    # UI / Design / Figma
-    elif "figma" in n:
-        return {"emoji": "🎨", "icon": "bezier", "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "make-interfaces-feel-better" in n or "vibe-component" in n:
-        return {"emoji": "✨", "icon": "magicpen", "color": "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200"}
-    elif "vibe-production-hardening" in n:
-        return {"emoji": "🔒", "icon": "security-safe", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-
-    # SEO & Search
-    elif "seo" in n or "search-console" in n:
-        return {"emoji": "🌐", "icon": "global-search", "color": "text-blue-600 bg-blue-50 border-blue-200"}
-
-    # Persian & Localization
-    elif "persian-writing" in n or "persian-rtl" in n or "persian" in n:
-        return {"emoji": "🇮🇷", "icon": "translate", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-
-    # MCP Servers
-    elif "hooshang" in n:
-        return {"emoji": "🤖", "icon": "robot", "color": "text-indigo-600 bg-indigo-50 border-indigo-200"}
-    elif "mem0" in n:
-        return {"emoji": "🧠", "icon": "hierarchy-3", "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif "notion" in n:
-        return {"emoji": "📝", "icon": "document-text", "color": "text-slate-800 bg-slate-100 border-slate-200"}
-    elif "posthog" in n:
-        return {"emoji": "🦔", "icon": "data-2", "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "pinterest" in n:
-        return {"emoji": "📌", "icon": "bookmark", "color": "text-red-600 bg-red-50 border-red-200"}
-
-    # CLIs & Tools
-    elif "claude" in n:
-        return {"emoji": "🤖", "icon": "command", "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif "agy" in n or "antigravity" in n:
-        return {"emoji": "🚀", "icon": "flash-1", "color": "text-blue-600 bg-blue-50 border-blue-200"}
-    elif "uv" in n or "uvx" in n:
-        return {"emoji": "⚡", "icon": "electricity", "color": "text-violet-600 bg-violet-50 border-violet-200"}
-    elif "pnpm" in n or "npm" in n or "node" in n:
-        return {"emoji": "📦", "icon": "box-add", "color": "text-red-600 bg-red-50 border-red-200"}
-    elif "python" in n:
-        return {"emoji": "🐍", "icon": "code-1", "color": "text-sky-600 bg-sky-50 border-sky-200"}
-    elif "git" in n:
-        return {"emoji": "🌿", "icon": "git-branch", "color": "text-orange-600 bg-orange-50 border-orange-200"}
-    elif "code" in n:
-        return {"emoji": "💻", "icon": "code-circle", "color": "text-blue-600 bg-blue-50 border-blue-200"}
-
-    # Fallback by Item Type
-    if item_type == "MCP Server":
-        return {"emoji": "🔌", "icon": "server", "color": "text-emerald-600 bg-emerald-50 border-emerald-200"}
-    elif item_type == "Command":
-        return {"emoji": "⚡", "icon": "slash", "color": "text-amber-600 bg-amber-50 border-amber-200"}
-    elif item_type == "Rule":
-        return {"emoji": "📜", "icon": "shield-security", "color": "text-purple-600 bg-purple-50 border-purple-200"}
-    elif item_type == "CLI":
-        return {"emoji": "💻", "icon": "command", "color": "text-sky-600 bg-sky-50 border-sky-200"}
-
-    return {"emoji": "🧩", "icon": "category", "color": "text-slate-600 bg-slate-100 border-slate-200"}
-    """Calculates size, file count, and line count for depth/richness scoring."""
-    total_bytes = 0
-    file_count = 0
-    line_count = 0
-    try:
-        for f in folder_path.rglob("*"):
-            if f.is_file():
-                file_count += 1
-                try:
-                    size = f.stat().st_size
-                    total_bytes += size
-                    # Count lines for text files
-                    if f.suffix in [".md", ".py", ".json", ".js", ".ts", ".txt", ".html", ".sh"]:
-                        with open(f, "r", encoding="utf-8", errors="ignore") as tf:
-                            line_count += sum(1 for _ in tf)
-                except Exception:
-                    pass
-    except Exception:
-        pass
-    
-    # Richness score formula: byte size + weighted bonuses for files and lines
-    score = total_bytes + (file_count * 1500) + (line_count * 8)
     return {
-        "size_bytes": total_bytes,
-        "size_kb": round(total_bytes / 1024, 1),
-        "file_count": file_count,
-        "line_count": line_count,
-        "richness_score": score
+        "emoji": emoji,
+        "icon": icon,
+        "thiings": model_3d,
+        "color": color
     }
+
 
 def scan_antigravity_skills():
     skills = []
