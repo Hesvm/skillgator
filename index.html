@@ -834,14 +834,14 @@
         const lower = p.toLowerCase();
         if (lower.includes('antigravity')) {
           return `
-            <div class="${dim} rounded-full bg-[#161b22] ${border} shadow-2xs flex items-center justify-center p-1 overflow-hidden shrink-0 transition-transform hover:scale-110 hover:z-10" title="Antigravity">
-              <img src="/assets/antigravity.png" alt="Antigravity" class="w-full h-full object-contain">
+            <div class="${dim} rounded-full bg-white ${border} shadow-2xs flex items-center justify-center overflow-hidden shrink-0 transition-transform hover:scale-110 hover:z-10" title="Antigravity">
+              <img src="/assets/antigravity.png" alt="Antigravity" class="w-full h-full object-cover scale-120">
             </div>
           `;
         } else if (lower.includes('claude')) {
           return `
-            <div class="${dim} rounded-full bg-[#2a1d18] ${border} shadow-2xs flex items-center justify-center p-1 overflow-hidden shrink-0 transition-transform hover:scale-110 hover:z-10" title="${escapeHtml(p)}">
-              <img src="/assets/claude.png" alt="Claude" class="w-full h-full object-contain">
+            <div class="${dim} rounded-full bg-[#d97757] ${border} shadow-2xs flex items-center justify-center overflow-hidden shrink-0 transition-transform hover:scale-110 hover:z-10" title="${escapeHtml(p)}">
+              <img src="/assets/claude.png" alt="Claude" class="w-full h-full object-cover scale-120">
             </div>
           `;
         } else if (lower.includes('creator os') || (item.suite === 'Creator OS')) {
