@@ -200,8 +200,16 @@ class EcosystemMonitorHandler(SimpleHTTPRequestHandler):
                 qs = parse_qs(parsed.query)
                 file_path = qs.get("path", [""])[0]
                 if file_path and os.path.exists(file_path):
-                    content = Path(file_path).read_text(encoding="utf-8", errors="ignore")
-                    resp = json.dumps({"status": "ok", "content": content}).encode("utf-8")
+                    p = Path(file_path)
+                    ext = p.suffix.lower()
+                    if ext in [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]:
+                        import base64
+                        mime = "image/svg+xml" if ext == ".svg" else ("image/jpeg" if ext in [".jpg", ".jpeg"] else f"image/{ext.replace('.', '')}")
+                        b64 = base64.b64encode(p.read_bytes()).decode("utf-8")
+                        resp = json.dumps({"status": "ok", "type": "image", "data_url": f"data:{mime};base64,{b64}", "ext": ext}).encode("utf-8")
+                    else:
+                        content = p.read_text(encoding="utf-8", errors="ignore")
+                        resp = json.dumps({"status": "ok", "type": "text", "content": content, "ext": ext}).encode("utf-8")
                 else:
                     resp = json.dumps({"status": "error", "message": "File not found"}).encode("utf-8")
                 self.send_response(200)
