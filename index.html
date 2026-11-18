@@ -988,10 +988,10 @@
 
         return `
           <div onclick="openModal('${item.id || item.name}')" 
-               class="card-hover bg-white border border-slate-200/70 hover:border-slate-300 rounded-2xl p-3.5 cursor-pointer flex flex-col justify-between group transition-all duration-200 hover:shadow-xs min-h-[165px]">
+               class="card-hover bg-white border border-slate-200/70 hover:border-slate-300 rounded-2xl p-3 cursor-pointer flex flex-col justify-between group transition-all duration-200 hover:shadow-xs aspect-square overflow-hidden">
             
             <!-- هدر کارت: تگ گرد در سمت راست، لوگوهای پلتفرم در سمت چپ (بدون نام) -->
-            <div class="w-full flex items-center justify-between mb-2">
+            <div class="w-full flex items-center justify-between shrink-0 mb-1">
               <div class="shrink-0">
                 ${singleBadge}
               </div>
@@ -1000,22 +1000,22 @@
               </div>
             </div>
 
-            <!-- مرکز کارت: آیکون سه‌بعدی و نام مهارت -->
-            <div class="w-full flex flex-col items-center text-center my-auto py-1">
-              <div class="w-13 h-13 mb-1.5 flex items-center justify-center shrink-0">
+            <!-- مرکز کارت: آیکون سه‌بعدی و نام مهارت کاملاً متمرکز در مربع -->
+            <div class="w-full flex flex-col items-center text-center my-auto min-h-0 py-0.5">
+              <div class="w-12 h-12 sm:w-13 sm:h-13 mb-1.5 flex items-center justify-center shrink-0">
                 ${thiingsUrl 
-                  ? `<img src="${thiingsUrl}" alt="${escapeHtml(item.name)}" class="w-13 h-13 object-contain group-hover:scale-105 transition-transform duration-200" loading="lazy">` 
+                  ? `<img src="${thiingsUrl}" alt="${escapeHtml(item.name)}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200" loading="lazy">` 
                   : `<span class="text-3xl">${item.emoji || '🧩'}</span>`
                 }
               </div>
-              <h4 class="text-xs font-bold text-slate-800 font-mono-code truncate w-full group-hover:text-blue-600 transition-colors" title="${escapeHtml(item.name)}">
+              <h4 class="text-xs font-bold text-slate-800 font-mono-code truncate w-full px-1 group-hover:text-blue-600 transition-colors" title="${escapeHtml(item.name)}">
                 ${escapeHtml(item.name)}
               </h4>
             </div>
 
-            <!-- فوتر کارت: مشخصات عددی تمیز و بدون شلوغی -->
-            <div class="w-full pt-2 mt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono-code">
-              <span class="text-slate-400 truncate max-w-[90px]">
+            <!-- فوتر کارت: مشخصات عددی تمیز و فیت درون مربع -->
+            <div class="w-full pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono-code shrink-0">
+              <span class="text-slate-400 truncate max-w-[85px]">
                 ${item.tools_count ? (isEn ? `${item.tools_count} tools` : `${item.tools_count} ابزار`) : (item.size_kb ? formatFileSize(item.size_kb) : '')}
               </span>
               <span dir="ltr" class="text-slate-400 shrink-0 font-medium">${formattedTokens ? `${formattedTokens} tok` : (isEn ? 'Ready' : 'آماده')}</span>
