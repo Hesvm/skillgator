@@ -195,17 +195,17 @@
     }
   </style>
 </head>
-<body class="h-screen w-screen overflow-hidden app-canvas text-slate-800 antialiased selection:bg-slate-900 selection:text-white flex p-3 md:p-4 gap-3 md:gap-4">
-  <!-- سایدبار سمت راست (اولین عنصر در جهت RTL = سمت راست صفحه) -->
-  <aside class="w-64 md:w-72 h-full flex flex-col justify-between shrink-0 py-2 select-none">
+<body class="h-screen w-screen overflow-hidden app-canvas text-slate-800 antialiased selection:bg-slate-900 selection:text-white flex p-3 md:p-4">
+  <!-- سایدبار سمت راست (اولین عنصر در جهت RTL = سمت راست صفحه) با قابلیت تغییر عرض -->
+  <aside id="appSidebar" style="width: 268px;" class="h-full flex flex-col justify-between shrink-0 py-2 select-none min-w-[200px] max-w-[420px] overflow-hidden">
     
     <!-- بخش بالایی سایدبار: لوگو، سرچ‌بار و دسته‌بندی‌ها -->
     <div class="space-y-4">
       
       <!-- عنوان برند در بالای سایدبار (لوگو کاملاً آزاد بدون فریم و بدون برچسب زنده) -->
-      <div class="flex items-center gap-2.5 px-2 pt-2">
+      <div class="flex items-center gap-2.5 px-2 pt-2 min-w-0">
         <img src="/assets/crocodile_3d.png" alt="Skillgator" class="w-8 h-8 object-contain shrink-0">
-        <span id="brandTitle" class="text-base font-bold text-slate-900 tracking-tight">اسکیل‌گیتور</span>
+        <span id="brandTitle" class="text-base font-bold text-slate-900 tracking-tight truncate">اسکیل‌گیتور</span>
       </div>
 
       <!-- باکس جستجوی مینیمال درون سایدبار -->
@@ -222,67 +222,67 @@
         <nav class="space-y-1">
           
           <button onclick="setTab('all')" id="tab-all" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base" icon-name="category-2"></i>
-              <span id="txt-tab-all">همه آیتم‌ها</span>
+                  class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="iconsax text-base shrink-0" icon-name="category-2"></i>
+              <span id="txt-tab-all" class="truncate">همه آیتم‌ها</span>
             </div>
-            <span id="count-all" class="font-mono-code text-[11px] opacity-75">0</span>
+            <span id="count-all" class="font-mono-code text-[11px] opacity-75 shrink-0">0</span>
           </button>
 
 
           <button onclick="setTab('user-custom')" id="tab-user-custom" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base text-emerald-600" icon-name="star-1"></i>
-              <span id="txt-tab-user-custom">ساخته‌های خودم</span>
+                  class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="iconsax text-base text-emerald-600 shrink-0" icon-name="star-1"></i>
+              <span id="txt-tab-user-custom" class="truncate">ساخته‌های خودم</span>
             </div>
-            <span id="count-user-custom" class="font-mono-code text-[11px] opacity-75">0</span>
+            <span id="count-user-custom" class="font-mono-code text-[11px] opacity-75 shrink-0">0</span>
           </button>
 
           <button onclick="setTab('antigravity')" id="tab-antigravity" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base text-blue-600" icon-name="cpu"></i>
-              <span id="txt-tab-antigravity">آنتی‌گرویتی (Antigravity)</span>
+                  class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="iconsax text-base text-blue-600 shrink-0" icon-name="cpu"></i>
+              <span id="txt-tab-antigravity" class="truncate">آنتی‌گرویتی (Antigravity)</span>
             </div>
-            <span id="count-antigravity" class="font-mono-code text-[11px] opacity-75">0</span>
+            <span id="count-antigravity" class="font-mono-code text-[11px] opacity-75 shrink-0">0</span>
           </button>
 
           <button onclick="setTab('claude')" id="tab-claude" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base text-amber-600" icon-name="code-circle"></i>
-              <span id="txt-tab-claude">کلاد کد (Claude Code)</span>
+                  class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="iconsax text-base text-amber-600 shrink-0" icon-name="code-circle"></i>
+              <span id="txt-tab-claude" class="truncate">کلاد کد (Claude Code)</span>
             </div>
-            <span id="count-claude" class="font-mono-code text-[11px] opacity-75">0</span>
+            <span id="count-claude" class="font-mono-code text-[11px] opacity-75 shrink-0">0</span>
           </button>
 
           <button onclick="setTab('mcp')" id="tab-mcp" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base text-purple-600" icon-name="driver-2"></i>
-              <span id="txt-tab-mcp">سرورهای MCP</span>
+                  class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="iconsax text-base text-purple-600 shrink-0" icon-name="driver-2"></i>
+              <span id="txt-tab-mcp" class="truncate">سرورهای MCP</span>
             </div>
-            <span id="count-mcp" class="font-mono-code text-[11px] opacity-75">0</span>
+            <span id="count-mcp" class="font-mono-code text-[11px] opacity-75 shrink-0">0</span>
           </button>
 
           <button onclick="setTab('clis')" id="tab-clis" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base text-slate-500" icon-name="command"></i>
-              <span id="txt-tab-clis">دستورات خط فرمان (CLI)</span>
+                  class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="iconsax text-base text-slate-500 shrink-0" icon-name="command"></i>
+              <span id="txt-tab-clis" class="truncate">دستورات خط فرمان (CLI)</span>
             </div>
-            <span id="count-clis" class="font-mono-code text-[11px] opacity-75">0</span>
+            <span id="count-clis" class="font-mono-code text-[11px] opacity-75 shrink-0">0</span>
           </button>
 
           <button onclick="setTab('conflicts')" id="tab-conflicts" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-amber-700 hover:text-amber-900 hover:bg-amber-100/60">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base text-amber-600" icon-name="warning-2"></i>
-              <span id="txt-tab-conflicts">تداخل تریگرها (Conflicts)</span>
+                  class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-amber-700 hover:text-amber-900 hover:bg-amber-100/60">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="iconsax text-base text-amber-600 shrink-0" icon-name="warning-2"></i>
+              <span id="txt-tab-conflicts" class="truncate">تداخل تریگرها (Conflicts)</span>
             </div>
-            <span id="count-conflicts" class="font-mono-code text-[11px] bg-amber-200/80 text-amber-900 px-1.5 py-0.5 rounded-full font-bold">0</span>
+            <span id="count-conflicts" class="font-mono-code text-[11px] bg-amber-200/80 text-amber-900 px-1.5 py-0.5 rounded-full font-bold shrink-0">0</span>
           </button>
 
         </nav>
@@ -295,28 +295,34 @@
       <!-- دکمه حمایت مالی (Animated Heart دقیقاً به سبک Vibekit) -->
       <button onclick="openDonationModal()" 
               id="btn-support-heart"
-              class="group w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-600 hover:text-rose-500 hover:bg-rose-50/70 transition-all cursor-pointer"
+              class="group w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-600 hover:text-rose-500 hover:bg-rose-50/70 transition-all cursor-pointer min-w-0"
               title="حمایت مالی از پروژه">
         <div class="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-rose-100/70 flex items-center justify-center text-slate-600 group-hover:text-rose-500 shadow-2xs shrink-0 transition-all group-hover:scale-110">
           <i class="iconsax text-base text-rose-500 transition-transform group-hover:scale-115" icon-name="heart"></i>
         </div>
-        <span id="txt-support-label" class="font-bold text-slate-700 group-hover:text-rose-500 transition-colors">حمایت مالی</span>
+        <span id="txt-support-label" class="font-bold text-slate-700 group-hover:text-rose-500 transition-colors truncate">حمایت مالی</span>
       </button>
 
       <!-- دکمه تنظیمات -->
       <button onclick="openSettingsModal()" 
-              class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 transition-all">
+              class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 transition-all min-w-0">
         <div class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shadow-2xs shrink-0">
           <i class="iconsax text-base" icon-name="setting-2"></i>
         </div>
-        <span id="txt-settings-label" class="font-bold">تنظیمات</span>
+        <span id="txt-settings-label" class="font-bold truncate">تنظیمات</span>
       </button>
     </div>
 
   </aside>
 
+  <!-- دستگیره تغییر عرض سایدبار (Sidebar Resize Handle - Drag to resize, Double-click to reset) -->
+  <div id="sidebarResizer" title="بکشید برای تغییر عرض • دابل‌کلیک برای بازنشانی"
+       class="w-3 md:w-4 h-full shrink-0 flex items-center justify-center cursor-col-resize group relative z-20 select-none">
+    <div id="sidebarResizerPill" class="w-1 h-10 rounded-full bg-slate-400/0 group-hover:bg-slate-400/60 group-hover:h-14 transition-all duration-150"></div>
+  </div>
+
   <!-- محتوای اصلی شناور (Floating Frame در سمت چپ) -->
-  <main class="flex-1 h-full floating-frame flex flex-col overflow-hidden relative z-10 transition-all duration-300">
+  <main id="appMainFrame" class="flex-1 min-w-0 h-full floating-frame flex flex-col overflow-hidden relative z-10 transition-all duration-300">
     
     <!-- نوار بالای فریم اصلی (فقط کنترل‌های مرتب‌سازی، تغییر نما و خروجی) -->
     <header class="px-5 py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-xs relative z-30">
@@ -2644,6 +2650,12 @@
       if (typeof renderSortDropdownOptions === 'function') {
         renderSortDropdownOptions();
       }
+      const resizerEl = document.getElementById('sidebarResizer');
+      if (resizerEl) {
+        resizerEl.title = lang === 'en'
+          ? 'Drag to resize • Double-click to reset'
+          : 'بکشید برای تغییر عرض • دابل‌کلیک برای بازنشانی';
+      }
 
       // Translate view buttons
       const viewGridBtn = document.getElementById('viewGridBtn');
@@ -2879,7 +2891,78 @@ Optimize content structure and citation readiness for AI Overviews and answer en
       });
     }
 
+    function initSidebarResizer() {
+      const sidebar = document.getElementById('appSidebar');
+      const resizer = document.getElementById('sidebarResizer');
+      const pill = document.getElementById('sidebarResizerPill');
+      const mainFrame = document.getElementById('appMainFrame');
+      if (!sidebar || !resizer) return;
+
+      const MIN_W = 200;
+      const MAX_W = 420;
+      const DEFAULT_W = 268;
+      const STORAGE_KEY = 'skillgator_sidebar_width';
+
+      // Restore saved width
+      const saved = parseInt(localStorage.getItem(STORAGE_KEY) || '', 10);
+      if (!isNaN(saved) && saved >= MIN_W && saved <= MAX_W) {
+        sidebar.style.width = `${saved}px`;
+      } else {
+        sidebar.style.width = `${DEFAULT_W}px`;
+      }
+
+      let isDragging = false;
+      let startX = 0;
+      let startWidth = DEFAULT_W;
+
+      resizer.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        startX = e.clientX;
+        startWidth = sidebar.getBoundingClientRect().width;
+
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        if (mainFrame) mainFrame.style.transition = 'none';
+        if (pill) {
+          pill.classList.remove('bg-slate-400/0', 'h-10');
+          pill.classList.add('bg-blue-500', 'h-16', 'w-1.5');
+        }
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const isRtl = document.documentElement.getAttribute('dir') === 'rtl';
+        const delta = isRtl ? (startX - e.clientX) : (e.clientX - startX);
+        const nextWidth = Math.round(Math.min(MAX_W, Math.max(MIN_W, startWidth + delta)));
+        sidebar.style.width = `${nextWidth}px`;
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        if (mainFrame) mainFrame.style.transition = '';
+        if (pill) {
+          pill.classList.remove('bg-blue-500', 'h-16', 'w-1.5');
+          pill.classList.add('bg-slate-400/0', 'h-10');
+        }
+        const finalWidth = Math.round(sidebar.getBoundingClientRect().width);
+        localStorage.setItem(STORAGE_KEY, String(finalWidth));
+      });
+
+      // Double-click to reset to default width
+      resizer.addEventListener('dblclick', () => {
+        sidebar.style.transition = 'width 180ms cubic-bezier(0.16, 1, 0.3, 1)';
+        sidebar.style.width = `${DEFAULT_W}px`;
+        localStorage.setItem(STORAGE_KEY, String(DEFAULT_W));
+        setTimeout(() => { sidebar.style.transition = ''; }, 200);
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      initSidebarResizer();
       applyLanguage(currentLanguage);
       initLiveStream();
 
