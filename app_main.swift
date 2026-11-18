@@ -16,7 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDe
         startServerIfNeeded { [weak self] in
             guard let self = self else { return }
             DispatchQueue.main.async {
-                self.webView.load(URLRequest(url: self.serverURL))
+                self.webView.load(URLRequest(url: self.serverURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
             }
         }
     }
@@ -104,7 +104,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDe
     }
 
     @objc func reloadPage() {
-        webView.reload()
+        webView.reloadFromOrigin()
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

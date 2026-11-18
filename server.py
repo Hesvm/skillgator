@@ -221,8 +221,19 @@ class EcosystemMonitorHandler(SimpleHTTPRequestHandler):
                 return
 
         elif path == "/" or path == "/index.html":
-            self.path = "/index.html"
-            return super().do_GET()
+            index_file = CURRENT_DIR / "index.html"
+            if index_file.exists():
+                content = index_file.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+                self.send_header("Pragma", "no-cache")
+                self.send_header("Expires", "0")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(content)))
+                self.end_headers()
+                self.wfile.write(content)
+                return
 
         elif path == "/favicon.ico":
             self.send_response(204)
