@@ -102,6 +102,17 @@
       background: #94a3b8;
     }
 
+    /* Command Palette Styles */
+    .pal-item.pal-active {
+      background-color: rgba(38, 166, 125, 0.08) !important;
+      border-color: rgba(38, 166, 125, 0.45) !important;
+      box-shadow: 0 4px 14px -2px rgba(38, 166, 125, 0.15) !important;
+    }
+    .pal-item.pal-active .pal-arrow {
+      color: #26a67d !important;
+      opacity: 1 !important;
+    }
+
     @keyframes pulse-live {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(1.15); }
@@ -208,12 +219,13 @@
         <span id="brandTitle" class="text-base font-bold text-slate-900 tracking-tight truncate">اسکیل‌گیتور</span>
       </div>
 
-      <!-- باکس جستجوی مینیمال درون سایدبار -->
+      <!-- باکس جستجوی مینیمال درون سایدبار (با کلیک، پالت شناور در مرکز صفحه باز می‌شود) -->
       <div class="px-1">
-        <div class="relative w-full">
-          <input type="text" id="searchInput" oninput="renderItems()" placeholder="جستجو در اسکیل‌ها... (⌘K)" 
-                 class="w-full pl-3 pr-8 py-2 rounded-2xl bg-white border border-slate-200/80 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-400 shadow-2xs transition-all">
-          <i class="iconsax text-slate-400 text-xs absolute right-3 top-3" icon-name="search-normal"></i>
+        <div onclick="openCommandPalette()" class="relative w-full cursor-pointer group">
+          <input type="text" id="searchInput" readonly placeholder="جستجو در اسکیل‌ها... (⌘K)" 
+                 class="w-full ps-8 pe-12 py-2 rounded-2xl bg-white border border-slate-200/80 group-hover:border-[#26a67d]/70 text-xs text-slate-800 placeholder-slate-400 focus:outline-none shadow-2xs transition-all cursor-pointer select-none">
+          <i class="iconsax text-slate-400 group-hover:text-[#26a67d] text-xs absolute start-3 top-3 transition-colors pointer-events-none" icon-name="search-normal"></i>
+          <kbd class="absolute end-2.5 top-2 px-1.5 py-0.5 rounded-lg bg-slate-100 group-hover:bg-[#26a67d]/10 text-slate-400 group-hover:text-[#26a67d] border border-slate-200/70 font-mono-code text-[10px] transition-all pointer-events-none">⌘K</kbd>
         </div>
       </div>
 
@@ -771,18 +783,54 @@
     </div>
   </div>
 
-  <!-- پالت دستورات و جستجوی سریع (Raycast / Linear Command Palette) -->
-  <div id="cmdPaletteModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-start justify-center pt-20 p-4">
-    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-      <div class="p-4 border-b border-slate-100 flex items-center gap-3">
-        <i class="iconsax text-xl text-slate-400" icon-name="search-normal"></i>
-        <input type="text" id="cmdPaletteInput" oninput="filterPalette()" placeholder="جستجوی سریع اسکیل، ابزار، MCP، تریگر... (Esc برای خروج)"
-               class="w-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent">
-        <kbd class="px-2 py-0.5 rounded-lg bg-slate-100 border border-slate-200 font-mono-code text-[10px] text-slate-400">ESC</kbd>
+  <!-- پالت دستورات و جستجوی هوشمند شناور (Raycast / Apple Spotlight / Linear Command Palette) -->
+  <div id="cmdPaletteModal" onclick="closeCommandPalette()" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md hidden flex items-start justify-center pt-[10vh] sm:pt-[12vh] p-3 sm:p-4 transition-all duration-200 select-none">
+    <div onclick="event.stopPropagation()" class="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl w-full max-w-2xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col max-h-[82vh] animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- هدر ورودی و سرچ اصلی -->
+      <div class="p-4 sm:p-5 border-b border-slate-100/90 flex items-center gap-3 bg-white/70">
+        <div class="w-9 h-9 rounded-2xl bg-[#26a67d]/10 text-[#26a67d] flex items-center justify-center shrink-0">
+          <i class="iconsax text-lg" icon-name="search-normal"></i>
+        </div>
+        <input type="text" id="cmdPaletteInput" oninput="filterPalette()" 
+               placeholder="جستجو در تمام ۲۴۱ اسکیل، سرور MCP، متدها و تریگرها... (Esc خروج)"
+               class="w-full text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent font-sans">
+        
+        <button id="cmdPaletteClearBtn" onclick="clearPaletteInput()" class="hidden w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center text-xs transition-colors shrink-0" title="پاک کردن">
+          ✕
+        </button>
+        <button onclick="closeCommandPalette()" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[11px] font-mono-code text-slate-500 transition-colors shrink-0">
+          ESC
+        </button>
       </div>
-      <div id="cmdPaletteResults" class="max-h-80 overflow-y-auto custom-scrollbar p-2 divide-y divide-slate-50">
-        <!-- نتایج سرچ پالتی -->
+
+      <!-- فیلتر چیپ‌های سریع دسته‌بندی -->
+      <div class="px-4 py-2 border-b border-slate-100/80 bg-slate-50/50 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[11px]">
+        <button onclick="setPaletteFilter('all')" id="palChip-all" class="pal-chip px-2.5 py-1 rounded-xl font-bold bg-[#26a67d] text-white transition-all shadow-2xs">همه</button>
+        <button onclick="setPaletteFilter('skill')" id="palChip-skill" class="pal-chip px-2.5 py-1 rounded-xl font-medium bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/60 transition-all">مهارت‌ها</button>
+        <button onclick="setPaletteFilter('mcp')" id="palChip-mcp" class="pal-chip px-2.5 py-1 rounded-xl font-medium bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/60 transition-all">سرورهای MCP</button>
+        <button onclick="setPaletteFilter('custom')" id="palChip-custom" class="pal-chip px-2.5 py-1 rounded-xl font-medium bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/60 transition-all">ساخت خودم</button>
+        <button onclick="setPaletteFilter('rule')" id="palChip-rule" class="pal-chip px-2.5 py-1 rounded-xl font-medium bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/60 transition-all">قوانین و دستورات</button>
       </div>
+
+      <!-- بدنه محتوا: اخیراً مشاهده شده + گزینه‌های بامزه / یا نتایج جستجوی لایو -->
+      <div id="cmdPaletteBody" class="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-4 space-y-4">
+        <!-- رندر پویا توسط filterPalette() -->
+      </div>
+
+      <!-- فوتر کلیدهای میانبر -->
+      <div class="p-3 px-5 border-t border-slate-100 bg-slate-50/80 flex items-center justify-between text-[11px] text-slate-400">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-mono-code text-slate-600 shadow-2xs">↑</kbd><kbd class="px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-mono-code text-slate-600 shadow-2xs">↓</kbd> <span id="palNavText">پیمایش</span></span>
+          <span class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-mono-code text-slate-600 shadow-2xs">↵</kbd> <span id="palOpenText">انتخاب</span></span>
+          <span class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-mono-code text-slate-600 shadow-2xs">Esc</kbd> <span id="palExitText">خروج</span></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="palCounterText" class="font-mono-code text-[11px] text-slate-500">۲۴۱ آیتم ایندکس‌شده</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#26a67d]"></span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1575,6 +1623,10 @@
       const item = all.find(i => (i.id === itemId || i.name === itemId));
       if (!item) return;
 
+      if (typeof addRecentSkill === 'function') {
+        addRecentSkill(item.id || item.name);
+      }
+
       currentModalItem = item;
       const isEn = (currentLanguage === 'en');
       
@@ -2121,55 +2173,548 @@
       }
     }
 
-    // Command Palette Functions (⌘K)
+    // ==========================================
+    // Command Palette & Quick Actions (⌘K)
+    // ==========================================
+    let palActiveFilter = 'all';
+    let palActiveIndex = 0;
+
+    function getRecentSkills() {
+      try {
+        return JSON.parse(localStorage.getItem('skillgator_recent_items') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function addRecentSkill(itemId) {
+      if (!itemId) return;
+      try {
+        let recents = getRecentSkills().filter(id => id !== itemId);
+        recents.unshift(itemId);
+        recents = recents.slice(0, 8);
+        localStorage.setItem('skillgator_recent_items', JSON.stringify(recents));
+      } catch (e) {}
+    }
+
+    function clearRecentSkills(event) {
+      if (event) event.stopPropagation();
+      localStorage.removeItem('skillgator_recent_items');
+      filterPalette();
+      showToast(currentLanguage === 'en' ? 'Recent items cleared' : 'لیست آیتم‌های اخیر پاک شد');
+    }
+
     function openCommandPalette() {
-      document.getElementById('cmdPaletteModal').classList.remove('hidden');
+      const modal = document.getElementById('cmdPaletteModal');
+      modal.classList.remove('hidden');
       const input = document.getElementById('cmdPaletteInput');
       input.value = '';
-      input.focus();
+      palActiveFilter = 'all';
+      updatePaletteChips();
+      palActiveIndex = 0;
       filterPalette();
+      setTimeout(() => input.focus(), 40);
     }
 
     function closeCommandPalette() {
-      document.getElementById('cmdPaletteModal').classList.add('hidden');
+      const modal = document.getElementById('cmdPaletteModal');
+      modal.classList.add('hidden');
+    }
+
+    function clearPaletteInput() {
+      const input = document.getElementById('cmdPaletteInput');
+      input.value = '';
+      palActiveIndex = 0;
+      filterPalette();
+      input.focus();
+    }
+
+    function setPaletteFilter(filterType) {
+      palActiveFilter = filterType;
+      palActiveIndex = 0;
+      updatePaletteChips();
+      filterPalette();
+    }
+
+    function updatePaletteChips() {
+      const chips = ['all', 'skill', 'mcp', 'custom', 'rule'];
+      chips.forEach(key => {
+        const btn = document.getElementById(`palChip-${key}`);
+        if (!btn) return;
+        if (key === palActiveFilter) {
+          btn.className = 'pal-chip px-2.5 py-1 rounded-xl font-bold bg-[#26a67d] text-white transition-all shadow-2xs';
+        } else {
+          btn.className = 'pal-chip px-2.5 py-1 rounded-xl font-medium bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/60 transition-all';
+        }
+      });
+    }
+
+    function openRandomSkill() {
+      if (!rawData) return;
+      const all = getAllItemsList(rawData);
+      if (!all || all.length === 0) return;
+      const randomItem = all[Math.floor(Math.random() * all.length)];
+      closeCommandPalette();
+      openModal(randomItem.id || randomItem.name);
+      const isEn = (currentLanguage === 'en');
+      showToast(isEn ? `🎲 Opened random skill: ${randomItem.name}` : `🎲 اسکیل تصادفی انتخاب شد: ${randomItem.name}`);
+    }
+
+    function copyRandomSkillPrompt() {
+      if (!rawData) return;
+      const all = getAllItemsList(rawData);
+      if (!all || all.length === 0) return;
+      const richItems = all.filter(i => (i.triggers && i.triggers.length > 0) || i.description);
+      const targetItem = richItems.length > 0 ? richItems[Math.floor(Math.random() * richItems.length)] : all[0];
+      const prompts = generateSkillPrompts(targetItem);
+      const promptToCopy = (prompts && prompts.length > 0) ? prompts[0].text : `Use skill ${targetItem.name}`;
+      
+      navigator.clipboard.writeText(promptToCopy).then(() => {
+        const isEn = (currentLanguage === 'en');
+        showToast(isEn ? `⚡ Copied prompt for "${targetItem.name}"!` : `⚡ پرامپت آماده اسکیل «${targetItem.name}» کپی شد!`);
+        closeCommandPalette();
+      }).catch(() => {
+        closeCommandPalette();
+        openModal(targetItem.id || targetItem.name);
+      });
+    }
+
+    function jumpToConflictsFromPalette() {
+      closeCommandPalette();
+      setTab('conflicts');
+    }
+
+    function quickFilterTabFromPalette(tabId) {
+      closeCommandPalette();
+      setTab(tabId);
+    }
+
+    function toggleViewModeFromPalette() {
+      const nextMode = (currentViewMode === 'grid') ? 'table' : 'grid';
+      setViewMode(nextMode);
+      closeCommandPalette();
+      showToast(currentLanguage === 'en' ? `Switched to ${nextMode} view` : `حالت نمایش به ${nextMode === 'grid' ? 'کارتی' : 'جدولی'} تغییر کرد`);
+    }
+
+    function toggleLanguageFromPalette() {
+      const next = (currentLanguage === 'fa') ? 'en' : 'fa';
+      setLanguage(next);
+      filterPalette();
+      showToast(next === 'fa' ? 'زبان برنامه به فارسی تغییر کرد' : 'Language switched to English');
+    }
+
+    function openDonationFromPalette() {
+      closeCommandPalette();
+      openDonationModal();
+    }
+
+    function openAddSkillFromPalette() {
+      closeCommandPalette();
+      openAddSkillModal();
     }
 
     function filterPalette() {
       if (!rawData) return;
-      const q = (document.getElementById('cmdPaletteInput').value || '').toLowerCase().trim();
-      const resultsContainer = document.getElementById('cmdPaletteResults');
-      const all = getAllItemsList(rawData);
+      const input = document.getElementById('cmdPaletteInput');
+      const q = (input.value || '').toLowerCase().trim();
+      const clearBtn = document.getElementById('cmdPaletteClearBtn');
+      const body = document.getElementById('cmdPaletteBody');
+      const isEn = (currentLanguage === 'en');
 
-      let matches = all;
-      if (q) {
-        matches = all.filter(i => 
-          (i.name || '').toLowerCase().includes(q) ||
-          (i.description || '').toLowerCase().includes(q) ||
-          (i.triggers && i.triggers.some(t => t.toLowerCase().includes(q))) ||
-          (i.tools && i.tools.some(t => t.toLowerCase().includes(q)))
-        );
+      if (clearBtn) {
+        if (q) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
       }
 
-      if (matches.length === 0) {
-        resultsContainer.innerHTML = '<div class="p-6 text-center text-xs text-slate-400">موردی یافت نشد.</div>';
+      const all = getAllItemsList(rawData);
+      const counterEl = document.getElementById('palCounterText');
+      if (counterEl) {
+        counterEl.innerText = isEn ? `${all.length} items indexed` : `${all.length} آیتم فعال`;
+      }
+
+      // VIEW A: If query is EMPTY, show Recent Items + Fun / Quick Actions
+      if (!q) {
+        const recentIds = getRecentSkills();
+        let recentItems = recentIds.map(id => all.find(i => (i.id === id || i.name === id))).filter(Boolean);
+        
+        const isRecentsEmpty = (recentItems.length === 0);
+        if (isRecentsEmpty) {
+          recentItems = all.slice(0, 3);
+        }
+
+        let html = '';
+
+        // 1. Recent Items Section
+        html += `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between px-2 text-[11px] font-bold text-slate-400">
+              <div class="flex items-center gap-1.5">
+                <i class="iconsax text-sm text-[#26a67d]" icon-name="clock"></i>
+                <span>${isRecentsEmpty ? (isEn ? 'Recommended Starters' : 'پیشنهادهای شروع سریع') : (isEn ? 'Recently Viewed' : 'اخیراً مشاهده شده')}</span>
+              </div>
+              ${!isRecentsEmpty ? `
+                <button onclick="clearRecentSkills(event)" class="text-[10px] text-slate-400 hover:text-rose-500 transition-colors">
+                  ${isEn ? 'Clear' : 'پاک کردن'}
+                </button>
+              ` : ''}
+            </div>
+            
+            <div class="space-y-1.5">
+              ${recentItems.map(item => `
+                <div onclick="closeCommandPalette(); openModal('${item.id || item.name}')" 
+                     class="pal-item group p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/50 border border-slate-200/60 hover:border-[#26a67d]/40 flex items-center justify-between cursor-pointer transition-all duration-150">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-8 h-8 rounded-xl bg-white border border-slate-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      ${item.thiings ? `<img src="${item.thiings}" class="w-5 h-5 object-contain">` : `<span class="text-sm">${item.emoji || '🐊'}</span>`}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="font-mono-code font-bold text-xs text-slate-800 truncate">${escapeHtml(item.name)}</span>
+                        ${item.is_user_created ? `<span class="text-[9px] px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 font-medium">${isEn ? 'Custom' : 'شخصی'}</span>` : ''}
+                      </div>
+                      <div class="text-[11px] text-slate-400 truncate max-w-sm">${escapeHtml((item.description || '').slice(0, 55))}</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-[10px] px-2 py-0.5 rounded-lg bg-white text-slate-600 font-mono-code border border-slate-200/80 shadow-2xs">
+                      ${escapeHtml(item.platform || (isEn ? 'General' : 'عمومی'))}
+                    </span>
+                    <span class="pal-arrow text-slate-300 group-hover:text-[#26a67d] text-xs transition-colors">↵</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        // 2. Fun & Quick Actions Section
+        html += `
+          <div class="space-y-2 pt-2 border-t border-slate-100/90">
+            <div class="px-2 text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
+              <i class="iconsax text-sm text-[#26a67d]" icon-name="flash"></i>
+              <span>${isEn ? 'Quick Actions & Magic Options' : 'جعبه ابزار و عملیات‌های سریع'}</span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              
+              <!-- Surprise Me -->
+              <div onclick="openRandomSkill()" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 border border-slate-200/60 hover:border-[#26a67d]/40 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 text-sm group-hover:rotate-12 transition-transform">
+                  🎲
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-[#26a67d] transition-colors truncate">
+                    ${isEn ? 'Surprise Me' : 'اسکیل شانسی (Surprise Me)'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'Open a random skill card' : 'یک مهارت تصادفی برام باز کن!'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-[#26a67d] text-xs">↵</span>
+              </div>
+
+              <!-- Quick Random Prompt -->
+              <div onclick="copyRandomSkillPrompt()" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-amber-50/60 border border-slate-200/60 hover:border-amber-300/60 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 text-sm group-hover:scale-110 transition-transform">
+                  ⚡
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-amber-700 transition-colors truncate">
+                    ${isEn ? 'Surprise Prompt' : 'پرامپت هوشمند آماده'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'Copy ready-to-use prompt' : 'کپی پرامپت کاربردی با ۱-کلیک'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-amber-600 text-xs">↵</span>
+              </div>
+
+              <!-- Conflicts Radar -->
+              <div onclick="jumpToConflictsFromPalette()" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-rose-50/60 border border-slate-200/60 hover:border-rose-300/60 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 text-sm group-hover:scale-110 transition-transform">
+                  ⚠️
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-rose-700 transition-colors truncate">
+                    ${isEn ? 'Trigger Conflicts Radar' : 'رادار تداخل تریگرها'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'Inspect overlapping keywords' : 'شناسایی تداخل کلمات کلیدی'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-rose-600 text-xs">↵</span>
+              </div>
+
+              <!-- MCP Servers Only -->
+              <div onclick="quickFilterTabFromPalette('mcp')" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 border border-slate-200/60 hover:border-blue-300/60 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 text-sm group-hover:scale-110 transition-transform">
+                  🔌
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-blue-700 transition-colors truncate">
+                    ${isEn ? 'MCP Protocol Servers' : 'سرورهای پروتکل MCP'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'Inspect 94+ connected methods' : 'مشاهده تمام متدهای فعال'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-blue-600 text-xs">↵</span>
+              </div>
+
+              <!-- My Custom Skills -->
+              <div onclick="quickFilterTabFromPalette('user-custom')" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 border border-slate-200/60 hover:border-purple-300/60 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 text-sm group-hover:scale-110 transition-transform">
+                  ⭐
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-purple-700 transition-colors truncate">
+                    ${isEn ? 'My Custom Skills' : 'ساخته‌های خودم'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'Filter your handcrafted skills' : 'مهارت‌های اختصاصی شما'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-purple-600 text-xs">↵</span>
+              </div>
+
+              <!-- Toggle View Mode -->
+              <div onclick="toggleViewModeFromPalette()" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-slate-100 border border-slate-200/60 hover:border-slate-300 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-slate-200 text-slate-700 flex items-center justify-center shrink-0 text-sm group-hover:scale-110 transition-transform">
+                  🔀
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-slate-900 transition-colors truncate">
+                    ${isEn ? 'Toggle Cards / Table' : 'سوییچ حالت نمایش'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'Switch between card & table layout' : 'تغییر چیدمان کارتی و جدولی'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-slate-700 text-xs">↵</span>
+              </div>
+
+              <!-- Toggle Language -->
+              <div onclick="toggleLanguageFromPalette()" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/60 border border-slate-200/60 hover:border-indigo-300/60 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 text-sm group-hover:scale-110 transition-transform">
+                  🌐
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-indigo-700 transition-colors truncate">
+                    ${isEn ? 'تغییر زبان به فارسی' : 'Switch to English'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'چیدمان راست‌چین و فونت دیجی‌کالا' : 'LTR layout with Plus Jakarta Sans'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-indigo-600 text-xs">↵</span>
+              </div>
+
+              <!-- Support Project -->
+              <div onclick="openDonationFromPalette()" 
+                   class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-rose-50/60 border border-slate-200/60 hover:border-rose-300/60 flex items-center gap-3 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 text-sm group-hover:scale-110 transition-transform">
+                  💖
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold text-slate-800 group-hover:text-rose-700 transition-colors truncate">
+                    ${isEn ? 'Support Hesam' : 'حمایت از پروژه و حسام'}
+                  </div>
+                  <div class="text-[10px] text-slate-400 truncate">
+                    ${isEn ? 'Help fund new features' : 'توسعه پایدار و فیچرهای جدید'}
+                  </div>
+                </div>
+                <span class="pal-arrow text-slate-300 group-hover:text-rose-600 text-xs">↵</span>
+              </div>
+
+            </div>
+          </div>
+        `;
+
+        body.innerHTML = html;
+        bindPaletteHover();
+        updatePaletteSelection();
         return;
       }
 
-      resultsContainer.innerHTML = matches.slice(0, 15).map(item => `
-        <div onclick="closeCommandPalette(); openModal('${item.id || item.name}')" 
-             class="p-2.5 rounded-2xl hover:bg-slate-100 flex items-center justify-between cursor-pointer transition-colors group">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-white flex items-center justify-center shrink-0">
-              ${item.thiings ? `<img src="${item.thiings}" class="w-6 h-6 object-contain">` : `<span class="text-sm">${item.emoji || '🧩'}</span>`}
+      // VIEW B: Search Query is PRESENT
+      let matches = all;
+
+      // Filter by active chip
+      if (palActiveFilter === 'skill') {
+        matches = matches.filter(i => i.type === 'Skill');
+      } else if (palActiveFilter === 'mcp') {
+        matches = matches.filter(i => i.type === 'MCP Server');
+      } else if (palActiveFilter === 'custom') {
+        matches = matches.filter(i => i.is_user_created || i.scope === 'User Config');
+      } else if (palActiveFilter === 'rule') {
+        matches = matches.filter(i => i.type === 'Rule' || i.type === 'CLI' || i.type === 'Command');
+      }
+
+      // Multi-attribute search
+      matches = matches.filter(i => {
+        const name = (i.name || '').toLowerCase();
+        const desc = (i.description || '').toLowerCase();
+        const plat = (i.platform || '').toLowerCase();
+        const trigs = (i.triggers || []).map(t => String(t).toLowerCase());
+        const tools = (i.tools || []).map(t => String(t).toLowerCase());
+
+        return name.includes(q) ||
+               desc.includes(q) ||
+               plat.includes(q) ||
+               trigs.some(t => t.includes(q)) ||
+               tools.some(t => t.includes(q));
+      });
+
+      // Sort by relevance
+      matches.sort((a, b) => {
+        const aName = (a.name || '').toLowerCase();
+        const bName = (b.name || '').toLowerCase();
+        if (aName === q && bName !== q) return -1;
+        if (bName === q && aName !== q) return 1;
+        if (aName.startsWith(q) && !bName.startsWith(q)) return -1;
+        if (bName.startsWith(q) && !aName.startsWith(q)) return 1;
+        return 0;
+      });
+
+      if (matches.length === 0) {
+        body.innerHTML = `
+          <div class="py-12 px-4 text-center space-y-4">
+            <div class="w-14 h-14 mx-auto rounded-3xl bg-slate-100 flex items-center justify-center text-3xl">
+              🐊
             </div>
-            <div>
-              <div class="font-mono-code font-bold text-xs text-slate-800">${escapeHtml(item.name)}</div>
-              <div class="text-[11px] text-slate-400 truncate max-w-sm">${escapeHtml((item.description || '').slice(0, 60))}</div>
+            <div class="space-y-1">
+              <div class="text-sm font-bold text-slate-800">
+                ${isEn ? 'No results found' : 'موردی با این مشخصات یافت نشد'}
+              </div>
+              <div class="text-xs text-slate-400 max-w-xs mx-auto">
+                ${isEn ? `No skill matches "${escapeHtml(q)}". Try searching by another keyword or create a new skill!` : `هیچ اسکیلی با عبارت «${escapeHtml(q)}» پیدا نشد. مایلید یک مهارت جدید بسازید؟`}
+              </div>
             </div>
+            <button onclick="openAddSkillFromPalette()" class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#26a67d] hover:bg-[#1f8a68] text-white text-xs font-bold transition-all shadow-sm">
+              <i class="iconsax text-sm" icon-name="add"></i>
+              <span>${isEn ? '+ Create New Skill' : '+ ساخت مهارت جدید'}</span>
+            </button>
           </div>
-          <span class="text-[10px] px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 font-mono-code border border-slate-200">${escapeHtml(item.platform || '')}</span>
+        `;
+        return;
+      }
+
+      let html = `
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-2 text-[11px] font-bold text-slate-400">
+            <span>${isEn ? `Found ${matches.length} results for "${escapeHtml(q)}"` : `${matches.length} نتیجه برای «${escapeHtml(q)}»`}</span>
+            <span class="text-[10px] font-mono-code">${palActiveFilter !== 'all' ? `Filter: ${palActiveFilter}` : ''}</span>
+          </div>
+          
+          <div class="space-y-1.5">
+            ${matches.slice(0, 30).map(item => {
+              const trigs = item.triggers || [];
+              const tools = item.tools || [];
+              const matchedTrig = trigs.find(t => String(t).toLowerCase().includes(q));
+              const matchedTool = tools.find(t => String(t).toLowerCase().includes(q));
+
+              return `
+                <div onclick="closeCommandPalette(); openModal('${item.id || item.name}')" 
+                     class="pal-item group p-3 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/50 border border-slate-200/60 hover:border-[#26a67d]/40 flex items-center justify-between cursor-pointer transition-all duration-150">
+                  <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div class="w-9 h-9 rounded-xl bg-white border border-slate-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      ${item.thiings ? `<img src="${item.thiings}" class="w-6 h-6 object-contain">` : `<span class="text-sm">${item.emoji || '🧩'}</span>`}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2">
+                        <span class="font-mono-code font-bold text-xs text-slate-800 truncate">${escapeHtml(item.name)}</span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded-md font-medium border ${
+                          item.type === 'MCP Server' ? 'bg-purple-50 text-purple-700 border-purple-200/60' :
+                          item.type === 'Rule' ? 'bg-slate-100 text-slate-700 border-slate-200/60' :
+                          'bg-blue-50 text-blue-700 border-blue-200/60'
+                        }">
+                          ${escapeHtml(item.type || 'Skill')}
+                        </span>
+                        ${item.is_user_created ? `<span class="text-[9px] px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 font-medium">${isEn ? 'Custom' : 'اختصاصی'}</span>` : ''}
+                      </div>
+                      <div class="text-[11px] text-slate-400 truncate mt-0.5">${escapeHtml((item.description || '').slice(0, 65))}</div>
+                      
+                      ${matchedTrig ? `
+                        <div class="flex items-center gap-1.5 mt-1 text-[10px] text-emerald-700 font-mono-code">
+                          <span class="text-slate-400">${isEn ? 'Trigger match:' : 'تطابق تریگر:'}</span>
+                          <span class="px-1.5 py-0.5 rounded bg-emerald-100/70 border border-emerald-200/70">${escapeHtml(matchedTrig)}</span>
+                        </div>
+                      ` : ''}
+
+                      ${matchedTool ? `
+                        <div class="flex items-center gap-1.5 mt-1 text-[10px] text-purple-700 font-mono-code">
+                          <span class="text-slate-400">${isEn ? 'Tool match:' : 'تطابق ابزار:'}</span>
+                          <span class="px-1.5 py-0.5 rounded bg-purple-100/70 border border-purple-200/70">${escapeHtml(matchedTool)}</span>
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-[10px] px-2 py-0.5 rounded-lg bg-white text-slate-600 font-mono-code border border-slate-200/80 shadow-2xs">
+                      ${escapeHtml(item.platform || (isEn ? 'General' : 'عمومی'))}
+                    </span>
+                    <span class="pal-arrow text-slate-300 group-hover:text-[#26a67d] text-xs transition-colors">↵</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
         </div>
-      `).join('');
+      `;
+
+      body.innerHTML = html;
+      bindPaletteHover();
+      updatePaletteSelection();
+    }
+
+    function bindPaletteHover() {
+      const items = document.querySelectorAll('.pal-item');
+      items.forEach((el, idx) => {
+        el.addEventListener('mouseenter', () => {
+          palActiveIndex = idx;
+          updatePaletteSelection(false);
+        });
+      });
+    }
+
+    function updatePaletteSelection(shouldScroll = true) {
+      const items = document.querySelectorAll('.pal-item');
+      if (items.length === 0) return;
+      if (palActiveIndex >= items.length) palActiveIndex = items.length - 1;
+      if (palActiveIndex < 0) palActiveIndex = 0;
+
+      items.forEach((el, idx) => {
+        if (idx === palActiveIndex) {
+          el.classList.add('pal-active');
+          if (shouldScroll) {
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          }
+        } else {
+          el.classList.remove('pal-active');
+        }
+      });
+    }
+
+    function navigatePalette(delta) {
+      const items = document.querySelectorAll('.pal-item');
+      if (items.length === 0) return;
+      palActiveIndex = (palActiveIndex + delta + items.length) % items.length;
+      updatePaletteSelection(true);
+    }
+
+    function executeActivePaletteItem() {
+      const items = document.querySelectorAll('.pal-item');
+      if (items.length > 0 && items[palActiveIndex]) {
+        items[palActiveIndex].click();
+      }
     }
 
     // Prompt Matcher Simulator Functions
@@ -2371,8 +2916,27 @@
       renderItems();
     }
 
-    // Global Keybindings (Cmd+K, Ctrl+K, Escape)
+    // Global Keybindings (Cmd+K, Ctrl+K, Escape, Arrows in Command Palette)
     document.addEventListener('keydown', (e) => {
+      const palModal = document.getElementById('cmdPaletteModal');
+      const isPalOpen = palModal && !palModal.classList.contains('hidden');
+
+      if (isPalOpen) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          navigatePalette(1);
+          return;
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          navigatePalette(-1);
+          return;
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          executeActivePaletteItem();
+          return;
+        }
+      }
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         openCommandPalette();
@@ -2407,7 +2971,7 @@
         radarTitle: 'اسکیل‌گیتور',
         liveStatus: 'زنده',
         searchPlaceholder: 'جستجو در اسکیل‌ها... (⌘K)',
-        palettePlaceholder: 'جستجوی سریع اسکیل، ابزار، MCP، تریگر... (Esc برای خروج)',
+        palettePlaceholder: 'جستجو در تمام ۲۴۱ اسکیل، سرور MCP، متدها و تریگرها... (Esc خروج)',
         tabAll: 'همه آیتم‌ها',
         tabCreatorOs: 'کریتور او‌اس (Creator OS)',
         tabUserCustom: 'ساخته‌های خودم',
@@ -2477,7 +3041,7 @@
         radarTitle: 'Skillgator',
         liveStatus: 'Live',
         searchPlaceholder: 'Search skills & tools... (⌘K)',
-        palettePlaceholder: 'Search skills, tools, MCP, triggers... (Esc to exit)',
+        palettePlaceholder: 'Search 241+ skills, MCP servers, tools & triggers... (Esc to exit)',
         tabAll: 'All Items',
         tabCreatorOs: 'Creator OS',
         tabUserCustom: 'Custom Created',
@@ -2666,6 +3230,24 @@
 
       const cmdPaletteInput = document.getElementById('cmdPaletteInput');
       if (cmdPaletteInput) cmdPaletteInput.placeholder = t.palettePlaceholder;
+
+      const palNav = document.getElementById('palNavText');
+      if (palNav) palNav.innerText = lang === 'en' ? 'Navigate' : 'پیمایش';
+      const palOpen = document.getElementById('palOpenText');
+      if (palOpen) palOpen.innerText = lang === 'en' ? 'Open' : 'انتخاب';
+      const palExit = document.getElementById('palExitText');
+      if (palExit) palExit.innerText = lang === 'en' ? 'Exit' : 'خروج';
+
+      const palChipAll = document.getElementById('palChip-all');
+      if (palChipAll) palChipAll.innerText = lang === 'en' ? 'All' : 'همه';
+      const palChipSkill = document.getElementById('palChip-skill');
+      if (palChipSkill) palChipSkill.innerText = lang === 'en' ? 'Skills' : 'مهارت‌ها';
+      const palChipMcp = document.getElementById('palChip-mcp');
+      if (palChipMcp) palChipMcp.innerText = lang === 'en' ? 'MCP Servers' : 'سرورهای MCP';
+      const palChipCustom = document.getElementById('palChip-custom');
+      if (palChipCustom) palChipCustom.innerText = lang === 'en' ? 'Custom' : 'ساخت خودم';
+      const palChipRule = document.getElementById('palChip-rule');
+      if (palChipRule) palChipRule.innerText = lang === 'en' ? 'Rules & CLI' : 'قوانین و دستورات';
 
       if (typeof localizeDonationModal === 'function') {
         localizeDonationModal();
