@@ -966,21 +966,31 @@
         const isCreatorOs = item.suite === 'Creator OS' || (item.platform && item.platform.includes('Creator OS'));
         const formattedTokens = item.token_weight ? (item.token_weight >= 1000000 ? `~${(item.token_weight / 1000000).toFixed(1)}M` : (item.token_weight >= 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`)) : null;
         
+        // Option 1: Clean, consistent Item Type Badge (Linear / Raycast style)
         let singleBadge = '';
-        if (item.tools_count) {
-          const toolWord = isEn ? 'methods' : 'ابزار';
-          singleBadge = `<span class="text-[10px] font-mono-code text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/50">${item.tools_count} ${toolWord}</span>`;
-        } else if (isCreatorOs) {
-          singleBadge = `<span class="text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/50">👑 Creator OS</span>`;
-        } else if (sortOrder === 'tokens' && formattedTokens) {
-          singleBadge = `<span dir="ltr" class="text-[10px] font-mono-code text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200/50">${formattedTokens} tok</span>`;
-        } else if (item.triggers && item.triggers.length > 0) {
-          singleBadge = `<span class="text-[10px] font-mono-code text-slate-500 bg-slate-100/80 px-2 py-0.5 rounded-md truncate max-w-[130px]">/${escapeHtml(item.triggers[0])}</span>`;
-        } else if (item.is_user_created) {
-          const customWord = isEn ? 'Custom' : 'شخصی';
-          singleBadge = `<span class="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50">${customWord}</span>`;
+        if (isCreatorOs) {
+          singleBadge = `<span class="text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">👑 Creator OS</span>`;
+        } else if (item.type === 'MCP Server') {
+          const mcpLabel = isEn ? 'MCP Server' : 'سرور MCP';
+          singleBadge = `<span class="text-[10px] font-mono-code text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/60">${mcpLabel}</span>`;
+        } else if (item.type === 'Rule') {
+          const ruleLabel = isEn ? 'System Rule' : 'قانون سیستم';
+          singleBadge = `<span class="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">${ruleLabel}</span>`;
+        } else if (item.type === 'Command') {
+          const cmdLabel = isEn ? 'Slash Command' : 'دستور سریع';
+          singleBadge = `<span class="text-[10px] font-mono-code text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200/60">${cmdLabel}</span>`;
+        } else if (item.type === 'CLI') {
+          const cliLabel = isEn ? 'CLI Tool' : 'خط فرمان CLI';
+          singleBadge = `<span class="text-[10px] font-mono-code text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">${cliLabel}</span>`;
+        } else if (item.type === 'Plugin') {
+          const pluginLabel = isEn ? 'Plugin' : 'پلاگین';
+          singleBadge = `<span class="text-[10px] font-medium text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-200/60">${pluginLabel}</span>`;
         } else {
-          singleBadge = `<span class="text-[10px] text-slate-400 font-mono-code">${item.file_count ? (isEn ? `${item.file_count} files` : `${item.file_count} فایل`) : (isEn ? 'Active' : 'فعال')}</span>`;
+          // Default Skill
+          const skillLabel = isEn 
+            ? (item.is_user_created ? 'Custom Skill' : 'Skill') 
+            : (item.is_user_created ? 'مهارت اختصاصی' : 'مهارت');
+          singleBadge = `<span class="text-[10px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200/60">${skillLabel}</span>`;
         }
 
         const platformLabel = (item.platforms && item.platforms.length > 1) 
