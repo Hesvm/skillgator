@@ -963,25 +963,25 @@
         let singleBadge = '';
         if (item.type === 'MCP Server') {
           const mcpLabel = isEn ? 'MCP Server' : 'سرور MCP';
-          singleBadge = `<span class="text-[10px] font-mono-code text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200/60 shadow-2xs">${mcpLabel}</span>`;
+          singleBadge = `<span class="text-[10px] font-mono-code text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full">${mcpLabel}</span>`;
         } else if (item.type === 'Rule') {
           const ruleLabel = isEn ? 'System Rule' : 'قانون سیستم';
-          singleBadge = `<span class="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 shadow-2xs">${ruleLabel}</span>`;
+          singleBadge = `<span class="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">${ruleLabel}</span>`;
         } else if (item.type === 'Command') {
           const cmdLabel = isEn ? 'Slash Command' : 'دستور سریع';
-          singleBadge = `<span class="text-[10px] font-mono-code text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200/60 shadow-2xs">${cmdLabel}</span>`;
+          singleBadge = `<span class="text-[10px] font-mono-code text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full">${cmdLabel}</span>`;
         } else if (item.type === 'CLI') {
           const cliLabel = isEn ? 'CLI Tool' : 'خط فرمان CLI';
-          singleBadge = `<span class="text-[10px] font-mono-code text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200/60 shadow-2xs">${cliLabel}</span>`;
+          singleBadge = `<span class="text-[10px] font-mono-code text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full">${cliLabel}</span>`;
         } else if (item.type === 'Plugin') {
           const pluginLabel = isEn ? 'Plugin' : 'پلاگین';
-          singleBadge = `<span class="text-[10px] font-medium text-cyan-700 bg-cyan-50 px-2.5 py-0.5 rounded-full border border-cyan-200/60 shadow-2xs">${pluginLabel}</span>`;
+          singleBadge = `<span class="text-[10px] font-medium text-cyan-700 bg-cyan-50 px-2.5 py-0.5 rounded-full">${pluginLabel}</span>`;
         } else {
           // Default Skill
           const skillLabel = isEn 
             ? (item.is_user_created ? 'Custom Skill' : 'Skill') 
             : (item.is_user_created ? 'مهارت اختصاصی' : 'مهارت');
-          singleBadge = `<span class="text-[10px] font-medium text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200/60 shadow-2xs">${skillLabel}</span>`;
+          singleBadge = `<span class="text-[10px] font-medium text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full">${skillLabel}</span>`;
         }
 
         const thiingsUrl = item.thiings || '';
