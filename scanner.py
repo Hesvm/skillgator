@@ -95,13 +95,18 @@ def parse_markdown_frontmatter(content):
     return meta, body
 
 def calculate_folder_stats(folder_path):
-    """Calculates size, file count, and line count for depth/richness scoring."""
+    """Calculates size, file count, and line count for depth/richness scoring, excluding bloated caches and dependencies."""
     total_bytes = 0
     file_count = 0
     line_count = 0
+    ignored_names = {".venv", "venv", "node_modules", ".git", "__pycache__", ".pytest_cache", ".ruff_cache", "dist", "build"}
     try:
         for f in folder_path.rglob("*"):
             if f.is_file():
+                # Filter out heavy dependency or cache folders
+                rel_parts = f.relative_to(folder_path).parts
+                if any(p in ignored_names or (p.startswith(".") and p != ".env") for p in rel_parts[:-1]):
+                    continue
                 file_count += 1
                 try:
                     size = f.stat().st_size

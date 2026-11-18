@@ -110,6 +110,59 @@
       animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
+    /* Modal Markdown & Code Blocks styling */
+    #modalWhatItDoes, #modalWhenToUse {
+      direction: auto !important;
+      text-align: start !important;
+      unicode-bidi: plaintext !important;
+    }
+
+    #markdownRenderArea {
+      direction: ltr !important;
+      text-align: left !important;
+    }
+    #markdownRenderArea p, #markdownRenderArea li, #markdownRenderArea h1, #markdownRenderArea h2, #markdownRenderArea h3, #markdownRenderArea h4 {
+      direction: auto !important;
+      text-align: start !important;
+      unicode-bidi: plaintext !important;
+    }
+
+    #markdownRenderArea pre, #markdownRenderArea code, .markdown-body pre, .markdown-body code {
+      direction: ltr !important;
+      text-align: left !important;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    }
+    #markdownRenderArea pre {
+      background-color: #0f172a !important;
+      color: #e2e8f0 !important;
+      padding: 1rem !important;
+      border-radius: 0.875rem !important;
+      overflow-x: auto !important;
+      margin: 1rem 0 !important;
+    }
+    #markdownRenderArea table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin: 1rem 0 !important;
+      direction: ltr !important;
+      text-align: left !important;
+    }
+    #markdownRenderArea th, #markdownRenderArea td {
+      border: 1px solid #e2e8f0 !important;
+      padding: 0.5rem 0.75rem !important;
+    }
+    #markdownRenderArea th {
+      background-color: #f8fafc !important;
+      font-weight: 600 !important;
+    }
+
+    .modal-tab-btn.active {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08) !important;
+      font-weight: 600 !important;
+    }
+
     .iconsax {
       display: inline-flex;
       align-items: center;
@@ -381,124 +434,283 @@
   </main>
 
 
-  <!-- پاپ‌آپ پیشرفته کالبدشکافی اسکیل و فایل‌ها (Skill Inspector & Code Viewer) -->
+  <!-- پاپ‌آپ پیشرفته کارت فرماندهی و جزئیات اسکیل (Skill Command Sheet & Action Center) -->
   <div id="detailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6">
-    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-5xl h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+    <div class="bg-white border border-slate-200/90 rounded-3xl w-full max-w-4xl h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
       
-      <!-- سربرگ مدرن مدال -->
-      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
-        <div class="flex items-center gap-3">
-          <div id="modalIconContainer" class="w-10 h-10 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center shadow-2xs shrink-0">
-            <img id="modalThiingsImg" src="" alt="icon" class="w-8 h-8 object-contain">
-            <span id="modalEmojiFallback" class="text-2xl hidden">🧩</span>
+      <!-- سربرگ مدرن مدال (Hero Header) -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
+        <div class="flex items-center gap-3.5">
+          <div id="modalIconContainer" class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-center shadow-2xs shrink-0 overflow-hidden">
+            <img id="modalThiingsImg" src="" alt="icon" class="w-10 h-10 object-contain">
+            <span id="modalEmojiFallback" class="text-3xl hidden">🧩</span>
           </div>
           <div>
-            <div class="flex items-center gap-2">
-              <h3 id="modalTitle" class="text-sm font-bold text-slate-900 font-mono-code">عنوان آیتم</h3>
-              <span id="modalPlatform" class="text-[11px] px-2 py-0.5 rounded-lg bg-slate-200/60 text-slate-700 font-medium font-mono-code">پلتفرم</span>
-              <span id="modalCustomBadge" class="hidden text-[11px] px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">Custom</span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 id="modalTitle" class="text-base font-bold text-slate-900 font-mono-code tracking-tight">عنوان آیتم</h3>
+              <span id="modalTypeBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">مهارت</span>
+              <span id="modalPlatform" class="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium font-mono-code">پلتفرم</span>
+              <span id="modalCustomBadge" class="hidden text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-200/60">⭐ ساخت خودم</span>
             </div>
-            <p id="modalPathShort" class="text-[11px] text-slate-400 font-mono-code mt-0.5 truncate max-w-md">-</p>
+            <p id="modalPathShort" dir="ltr" class="text-[11px] text-slate-400 font-mono-code mt-0.5 truncate max-w-md text-right">-</p>
           </div>
         </div>
 
         <!-- دکمه‌های عملیاتی هدر مدال -->
         <div class="flex items-center gap-2">
-          <button id="modalSyncBtn" onclick="syncCurrentItem()" class="hidden px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs transition-colors" title="همگام‌سازی مستقیم با Claude Desktop / Code">
+          <!-- دکمه کپی پرامپت سریع اصلی -->
+          <button id="modalQuickPromptBtn" onclick="copyQuickPrompt()" class="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 flex items-center gap-1.5 font-semibold text-xs transition-colors shadow-2xs" title="کپی پرامپت آماده اجرای این مهارت">
+            <i class="iconsax text-sm" icon-name="flash"></i>
+            <span id="txt-modal-quick-prompt">کپی پرامپت سریع</span>
+          </button>
+          
+          <button id="modalSyncBtn" onclick="syncCurrentItem()" class="hidden px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs transition-colors" title="همگام‌سازی مستقیم با Claude Desktop / Code">
             <i class="iconsax text-sm" icon-name="refresh-2"></i>
             <span id="txt-modal-sync-btn">سینک به Claude</span>
           </button>
-          <button onclick="openInEditor()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs transition-colors">
+          
+          <button onclick="openInEditor()" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 font-medium text-xs shadow-2xs transition-colors" title="باز کردن در ادیتور کد">
             <i class="iconsax text-sm" icon-name="code-1"></i>
-            <span id="txt-modal-open-editor">باز کردن در ادیتور</span>
+            <span id="txt-modal-open-editor">ادیتور</span>
           </button>
-          <button onclick="copyPath()" class="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs transition-colors" id="modalCopyBtn" title="کپی مسیر">
+          
+          <button onclick="copyPath()" class="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs transition-colors" id="modalCopyBtn" title="کپی مسیر فایل">
             <i class="iconsax text-base" icon-name="copy"></i>
           </button>
+          
           <button onclick="closeModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
             <i class="iconsax text-lg" icon-name="close-circle"></i>
           </button>
         </div>
       </div>
 
-      <!-- ساختار دو ستونه: سمت راست درخت فایل‌ها (File Tree)، سمت چپ پیش‌نمایش محتوا و مارک‌داون -->
-      <div class="flex-1 flex overflow-hidden">
-        
-        <!-- ستون درخت فایل‌ها و متادیتا (Sidebar درون مدال) -->
-        <div class="w-72 border-e border-slate-100 bg-slate-50/50 flex flex-col justify-between shrink-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <!-- نوار تب‌های شیک (Segmented Pill Tabs) -->
+      <div class="px-6 py-2.5 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-1.5 bg-slate-200/50 p-1 rounded-2xl">
+          <button onclick="switchModalTab('overview')" id="tabBtn-overview" class="modal-tab-btn active px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all bg-white text-slate-900 shadow-2xs">
+            <span class="flex items-center gap-1.5">
+              <i class="iconsax text-sm" icon-name="info-circle"></i>
+              <span id="txt-tab-overview">درک کارکرد</span>
+            </span>
+          </button>
+          <button onclick="switchModalTab('prompts')" id="tabBtn-prompts" class="modal-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition-all">
+            <span class="flex items-center gap-1.5">
+              <i class="iconsax text-sm" icon-name="flash-1"></i>
+              <span id="txt-tab-prompts">اجرا و پرامپت</span>
+            </span>
+          </button>
+          <button onclick="switchModalTab('tools')" id="tabBtn-tools" class="modal-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition-all">
+            <span class="flex items-center gap-1.5">
+              <i class="iconsax text-sm" icon-name="element-equal"></i>
+              <span id="txt-tab-tools">ابزارها و متدها</span>
+              <span id="tabToolsBadge" class="hidden text-[10px] px-1.5 py-0.2 rounded-md bg-blue-100 text-blue-700 font-mono-code">0</span>
+            </span>
+          </button>
+          <button onclick="switchModalTab('docs')" id="tabBtn-docs" class="modal-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition-all">
+            <span class="flex items-center gap-1.5">
+              <i class="iconsax text-sm" icon-name="document-text"></i>
+              <span id="txt-tab-docs">مستندات و کد</span>
+            </span>
+          </button>
+        </div>
+
+        <!-- آمار خلاصه سریع گوشه تب‌ها -->
+        <div class="flex items-center gap-3 text-xs text-slate-500 font-mono-code">
+          <span class="flex items-center gap-1" title="تخمین بار توکن">
+            <span class="text-blue-600 font-bold" id="modalTokensQuick">~5k</span>
+            <span class="text-slate-400">tok</span>
+          </span>
+          <span class="text-slate-300">•</span>
+          <span class="flex items-center gap-1" title="حجم واقعی کدهای منبع">
+            <span id="modalSizeQuick" class="font-medium text-slate-700">-</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- محتوای متغیر تب‌ها -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50/30">
+
+        <!-- ================= تب ۱: درک کارکرد (Overview) ================= -->
+        <div id="tabContent-overview" class="modal-tab-content space-y-4">
           
-          <!-- آمار فایل‌ها و تخمین بار توکن -->
-          <div id="modalMetrics" class="grid grid-cols-4 gap-1 p-2 bg-white rounded-xl border border-slate-200/70 text-center font-mono-code text-[11px]">
-            <div>
-              <div class="text-[10px] text-slate-400" id="txt-modal-size">حجم</div>
-              <div id="modalSize" dir="ltr" class="font-bold text-slate-800">-</div>
+          <!-- کارت ۱: چه کاری انجام می‌دهد؟ (What it does) -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2">
+            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <div class="w-7 h-7 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0">
+                <i class="iconsax text-base" icon-name="message-question"></i>
+              </div>
+              <span id="txt-modal-what-title">چه کاری انجام می‌دهد؟</span>
             </div>
-            <div class="border-x border-slate-100">
-              <div class="text-[10px] text-slate-400" id="txt-modal-files">فایل‌ها</div>
-              <div id="modalFiles" dir="ltr" class="font-bold text-slate-800">-</div>
-            </div>
-            <div class="border-e border-slate-100">
-              <div class="text-[10px] text-slate-400" id="txt-modal-lines">خطوط</div>
-              <div id="modalLines" dir="ltr" class="font-bold text-slate-800">-</div>
-            </div>
-            <div>
-              <div class="text-[10px] text-blue-500 font-bold" id="txt-modal-tokens">توکن</div>
-              <div id="modalTokens" dir="ltr" class="font-bold text-blue-600">-</div>
+            <div id="modalWhatItDoes" class="text-xs text-slate-700 leading-relaxed font-sans pr-9">
+              <!-- توضیح مهارت -->
             </div>
           </div>
 
-          <!-- درخت کامل فایل‌ها و پوشه‌ها -->
-          <div class="flex-1">
-            <div class="text-[11px] font-bold text-slate-500 mb-1.5 px-1 flex items-center justify-between">
-              <span id="txt-modal-tree-title">ساختار پوشه‌ها و فایل‌ها</span>
-              <span id="fileTreeCount" class="text-[10px] font-mono-code text-slate-400"></span>
+          <!-- کارت ۲: چه زمانی استفاده کنیم؟ (When to use) -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2">
+            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <div class="w-7 h-7 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0">
+                <i class="iconsax text-base" icon-name="radar-2"></i>
+              </div>
+              <span id="txt-modal-when-title">چه زمانی استفاده کنیم؟</span>
             </div>
-            <div id="modalFileTree" class="space-y-0.5 bg-white p-2 rounded-xl border border-slate-200/70 text-xs font-mono-code max-h-56 overflow-y-auto custom-scrollbar">
-              <div class="text-slate-400 text-center py-4 text-[11px]">در حال خواندن ساختار...</div>
+            <div id="modalWhenToUse" class="text-xs text-slate-700 leading-relaxed font-sans pr-9">
+              <!-- زمان‌های استفاده -->
             </div>
           </div>
 
-          <!-- تریگرها -->
-          <div id="modalTriggersSection" class="hidden">
-            <div class="text-[11px] font-bold text-slate-500 mb-1.5 px-1" id="txt-modal-triggers">کلمات کلیدی محرک (Triggers)</div>
-            <div id="modalTriggersContent" class="flex flex-wrap gap-1 bg-white p-2 rounded-xl border border-slate-200/70 max-h-24 overflow-y-auto custom-scrollbar">
-              <!-- بج‌های تریگر -->
+          <!-- کارت ۳: مشخصات و ظرفیت (Execution & Profile) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/70 shadow-2xs flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0">
+                <i class="iconsax text-base" icon-name="cpu-charge"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-medium" id="txt-modal-spec-scope">محیط اجرا</div>
+                <div id="modalSpecScope" class="text-xs font-bold text-slate-800 font-mono-code">-</div>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/70 shadow-2xs flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0">
+                <i class="iconsax text-base" icon-name="weight-1"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-medium" id="txt-modal-spec-weight">بار روی کانتکست</div>
+                <div id="modalSpecWeight" class="text-xs font-bold text-slate-800 font-mono-code">-</div>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/70 shadow-2xs flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 border border-slate-200/60 flex items-center justify-center shrink-0">
+                <i class="iconsax text-base" icon-name="calendar-1"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-medium" id="txt-modal-spec-modified">آخرین بروزرسانی</div>
+                <div id="modalSpecModified" dir="ltr" class="text-xs font-medium text-slate-700 font-mono-code">-</div>
+              </div>
             </div>
           </div>
 
         </div>
 
-        <!-- ستون نمایش محتوای فایل فعال و سند SKILL.md -->
-        <div class="flex-1 flex flex-col overflow-hidden bg-white">
+        <!-- ================= تب ۲: اجرا و پرامپت‌ها (Prompts & Triggers) ================= -->
+        <div id="tabContent-prompts" class="modal-tab-content hidden space-y-4">
           
-          <!-- نوار تب فایل انتخابی -->
-          <div class="px-5 py-2.5 border-b border-slate-100 bg-white flex items-center justify-between shrink-0">
+          <!-- جعبه پرامپت‌های آماده چت -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                <div class="w-7 h-7 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0">
+                  <i class="iconsax text-base" icon-name="message-text"></i>
+                </div>
+                <span id="txt-modal-ready-prompts">پرامپت‌های آماده برای چت (با ۱-کلیک کپی کنید)</span>
+              </div>
+              <span class="text-[11px] text-slate-400">مستقیم در چت پیست کنید</span>
+            </div>
+            
+            <div id="modalPromptsList" class="space-y-2.5">
+              <!-- کارت‌های پرامپت -->
+            </div>
+          </div>
+
+          <!-- جعبه کلمات محرک (Triggers) -->
+          <div id="modalTriggersBox" class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <div class="w-7 h-7 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0">
+                <i class="iconsax text-base" icon-name="tag-2"></i>
+              </div>
+              <span id="txt-modal-triggers-title">کلمات کلیدی محرک (Triggers)</span>
+            </div>
+            <div id="modalTriggersList" class="flex flex-wrap gap-1.5">
+              <!-- تگ‌های محرک -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================= تب ۳: ابزارها و قابلیت‌ها (Tools & Capabilities) ================= -->
+        <div id="tabContent-tools" class="modal-tab-content hidden space-y-4">
+          
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                <div class="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0">
+                  <i class="iconsax text-base" icon-name="element-4"></i>
+                </div>
+                <span id="txt-modal-tools-title">لیست متدها و ابزارهای فعال</span>
+                <span id="modalToolsCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono-code font-bold">0</span>
+              </div>
+              <!-- سرچ فیلتر بین متدها -->
+              <div class="relative w-64">
+                <input type="text" id="modalToolSearchInput" oninput="filterModalTools()" placeholder="جستجوی ابزار..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 font-mono-code">
+              </div>
+            </div>
+
+            <!-- گرید متدها -->
+            <div id="modalToolsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-96 overflow-y-auto custom-scrollbar p-1">
+              <!-- لیست ابزارها -->
+            </div>
+            <div id="modalNoToolsMessage" class="hidden py-8 text-center text-slate-400 text-xs">
+              این آیتم ابزار MCP مستقلی ندارد یا به صورت پرامپت و مهارت فراخوانی می‌شود.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================= تب ۴: مستندات و فایل‌ها (Documentation & Code) ================= -->
+        <div id="tabContent-docs" class="modal-tab-content hidden flex flex-col h-full space-y-3">
+          
+          <!-- نوار کنترل ادیتور -->
+          <div class="flex items-center justify-between bg-white p-2.5 rounded-2xl border border-slate-200/80 shadow-2xs shrink-0">
             <div class="flex items-center gap-2">
-              <i class="iconsax text-sm text-slate-400" icon-name="document-text"></i>
+              <i class="iconsax text-base text-slate-400" icon-name="document-text"></i>
               <span id="activeFileName" class="text-xs font-mono-code font-bold text-slate-800">SKILL.md</span>
               <span id="activeFileSize" class="text-[10px] font-mono-code text-slate-400"></span>
             </div>
+            
             <div class="flex items-center gap-2">
-              <button id="viewRawBtn" onclick="toggleRawView()" class="text-[11px] font-mono-code text-slate-500 hover:text-slate-900 px-2 py-0.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-                Raw / Markdown
+              <select id="modalFileSelect" onchange="onModalFileSelect(this.value)" class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-slate-700 font-mono-code focus:outline-none">
+                <option value="">انتخاب فایل سورس...</option>
+              </select>
+              <button id="viewRawBtn" onclick="toggleRawView()" class="text-[11px] font-mono-code text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
+                Raw / Rendered
               </button>
             </div>
           </div>
 
-          <!-- محتوای فایل با قابلیت اسکرول و خوانایی حرفه‌ای -->
-          <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
+          <!-- کادر نمایش محتوای فایل -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs flex-1 overflow-y-auto custom-scrollbar p-6 min-h-[380px]">
             <!-- پیش‌نمایش رندر شده با marked.js -->
             <div id="markdownRenderArea" class="prose prose-slate max-w-none text-xs leading-relaxed space-y-3 font-sans">
               <!-- رندر markdown فایل SKILL.md -->
             </div>
-            <!-- متن خام کد -->
-            <pre id="rawContentArea" class="hidden p-4 rounded-2xl bg-slate-900 text-slate-100 font-mono-code text-[11px] overflow-x-auto custom-scrollbar select-all leading-normal whitespace-pre-wrap">
+            <!-- متن خام کد با جهت کاملاً LTR -->
+            <pre id="rawContentArea" dir="ltr" class="hidden p-4 rounded-xl bg-slate-950 text-slate-100 font-mono-code text-[11px] text-left overflow-x-auto custom-scrollbar select-all leading-normal whitespace-pre-wrap">
               <!-- کدهای خام -->
             </pre>
           </div>
 
         </div>
 
+      </div>
+
+      <!-- المان‌های پنهان برای سازگاری کامل کدها بدون ارور -->
+      <div class="hidden">
+        <div id="modalSize"></div>
+        <div id="modalFiles"></div>
+        <div id="modalLines"></div>
+        <div id="modalTokens"></div>
+        <div id="modalFileTree"></div>
+        <div id="modalTriggersSection"></div>
+        <div id="modalTriggersContent"></div>
+        <div id="fileTreeCount"></div>
+        <div id="txt-modal-size"></div>
+        <div id="txt-modal-files"></div>
+        <div id="txt-modal-lines"></div>
+        <div id="txt-modal-tokens"></div>
+        <div id="txt-modal-tree-title"></div>
+        <div id="txt-modal-triggers"></div>
       </div>
 
     </div>
@@ -546,6 +758,12 @@
           }
           if (params.get('view')) {
             setViewMode(params.get('view'));
+          }
+          if (params.get('open')) {
+            openModal(params.get('open'));
+          }
+          if (params.get('modalTab')) {
+            switchModalTab(params.get('modalTab'));
           }
         }
       } catch (e) {
@@ -1077,6 +1295,224 @@
 
     let currentRawContent = '';
     let isRawMode = false;
+    let currentModalPrompts = [];
+
+    function switchModalTab(tabId) {
+      const tabBtns = {
+        overview: document.getElementById('tabBtn-overview'),
+        prompts: document.getElementById('tabBtn-prompts'),
+        tools: document.getElementById('tabBtn-tools'),
+        docs: document.getElementById('tabBtn-docs')
+      };
+      const tabContents = {
+        overview: document.getElementById('tabContent-overview'),
+        prompts: document.getElementById('tabContent-prompts'),
+        tools: document.getElementById('tabContent-tools'),
+        docs: document.getElementById('tabContent-docs')
+      };
+
+      Object.keys(tabBtns).forEach(id => {
+        if (!tabBtns[id] || !tabContents[id]) return;
+        if (id === tabId) {
+          tabBtns[id].classList.add('active', 'bg-white', 'text-slate-900', 'shadow-2xs', 'font-semibold');
+          tabBtns[id].classList.remove('text-slate-600', 'hover:text-slate-900', 'font-medium');
+          tabContents[id].classList.remove('hidden');
+        } else {
+          tabBtns[id].classList.remove('active', 'bg-white', 'text-slate-900', 'shadow-2xs', 'font-semibold');
+          tabBtns[id].classList.add('text-slate-600', 'hover:text-slate-900', 'font-medium');
+          tabContents[id].classList.add('hidden');
+        }
+      });
+    }
+
+    function extractSkillInsights(item) {
+      const desc = (item.description || '').trim();
+      const triggers = item.triggers || [];
+      const isEn = (currentLanguage === 'en');
+      
+      let what = desc;
+      let when = '';
+      
+      // Extract "Use when..." or "Use for..."
+      const useMatch = desc.match(/(Use (?:when|for|this hub|whenever).*?)(?:\.|\n|$)/i);
+      if (useMatch) {
+        when = useMatch[1].trim();
+      }
+      
+      const triggersMatch = desc.match(/Triggers on:?\s*(.*?)(?:\.|\n|$)/i);
+      if (triggersMatch && !when) {
+        when = isEn ? `Triggers when working with: ${triggersMatch[1].trim()}` : `هنگام مواجهه با: ${triggersMatch[1].trim()}`;
+      } else if (!when && triggers.length > 0) {
+        when = isEn ? `When you need: ${triggers.slice(0, 4).join(', ')}` : `هنگامی که نیاز به «${triggers.slice(0, 4).join('، ')}» دارید.`;
+      }
+      
+      if (!when) {
+        when = isEn ? 'Invoke directly via prompt instructions or agent tool calling.' : 'هنگام گفتگو با هوش مصنوعی برای انجام وظایف و تسک‌های تخصصی این ماژول.';
+      }
+      
+      if (useMatch) {
+        what = desc.substring(0, useMatch.index).trim();
+      } else if (triggersMatch) {
+        what = desc.substring(0, triggersMatch.index).trim();
+      }
+      if (!what) what = desc || (isEn ? 'No description registered for this skill.' : 'توضیحی برای این مهارت ثبت نشده است.');
+      
+      return { what, when };
+    }
+
+    function generateSkillPrompts(item) {
+      const isEn = (currentLanguage === 'en');
+      const name = item.name || '';
+      const triggers = item.triggers || [];
+      
+      // Curated prominent skills
+      if (name === 'seo') {
+        return [
+          {
+            title: isEn ? 'Comprehensive SEO Audit' : 'آدیت کامل سئو و بررسی چک‌پوینت‌ها',
+            text: isEn ? 'Run a comprehensive SEO audit and technical review for: [URL]' : 'سئوی تکنیکال، ساختار متاتگ‌ها و خطاهای سئوی این وب‌سایت را تحلیل کن: [URL]'
+          },
+          {
+            title: isEn ? 'Schema.org JSON-LD Generation' : 'تولید استراکچردیتای Schema.org',
+            text: isEn ? 'Generate valid Schema.org JSON-LD structured data for this page: [URL]' : 'استراکچردیتای معتبر Schema.org JSON-LD را بر اساس آخرین مستندات برای صفحه زیر آماده کن: [URL]'
+          },
+          {
+            title: isEn ? 'Core Web Vitals & Speed' : 'بررسی Core Web Vitals و سرعت',
+            text: isEn ? 'Audit Core Web Vitals metrics (LCP, INP, CLS) and page speed for: [URL]' : 'معیارهای Core Web Vitals و سرعت بارگذاری صفحه را برای آدرس زیر تحلیل کن: [URL]'
+          }
+        ];
+      }
+
+      if (name === 'vidiq') {
+        return [
+          {
+            title: isEn ? 'YouTube Channel Analytics' : 'تحلیل ترندها و آمار یوتیوب',
+            text: isEn ? 'Analyze top trends and video metrics for my YouTube channel using VidIQ' : 'با استفاده از ابزارهای VidIQ، آمار عملکرد و ترندهای کانال یوتیوب را تحلیل کن'
+          },
+          {
+            title: isEn ? 'Viral Keywords & High-CTR Titles' : 'کلیدواژه‌ها و عنوان‌های پرکلیک',
+            text: isEn ? 'Find viral keyword opportunities and high-CTR title ideas for topic: [TOPIC]' : 'کلیدواژه‌های پرسرچ و عنوان‌های پرکلیک را برای موضوع [موضوع ویدیو] پیشنهاد بده'
+          }
+        ];
+      }
+
+      if (name === 'last30days') {
+        return [
+          {
+            title: isEn ? 'Research Last 30 Days Discussions' : 'تحلیل گفت‌وگوهای ۳۰ روز گذشته',
+            text: isEn ? 'What are people actually discussing about [TOPIC] in the last 30 days across Reddit, X, and YouTube?' : 'گفت‌وگوها، نظرات و ترندهای واقعی ۳۰ روز اخیر درباره [موضوع] را در ردیت، یوتیوب و وب استخراج کن'
+          }
+        ];
+      }
+
+      if (name === 'humanizer' || name === 'ig-human') {
+        return [
+          {
+            title: isEn ? 'Humanize Robotic Text' : 'طبیعی‌سازی متن و حذف ردپای هوش مصنوعی',
+            text: isEn ? 'Humanize the following text, removing AI cliches and robotic phrasing:\n\n[PASTE TEXT]' : 'متن زیر را طبیعی‌سازی کن و تمام الگوها و کلمات تکراری هوش مصنوعی را حذف کن تا کاملاً انسانی و روان شود:\n\n[متن شما]'
+          }
+        ];
+      }
+
+      if (name.includes('figma')) {
+        return [
+          {
+            title: isEn ? 'Inspect Figma Frame' : 'بررسی و پیاده‌سازی فریم فیگما',
+            text: isEn ? 'Inspect the selected Figma frame and generate pixel-perfect code components' : 'فریم انتخابی در فیگما را بررسی کن و ساختار کامپوننت‌ها و استایل‌ها را استخراج کن'
+          }
+        ];
+      }
+
+      // Dynamic generator
+      const prompts = [];
+      if (triggers.length > 0) {
+        prompts.push({
+          title: isEn ? `Execute ${name}` : `اجرای مهارت ${name}`,
+          text: isEn ? `Use skill "${name}" to perform: [TASK]` : `با استفاده از مهارت ${name}، تسک زیر را انجام بده: [دستور یا تسک شما]`
+        });
+        prompts.push({
+          title: isEn ? `Apply #${triggers[0]}` : `بررسی تخصصی #${triggers[0]}`,
+          text: isEn ? `Apply #${triggers[0]} guidelines to optimize: [TARGET]` : `با دستورالعمل‌های #${triggers[0]}، این مورد را بررسی و بهینه‌سازی کن: [ورودی شما]`
+        });
+      } else {
+        prompts.push({
+          title: isEn ? `Run ${name}` : `فراخوانی مهارت ${name}`,
+          text: isEn ? `Run ${name} on: [TARGET]` : `مهارت ${name} را روی [هدف یا ورودی] اجرا کن`
+        });
+      }
+      return prompts;
+    }
+
+    function copyQuickPrompt() {
+      if (!currentModalPrompts || currentModalPrompts.length === 0) return;
+      const promptText = currentModalPrompts[0].text;
+      const btn = document.getElementById('modalQuickPromptBtn');
+      const txt = document.getElementById('txt-modal-quick-prompt');
+      const origText = txt ? txt.innerText : '';
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        showToast(currentLanguage === 'en' ? 'Quick prompt copied to clipboard!' : 'پرامپت آماده کپی شد! در چت پیست کنید.');
+        if (txt) txt.innerText = currentLanguage === 'en' ? '✓ Copied!' : '✓ کپی شد!';
+        if (btn) btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+        setTimeout(() => {
+          if (txt) txt.innerText = origText;
+          if (btn) btn.classList.remove('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+        }, 2000);
+      });
+    }
+
+    function copyPromptText(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(currentLanguage === 'en' ? 'Prompt copied!' : 'پرامپت کپی شد!');
+        if (btnElement) {
+          const origHtml = btnElement.innerHTML;
+          btnElement.innerHTML = `<i class="iconsax text-xs" icon-name="tick-circle"></i><span>${currentLanguage === 'en' ? 'Copied' : 'کپی شد'}</span>`;
+          btnElement.classList.add('bg-emerald-600', 'text-white');
+          setTimeout(() => {
+            btnElement.innerHTML = origHtml;
+            btnElement.classList.remove('bg-emerald-600', 'text-white');
+          }, 1800);
+        }
+      });
+    }
+
+    function copyText(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(currentLanguage === 'en' ? 'Copied!' : 'کپی شد!');
+        if (btnElement) {
+          btnElement.classList.add('text-emerald-600');
+          setTimeout(() => {
+            btnElement.classList.remove('text-emerald-600');
+          }, 1500);
+        }
+      });
+    }
+
+    function filterModalTools() {
+      const q = (document.getElementById('modalToolSearchInput')?.value || '').trim().toLowerCase();
+      const items = document.querySelectorAll('.modal-tool-item');
+      let visibleCount = 0;
+      items.forEach(el => {
+        const name = (el.getAttribute('data-tool-name') || '').toLowerCase();
+        if (!q || name.includes(q)) {
+          el.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+      const noTools = document.getElementById('modalNoToolsMessage');
+      if (noTools) {
+        if (visibleCount === 0 && currentModalTools.length > 0) {
+          noTools.classList.remove('hidden');
+          noTools.innerText = currentLanguage === 'en' ? 'No matching tools found.' : 'ابزاری با این عنوان یافت نشد.';
+        } else if (currentModalTools.length === 0) {
+          noTools.classList.remove('hidden');
+        } else {
+          noTools.classList.add('hidden');
+        }
+      }
+    }
 
     async function openModal(itemId) {
       if (!rawData) return;
@@ -1086,12 +1522,26 @@
 
       currentModalItem = item;
       const isEn = (currentLanguage === 'en');
+      
+      // 1. Header Information
       document.getElementById('modalTitle').innerText = item.name;
       const displayPlatform = (item.platforms && item.platforms.length > 1) 
         ? item.platforms.join(' + ') 
         : (item.platform || (isEn ? 'General' : 'عمومی'));
       document.getElementById('modalPlatform').innerText = displayPlatform;
       
+      const typeBadge = document.getElementById('modalTypeBadge');
+      if (typeBadge) {
+        const typeLabels = {
+          'Skill': isEn ? 'Custom Skill' : 'مهارت اختصاصی',
+          'MCP Server': isEn ? 'MCP Server' : 'سرور MCP',
+          'Rule': isEn ? 'System Rule' : 'قانون سیستم',
+          'Command': isEn ? 'Slash Command' : 'دستور سریع',
+          'CLI': isEn ? 'Terminal CLI' : 'خط فرمان CLI'
+        };
+        typeBadge.innerText = typeLabels[item.type] || item.type;
+      }
+
       const customBadge = document.getElementById('modalCustomBadge');
       if (item.is_user_created) {
         customBadge.classList.remove('hidden');
@@ -1124,47 +1574,97 @@
         emojiFallback.innerText = item.emoji || '🧩';
       }
 
-      // Metrics
-      document.getElementById('modalSize').innerText = formatFileSize(item.size_kb || 0);
-      document.getElementById('modalFiles').innerText = `${item.file_count || 1}`;
-      document.getElementById('modalLines').innerText = `${(item.line_count || 0).toLocaleString()}`;
-      
+      // Quick summary stats in tab bar
       const tokenVal = item.token_weight ? (item.token_weight >= 1000000 ? `~${(item.token_weight / 1000000).toFixed(1)}M` : (item.token_weight >= 1000 ? `~${Math.round(item.token_weight / 1000)}k` : `~${item.token_weight}`)) : '-';
-      document.getElementById('modalTokens').innerText = tokenVal;
+      const sizeVal = formatFileSize(item.size_kb || 0);
+      document.getElementById('modalTokensQuick').innerText = tokenVal;
+      document.getElementById('modalSizeQuick').innerText = sizeVal;
 
-      // Localize modal headers
-      document.getElementById('txt-modal-size').innerText = isEn ? 'Size' : 'حجم';
-      document.getElementById('txt-modal-files').innerText = isEn ? 'Files' : 'فایل‌ها';
-      document.getElementById('txt-modal-lines').innerText = isEn ? 'Lines' : 'خطوط';
-      document.getElementById('txt-modal-tokens').innerText = isEn ? 'Tokens' : 'توکن';
-      document.getElementById('txt-modal-tree-title').innerText = isEn ? 'Files & Directory Structure' : 'ساختار پوشه‌ها و فایل‌ها';
-      document.getElementById('txt-modal-open-editor').innerText = isEn ? 'Open in Editor' : 'باز کردن در ادیتور';
-      if (document.getElementById('txt-modal-sync-btn')) {
-        document.getElementById('txt-modal-sync-btn').innerText = isEn ? 'Sync to Claude' : 'سینک به Claude';
-      }
-      if (document.getElementById('txt-modal-triggers')) {
-        document.getElementById('txt-modal-triggers').innerText = isEn ? 'Triggers & Keywords' : 'کلمات کلیدی محرک (Triggers)';
+      // Legacy fallback bindings
+      if (document.getElementById('modalSize')) document.getElementById('modalSize').innerText = sizeVal;
+      if (document.getElementById('modalFiles')) document.getElementById('modalFiles').innerText = `${item.file_count || 1}`;
+      if (document.getElementById('modalLines')) document.getElementById('modalLines').innerText = `${(item.line_count || 0).toLocaleString()}`;
+      if (document.getElementById('modalTokens')) document.getElementById('modalTokens').innerText = tokenVal;
+
+      // 2. Tab 1: Overview & Insights
+      const insights = extractSkillInsights(item);
+      document.getElementById('modalWhatItDoes').innerText = insights.what;
+      document.getElementById('modalWhenToUse').innerText = insights.when;
+      document.getElementById('modalSpecScope').innerText = item.scope || (item.is_user_created ? 'User Config' : 'Core System');
+      document.getElementById('modalSpecWeight').innerText = `${tokenVal} tokens`;
+      document.getElementById('modalSpecModified').innerText = item.last_modified ? item.last_modified.split(' ')[0] : '-';
+
+      // 3. Tab 2: Prompts & Triggers
+      currentModalPrompts = generateSkillPrompts(item);
+      const promptsContainer = document.getElementById('modalPromptsList');
+      if (promptsContainer) {
+        promptsContainer.innerHTML = currentModalPrompts.map(p => `
+          <div class="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:border-blue-300 transition-all group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="space-y-1 flex-1">
+              <div class="text-xs font-bold text-slate-800">${escapeHtml(p.title)}</div>
+              <div class="text-[11px] text-slate-600 font-sans leading-relaxed select-all">${escapeHtml(p.text)}</div>
+            </div>
+            <button onclick="copyPromptText('${escapeHtml(p.text).replace(/'/g, "\\'")}', this)" class="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-900 hover:text-white text-slate-700 border border-slate-200 text-xs font-medium transition-all shadow-2xs flex items-center gap-1.5">
+              <i class="iconsax text-sm" icon-name="copy"></i>
+              <span>${isEn ? 'Copy Prompt' : 'کپی پرامپت'}</span>
+            </button>
+          </div>
+        `).join('');
       }
 
-      // Triggers
-      const triggersSection = document.getElementById('modalTriggersSection');
-      const triggersContent = document.getElementById('modalTriggersContent');
+      // Triggers pills
+      const triggersList = document.getElementById('modalTriggersList');
+      const triggersBox = document.getElementById('modalTriggersBox');
       if (item.triggers && item.triggers.length > 0) {
-        triggersSection.classList.remove('hidden');
-        triggersContent.innerHTML = item.triggers.map(t => `
-          <span class="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-mono-code text-[10px]">
-            #${escapeHtml(t)}
-          </span>
+        triggersBox.classList.remove('hidden');
+        triggersList.innerHTML = item.triggers.map(t => `
+          <button onclick="copyText('#${escapeHtml(t)}', this)" class="px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/80 hover:border-blue-200 font-mono-code text-[11px] transition-colors flex items-center gap-1" title="کپی تریگر">
+            <span>#${escapeHtml(t)}</span>
+            <i class="iconsax text-[10px] text-slate-400 opacity-60" icon-name="copy"></i>
+          </button>
         `).join('');
       } else {
-        triggersSection.classList.add('hidden');
+        triggersBox.classList.add('hidden');
       }
 
-      // Reset file preview
+      // 4. Tab 3: Tools & Capabilities
+      currentModalTools = item.tools || [];
+      const toolsGrid = document.getElementById('modalToolsGrid');
+      const toolsCountBadge = document.getElementById('modalToolsCountBadge');
+      const tabToolsBadge = document.getElementById('tabToolsBadge');
+      const noToolsMsg = document.getElementById('modalNoToolsMessage');
+
+      if (currentModalTools.length > 0) {
+        tabToolsBadge.classList.remove('hidden');
+        tabToolsBadge.innerText = currentModalTools.length;
+        toolsCountBadge.innerText = `${currentModalTools.length} ${isEn ? 'methods' : 'ابزار'}`;
+        noToolsMsg.classList.add('hidden');
+        toolsGrid.innerHTML = currentModalTools.map(t => `
+          <div class="modal-tool-item p-2.5 rounded-xl bg-slate-50 hover:bg-white border border-slate-200/70 hover:border-blue-300 flex items-center justify-between group transition-all" data-tool-name="${escapeHtml(t)}">
+            <div class="flex items-center gap-2 truncate">
+              <i class="iconsax text-xs text-emerald-600" icon-name="code"></i>
+              <span dir="ltr" class="font-mono-code text-[11px] text-slate-800 font-medium truncate">${escapeHtml(t)}</span>
+            </div>
+            <button onclick="copyText('${escapeHtml(t)}', this)" class="p-1 rounded-lg text-slate-400 group-hover:text-blue-600 hover:bg-blue-50 transition-colors" title="کپی نام ابزار">
+              <i class="iconsax text-xs" icon-name="copy"></i>
+            </button>
+          </div>
+        `).join('');
+      } else {
+        tabToolsBadge.classList.add('hidden');
+        toolsCountBadge.innerText = '0';
+        toolsGrid.innerHTML = '';
+        noToolsMsg.classList.remove('hidden');
+      }
+
+      // 5. Tab 4: Docs & Code preparation
       document.getElementById('activeFileName').innerText = 'Loading...';
       document.getElementById('activeFileSize').innerText = '';
       document.getElementById('markdownRenderArea').innerHTML = '<div class="py-12 text-center text-slate-400">Loading documentation...</div>';
       document.getElementById('rawContentArea').innerText = '';
+
+      // Reset to overview tab
+      switchModalTab('overview');
 
       document.getElementById('detailModal').classList.remove('hidden');
 
@@ -1173,11 +1673,11 @@
     }
 
     async function loadSkillTreeAndPreview(item) {
-      const treeContainer = document.getElementById('modalFileTree');
+      const fileSelect = document.getElementById('modalFileSelect');
       const itemPath = item.path || '';
 
       if (!itemPath) {
-        treeContainer.innerHTML = '<div class="text-slate-400 text-center py-2 text-[11px]">No path</div>';
+        if (fileSelect) fileSelect.innerHTML = '<option value="">No path</option>';
         renderDirectContent(item.description || 'No description');
         return;
       }
@@ -1186,23 +1686,27 @@
         const res = await fetch(`/api/skill-tree?path=${encodeURIComponent(itemPath)}`);
         const data = await res.json();
         if (data.status === 'ok' && data.tree && data.tree.length > 0) {
-          renderFileTree(data.tree, treeContainer);
-          // Find SKILL.md or primary md file
+          // Populate file select dropdown
+          const allFiles = flattenTreeFiles(data.tree);
+          if (fileSelect) {
+            fileSelect.innerHTML = allFiles.map(f => `
+              <option value="${escapeHtml(f.path)}">${escapeHtml(f.name)} (${f.size_kb ? f.size_kb + ' KB' : ''})</option>
+            `).join('');
+          }
+          
+          // Find SKILL.md or primary md file with ROOT priority
           const skillMd = findPrimaryFile(data.tree);
           if (skillMd) {
+            if (fileSelect) fileSelect.value = skillMd.path;
             loadFileContent(skillMd.path, skillMd.name, skillMd.size_kb);
-          } else {
-            loadFileContent(data.tree[0].path, data.tree[0].name, data.tree[0].size_kb || 0);
+          } else if (allFiles.length > 0) {
+            loadFileContent(allFiles[0].path, allFiles[0].name, allFiles[0].size_kb || 0);
           }
         } else {
-          // If it is a single file
-          treeContainer.innerHTML = `
-            <div onclick="loadFileContent('${escapeHtml(itemPath)}', '${escapeHtml(item.name)}', ${item.size_kb || 0})" 
-                 class="px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center gap-1.5 text-blue-600 font-bold">
-              <i class="iconsax text-sm" icon-name="document"></i>
-              <span>${escapeHtml(item.name)}</span>
-            </div>
-          `;
+          // If single file
+          if (fileSelect) {
+            fileSelect.innerHTML = `<option value="${escapeHtml(itemPath)}">${escapeHtml(item.name)}</option>`;
+          }
           loadFileContent(itemPath, item.name, item.size_kb || 0);
         }
       } catch (err) {
@@ -1210,51 +1714,44 @@
       }
     }
 
-    function renderFileTree(tree, container, depth = 0) {
-      if (depth === 0) container.innerHTML = '';
-      tree.forEach(node => {
-        const nodeElem = document.createElement('div');
-        nodeElem.style.paddingLeft = (currentLanguage === 'en' ? `${depth * 14}px` : '0px');
-        nodeElem.style.paddingRight = (currentLanguage === 'fa' ? `${depth * 14}px` : '0px');
-
-        if (node.type === 'dir') {
-          nodeElem.className = 'py-1 flex items-center gap-1.5 text-slate-700 font-bold text-[11px] select-none';
-          nodeElem.innerHTML = `<i class="iconsax text-xs text-amber-500" icon-name="folder-2"></i><span>${escapeHtml(node.name)}</span>`;
-          container.appendChild(nodeElem);
-          if (node.children && node.children.length > 0) {
-            renderFileTree(node.children, container, depth + 1);
+    function flattenTreeFiles(tree) {
+      const files = [];
+      function recurse(nodes) {
+        for (const node of nodes) {
+          if (node.type === 'file') {
+            files.push(node);
+          } else if (node.type === 'dir' && node.children) {
+            recurse(node.children);
           }
-        } else {
-          const isMd = node.name.toLowerCase().endsWith('.md');
-          const isCode = ['.py', '.js', '.json', '.sh'].some(ext => node.name.toLowerCase().endsWith(ext));
-          const iconColor = isMd ? 'text-blue-500' : (isCode ? 'text-emerald-500' : 'text-slate-400');
-          
-          nodeElem.className = 'py-1 px-1.5 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center justify-between group transition-colors';
-          nodeElem.innerHTML = `
-            <div class="flex items-center gap-1.5 truncate">
-              <i class="iconsax text-xs ${iconColor}" icon-name="document-text"></i>
-              <span class="truncate text-[11px] group-hover:text-blue-600">${escapeHtml(node.name)}</span>
-            </div>
-            <span dir="ltr" class="text-[9px] text-slate-400 font-mono-code">${node.size_kb ? formatFileSize(node.size_kb) : ''}</span>
-          `;
-          nodeElem.onclick = () => loadFileContent(node.path, node.name, node.size_kb);
-          container.appendChild(nodeElem);
         }
-      });
+      }
+      recurse(tree);
+      return files;
     }
 
     function findPrimaryFile(tree) {
+      // 1. Search root level files first
       for (const node of tree) {
         if (node.type === 'file' && node.name.toLowerCase() === 'skill.md') return node;
+      }
+      for (const node of tree) {
+        if (node.type === 'file' && node.name.toLowerCase().endsWith('.md')) return node;
+      }
+      // 2. Search children recursively
+      for (const node of tree) {
         if (node.type === 'dir' && node.children) {
           const found = findPrimaryFile(node.children);
           if (found) return found;
         }
       }
-      for (const node of tree) {
-        if (node.type === 'file' && node.name.toLowerCase().endsWith('.md')) return node;
-      }
       return null;
+    }
+
+    function onModalFileSelect(filePath) {
+      if (!filePath) return;
+      const fileSelect = document.getElementById('modalFileSelect');
+      const fileName = fileSelect.options[fileSelect.selectedIndex].text.split(' (')[0];
+      loadFileContent(filePath, fileName, null);
     }
 
     async function loadFileContent(filePath, fileName, sizeKb) {
@@ -1327,7 +1824,7 @@
     function copyPath() {
       if (currentModalPath) {
         navigator.clipboard.writeText(currentModalPath).then(() => {
-          showToast('مسیر کپی شد.');
+          showToast(currentLanguage === 'en' ? 'Path copied to clipboard.' : 'مسیر در کلیپ‌بورد کپی شد.');
         });
       }
     }
@@ -1342,7 +1839,7 @@
         });
         const data = await res.json();
         if (data.status === 'ok') {
-          showToast('در ادیتور باز شد!');
+          showToast(currentLanguage === 'en' ? 'Opened in code editor!' : 'در ادیتور باز شد!');
         } else {
           showToast(`خطا: ${data.message || 'نامشخص'}`);
         }
@@ -1767,6 +2264,20 @@
       // Translate modal elements
       setTxt('txt-modal-tokens', t.modalTokens);
       setTxt('txt-modal-sync-btn', t.modalSyncBtn);
+      setTxt('txt-tab-overview', lang === 'en' ? 'Overview' : 'درک کارکرد');
+      setTxt('txt-tab-prompts', lang === 'en' ? 'Prompts & Triggers' : 'اجرا و پرامپت');
+      setTxt('txt-tab-tools', lang === 'en' ? 'Tools & Methods' : 'ابزارها و متدها');
+      setTxt('txt-tab-docs', lang === 'en' ? 'Docs & Code' : 'مستندات و کد');
+      setTxt('txt-modal-quick-prompt', lang === 'en' ? 'Quick Prompt' : 'کپی پرامپت سریع');
+      setTxt('txt-modal-open-editor', lang === 'en' ? 'Editor' : 'ادیتور');
+      setTxt('txt-modal-what-title', lang === 'en' ? 'What does it do?' : 'چه کاری انجام می‌دهد؟');
+      setTxt('txt-modal-when-title', lang === 'en' ? 'When to use?' : 'چه زمانی استفاده کنیم؟');
+      setTxt('txt-modal-spec-scope', lang === 'en' ? 'Scope' : 'محیط اجرا');
+      setTxt('txt-modal-spec-weight', lang === 'en' ? 'Context Weight' : 'بار روی کانتکست');
+      setTxt('txt-modal-spec-modified', lang === 'en' ? 'Last Modified' : 'آخرین بروزرسانی');
+      setTxt('txt-modal-ready-prompts', lang === 'en' ? 'Ready-to-Use Prompts (1-Click Copy)' : 'پرامپت‌های آماده برای چت (با ۱-کلیک کپی کنید)');
+      setTxt('txt-modal-triggers-title', lang === 'en' ? 'Trigger Keywords' : 'کلمات کلیدی محرک (Triggers)');
+      setTxt('txt-modal-tools-title', lang === 'en' ? 'Active Methods & Tools' : 'لیست متدها و ابزارهای فعال');
 
       // Translate Add Skill button & modal elements
       setTxt('txt-btn-add-skill', t.btnAddSkill);
@@ -2050,6 +2561,9 @@ Optimize content structure and citation readiness for AI Overviews and answer en
       }
       if (params.get('open')) {
         setTimeout(() => openModal(params.get('open')), 600);
+      }
+      if (params.get('modalTab')) {
+        setTimeout(() => switchModalTab(params.get('modalTab')), 800);
       }
       if (params.get('add')) {
         setTimeout(() => openAddSkillModal(), 500);
