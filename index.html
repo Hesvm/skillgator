@@ -319,7 +319,7 @@
   <main class="flex-1 h-full floating-frame flex flex-col overflow-hidden relative z-10 transition-all duration-300">
     
     <!-- نوار بالای فریم اصلی (فقط کنترل‌های مرتب‌سازی، تغییر نما و خروجی) -->
-    <header class="px-5 py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-xs">
+    <header class="px-5 py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-xs relative z-30">
       
       <!-- سمت راست هدر: سوئیچ نما و فیلتر مرتب‌سازی -->
       <div class="flex items-center gap-2">
@@ -335,14 +335,21 @@
           </button>
         </div>
 
-        <!-- فیلتر مرتب‌سازی ساده و مینیمال -->
-        <select id="sortOrder" onchange="renderItems()" class="bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200/60 text-slate-600 text-xs rounded-xl px-2.5 py-1.5 font-medium focus:outline-none focus:border-slate-300 cursor-pointer transition-colors">
-          <option value="richness" selected>غنی‌تر / محبوب‌تر</option>
-          <option value="tokens">وزن توکن</option>
-          <option value="files">تعداد فایل</option>
-          <option value="recent">آخرین تغییرات</option>
-          <option value="name">حروف الفبا</option>
-        </select>
+        <!-- فیلتر مرتب‌سازی اختصاصی و مینیمال (Custom Dropdown) -->
+        <div id="sortDropdownWrapper" class="relative">
+          <input type="hidden" id="sortOrder" value="richness">
+          <button type="button" id="sortDropdownBtn" onclick="toggleSortDropdown(event)"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50/90 border border-slate-200/75 hover:border-slate-300/80 text-slate-700 text-xs font-medium shadow-2xs transition-all cursor-pointer select-none">
+            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
+            <span id="sortDropdownLabel" class="font-semibold text-slate-700 whitespace-nowrap">غنی‌تر / محبوب‌تر</span>
+            <svg id="sortDropdownChevron" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-150 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          <!-- منوی شناور مرتب‌سازی -->
+          <div id="sortDropdownMenu" class="hidden absolute top-full mt-2 start-0 w-52 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-900/10 p-1.5 z-50 space-y-0.5">
+            <!-- گزینه‌ها به صورت داینامیک رندر می‌شوند -->
+          </div>
+        </div>
       </div>
 
       <!-- سمت چپ هدر: دکمه افزودن مهارت جدید و نشانگر وضعیت بار توکن -->
@@ -2265,12 +2272,108 @@
         .replace(/'/g, '&#039;');
     }
 
+    // Custom Sort Dropdown Logic
+    const SORT_OPTIONS_META = [
+      {
+        value: 'richness',
+        key: 'sortRichness',
+        icon: '<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+      },
+      {
+        value: 'tokens',
+        key: 'sortTokens',
+        icon: '<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
+      },
+      {
+        value: 'files',
+        key: 'sortFiles',
+        icon: '<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
+      },
+      {
+        value: 'recent',
+        key: 'sortRecent',
+        icon: '<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+      },
+      {
+        value: 'name',
+        key: 'sortName',
+        icon: '<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="m3 17 3 3 3-3"/><path d="M6 18V4"/></svg>'
+      }
+    ];
+
+    function renderSortDropdownOptions() {
+      const menu = document.getElementById('sortDropdownMenu');
+      const hiddenInput = document.getElementById('sortOrder');
+      const labelEl = document.getElementById('sortDropdownLabel');
+      if (!menu || !hiddenInput) return;
+
+      const t = translations[currentLanguage] || translations.fa;
+      const currentVal = hiddenInput.value || 'richness';
+
+      menu.innerHTML = SORT_OPTIONS_META.map(opt => {
+        const isActive = (opt.value === currentVal);
+        const label = t[opt.key] || opt.value;
+        if (isActive && labelEl) labelEl.innerText = label;
+
+        return `
+          <button type="button" onclick="selectSortOption('${opt.value}')"
+                  class="w-full px-2.5 py-2 rounded-xl text-xs flex items-center justify-between gap-2 transition-colors cursor-pointer ${
+                    isActive
+                      ? 'bg-slate-100/90 text-slate-900 font-semibold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
+                  }">
+            <span class="flex items-center gap-2 truncate">
+              <span class="${isActive ? 'text-slate-900' : 'text-slate-400'}">${opt.icon}</span>
+              <span class="truncate">${label}</span>
+            </span>
+            ${isActive ? '<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleSortDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('sortDropdownMenu');
+      const btn = document.getElementById('sortDropdownBtn');
+      const chevron = document.getElementById('sortDropdownChevron');
+      if (!menu) return;
+
+      const willOpen = menu.classList.contains('hidden');
+      if (willOpen) {
+        renderSortDropdownOptions();
+        menu.classList.remove('hidden');
+        if (btn) btn.classList.add('ring-2', 'ring-slate-200/70', 'border-slate-300');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+      } else {
+        closeSortDropdown();
+      }
+    }
+
+    function closeSortDropdown() {
+      const menu = document.getElementById('sortDropdownMenu');
+      const btn = document.getElementById('sortDropdownBtn');
+      const chevron = document.getElementById('sortDropdownChevron');
+      if (menu) menu.classList.add('hidden');
+      if (btn) btn.classList.remove('ring-2', 'ring-slate-200/70', 'border-slate-300');
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+
+    function selectSortOption(val) {
+      const hiddenInput = document.getElementById('sortOrder');
+      if (hiddenInput) hiddenInput.value = val;
+      renderSortDropdownOptions();
+      closeSortDropdown();
+      renderItems();
+    }
+
     // Global Keybindings (Cmd+K, Ctrl+K, Escape)
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         openCommandPalette();
       } else if (e.key === 'Escape') {
+        closeSortDropdown();
         closeCommandPalette();
         closePromptSimulator();
         closeModal();
@@ -2281,6 +2384,8 @@
     });
 
     window.onclick = function(event) {
+      const sortWrap = document.getElementById('sortDropdownWrapper');
+      if (sortWrap && !sortWrap.contains(event.target)) closeSortDropdown();
       if (event.target === document.getElementById('detailModal')) closeModal();
       if (event.target === document.getElementById('settingsModal')) closeSettingsModal();
       if (event.target === document.getElementById('cmdPaletteModal')) closeCommandPalette();
@@ -2535,14 +2640,9 @@
       // Translate empty state
       setTxt('txt-empty-state', t.emptyText);
 
-      // Translate sort order options
-      const sortSelect = document.getElementById('sortOrder');
-      if (sortSelect && sortSelect.options.length >= 5) {
-        sortSelect.options[0].text = t.sortRichness;
-        sortSelect.options[1].text = t.sortTokens;
-        sortSelect.options[2].text = t.sortFiles;
-        sortSelect.options[3].text = t.sortRecent;
-        sortSelect.options[4].text = t.sortName;
+      // Translate custom sort order dropdown
+      if (typeof renderSortDropdownOptions === 'function') {
+        renderSortDropdownOptions();
       }
 
       // Translate view buttons
