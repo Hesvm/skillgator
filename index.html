@@ -177,14 +177,6 @@
             <span id="count-all" class="font-mono-code text-[11px] opacity-75">0</span>
           </button>
 
-          <button onclick="setTab('creator-os')" id="tab-creator-os" 
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
-            <div class="flex items-center gap-2.5">
-              <i class="iconsax text-base text-amber-500" icon-name="crown-1"></i>
-              <span id="txt-tab-creator-os">کریتور او‌اس (Creator OS)</span>
-            </div>
-            <span id="count-creator-os" class="font-mono-code text-[11px] opacity-75">0</span>
-          </button>
 
           <button onclick="setTab('user-custom')" id="tab-user-custom" 
                   class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50">
@@ -649,7 +641,8 @@
       if (totalBadge) totalBadge.innerText = (currentLanguage === 'en') ? `${all.length} items` : `${all.length} مورد`;
 
       document.getElementById('count-all').innerText = all.length;
-      document.getElementById('count-creator-os').innerText = creatorOsCount;
+      const countCreatorOsEl = document.getElementById('count-creator-os');
+      if (countCreatorOsEl) countCreatorOsEl.innerText = creatorOsCount;
       document.getElementById('count-user-custom').innerText = userCustomCount;
       document.getElementById('count-antigravity').innerText = agyCount;
       document.getElementById('count-claude').innerText = claudeCount;
@@ -732,7 +725,7 @@
 
     function setTab(tab) {
       currentTab = tab;
-      const tabs = ['all', 'creator-os', 'user-custom', 'antigravity', 'claude', 'mcp', 'clis', 'conflicts'];
+      const tabs = ['all', 'user-custom', 'antigravity', 'claude', 'mcp', 'clis', 'conflicts'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (!btn) return;
@@ -968,9 +961,7 @@
         
         // Option 1: Clean, consistent Item Type Badge (Linear / Raycast style)
         let singleBadge = '';
-        if (isCreatorOs) {
-          singleBadge = `<span class="text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">👑 Creator OS</span>`;
-        } else if (item.type === 'MCP Server') {
+        if (item.type === 'MCP Server') {
           const mcpLabel = isEn ? 'MCP Server' : 'سرور MCP';
           singleBadge = `<span class="text-[10px] font-mono-code text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/60">${mcpLabel}</span>`;
         } else if (item.type === 'Rule') {

@@ -730,57 +730,7 @@ def find_creator_os_dir():
     return candidates[0]
 
 def scan_creator_os():
-    """Scans and integrates the local Creator OS installation into the dashboard."""
-    creator_os_path = find_creator_os_dir()
-    items = []
-    if creator_os_path.exists():
-        stats = calculate_folder_stats(creator_os_path)
-        items.append({
-            "id": "creator-os-core",
-            "name": "Creator OS (Master Suite)",
-            "platform": "Creator OS",
-            "type": "Suite",
-            "origin": "user",
-            "is_user_created": True,
-            "suite": "Creator OS",
-            "emoji": "👑",
-            "icon": "crown-1",
-            "color": "text-amber-600 bg-amber-50 border-amber-300",
-            "description": "سیستم جامع و بومی مهندسی محتوا برای حسام طاهری شامل ۱۴ اسکیل اختصاصی، پایگاه دانش (Knowledge Dossiers)، دیتابیس هوک‌ها، و اسکریپت‌های اتوماسیون.",
-            "path": str(creator_os_path),
-            "last_modified": get_file_time(creator_os_path),
-            "size_kb": stats["size_kb"],
-            "file_count": stats["file_count"],
-            "line_count": stats["line_count"],
-            "richness_score": stats["richness_score"] + 1000000
-        })
-
-        # Scan sub-modules of Creator OS
-        sub_dirs = ["knowledge", "research", "evaluations", "schemas", "scripts", "templates", "docs"]
-        for sub in sub_dirs:
-            sp = creator_os_path / sub
-            if sp.exists():
-                sstats = calculate_folder_stats(sp)
-                items.append({
-                    "id": f"creator-os-{sub}",
-                    "name": f"Creator OS / {sub.capitalize()}",
-                    "platform": "Creator OS",
-                    "type": "Module",
-                    "origin": "user",
-                    "is_user_created": True,
-                    "suite": "Creator OS",
-                    "emoji": "📂",
-                    "icon": "folder-favorite",
-                    "color": "text-amber-600 bg-amber-50 border-amber-200",
-                    "description": f"ماژول اختصاصی {sub.capitalize()} در سیستم Creator OS شامل فایل‌های مرجع، تمپلیت‌ها و کدهای اعتبارسنجی.",
-                    "path": str(sp),
-                    "last_modified": get_file_time(sp),
-                    "size_kb": sstats["size_kb"],
-                    "file_count": sstats["file_count"],
-                    "line_count": sstats["line_count"],
-                    "richness_score": sstats["richness_score"]
-                })
-    return items
+    return []
 
 def scan_clis():
     clis = []
@@ -1034,17 +984,7 @@ def get_complete_ecosystem():
     clis = scan_clis()
     cursor_windsurf_items = scan_cursor_windsurf()
 
-    # Mark skills that belong to Creator OS Suite
-    creator_os_prefixes = ["01-", "02-", "03-", "04-", "05-", "06-", "07-", "08-", "09-", "10-", "11-", "12-", "13-", "14-", "15-"]
-    for s in agy_skills:
-        if any(s["name"].startswith(p) for p in creator_os_prefixes):
-            s["suite"] = "Creator OS"
-    
-    for s in claude_skills:
-        if any(s["name"].startswith(p) for p in creator_os_prefixes):
-            s["suite"] = "Creator OS"
-
-    creator_os_items = scan_creator_os()
+    creator_os_items = []
 
     # Parity Matrix
     agy_skill_names = {s["name"].lower() for s in agy_skills}
